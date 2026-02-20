@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新NISA積立シミュレーター</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #e8f5f1;
+    --card: #ffffff;
+    --mint: #a8d5ba;
+    --green: #4a8c6f;
+    --text: #44504c;
+    --muted: #8fada3;
+    --muted-light: #ccd6d1;
+    --label-color: #5a7a70;
+    --slider-track: 10px;
+    --thumb-size: 28px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Roboto', 'ヒラギノ角ゴ Pro', 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
+    min-height: 100vh;
+    padding: 32px 20px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  header { margin-bottom: 28px; }
+  header h1 { font-size: 1.7rem; font-weight: 700; color: var(--green); letter-spacing: 0.02em; margin-bottom: 5px; }
+  header p { font-size: 0.88rem; color: var(--muted); }
+
+  .card { background: var(--card); border-radius: 22px; padding: 28px 26px; box-shadow: 0 4px 28px rgba(74,140,111,0.09); margin-bottom: 18px; }
+  .card-label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mint); margin-bottom: 20px; }
+
+  /* ===== INPUT ROWS ===== */
+  .input-rows { display: flex; flex-direction: column; gap: 22px; }
+
+  /* All irows use same 2-col layout */
+  .irow {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    align-items: center;
+    gap: 16px;
+  }
+  @media(max-width:560px){
+    .irow { grid-template-columns: 1fr; gap: 8px; }
+  }
+
+  .irow-label { display: flex; flex-direction: column; gap: 3px; }
+  .irow-label .lname { font-size: 1.05rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .irow-label .ldesc { font-size: 0.75rem; color: var(--muted); line-height: 1.4; }
+
+  .irow-right { display: flex; flex-direction: column; gap: 8px; }
+
+  /* value row */
+  .val-row { display: flex; align-items: baseline; gap: 6px; }
+  .num-edit {
+    font-size: 2rem; font-weight: 700; color: var(--text);
+    font-family: 'Roboto', sans-serif;
+    border: none; border-bottom: 2.5px solid var(--mint); outline: none;
+    background: transparent; width: 110px;
+    -moz-appearance: textfield;
+    padding: 0 3px 2px;
+    transition: border-color .2s;
+    line-height: 1.1;
+  }
+  .num-edit:focus { border-bottom-color: var(--green); }
+  .num-edit::-webkit-outer-spin-button,
+  .num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .val-unit { font-size: 1rem; color: var(--muted); font-weight: 500; }
+
+  /* DOB: 入力欄と同サイズ・太さ。プルダウン自体のフォントは2段階小さく（OSドロップダウン内）*/
+  .dob-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .dob-row select {
+    /* 表示値は num-edit に合わせて 2rem 700 */
+    font-size: 2rem; font-weight: 700; color: var(--text);
+    font-family: 'Roboto', 'ヒラギノ角ゴ Pro', sans-serif;
+    border: none; border-bottom: 2.5px solid var(--mint);
+    background: transparent; outline: none; cursor: pointer;
+    padding: 0 4px 2px;
+    -webkit-appearance: none; appearance: none;
+    transition: border-color .2s;
+    line-height: 1.1;
+    /* option内のフォントを2段階下げる（Chrome/Edgeで有効） */
+    option { font-size: 0.85rem; font-weight: 400; }
+  }
+  .dob-row select:focus { border-bottom-color: var(--green); }
+  .dob-unit { font-size: 1rem; color: var(--muted); font-weight: 500; }
+  .age-display { font-size: 0.88rem; color: var(--label-color); font-weight: 500; margin-left: 6px; white-space: nowrap; }
+
+  /* ===== SLIDER ROW — aligned across all rows ===== */
+  /*
+    Layout:  [－btn][range][＋btn]
+    The range-wrap uses flex:1 so all sliders get identical track width.
+    We enforce min-width:0 on range-wrap so flex shrinks properly.
+  */
+  .slider-row {
+    display: flex; align-items: center; gap: 12px;
+    /* Make slider area fill the full irow-right width */
+    width: 100%;
+  }
+  .pm-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    border: none; cursor: pointer; font-size: 1.3rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; line-height: 1;
+    box-shadow: 0 2px 8px rgba(74,140,111,0.3);
+    transition: background .15s, transform .1s;
+    user-select: none;
+  }
+  .pm-btn:hover { background: #3a7a5f; }
+  .pm-btn:active { transform: scale(0.92); }
+
+  /* range-wrap always takes remaining space equally */
+  .range-wrap { flex: 1; min-width: 0; }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: var(--slider-track);
+    background: linear-gradient(
+      to right,
+      var(--green) 0%, var(--green) var(--pct, 0%),
+      var(--muted-light) var(--pct, 0%), var(--muted-light) 100%
+    );
+    border-radius: 99px; outline: none; cursor: pointer;
+    display: block;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: var(--thumb-size); height: var(--thumb-size); border-radius: 50%;
+    background: var(--green); border: 3px solid #fff;
+    box-shadow: 0 2px 10px rgba(74,140,111,0.45);
+    transition: transform .15s; cursor: grab;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+  input[type="range"]::-moz-range-thumb {
+    width: var(--thumb-size); height: var(--thumb-size); border-radius: 50%;
+    background: var(--green); border: 3px solid #fff;
+    box-shadow: 0 2px 10px rgba(74,140,111,0.45); cursor: grab;
+  }
+
+  .irow-divider { border: none; border-top: 1.5px solid var(--bg); }
+
+  /* ===== OPTIONAL SECTION ===== */
+  /* Extend dashed border to full card width, inner content aligns with outer irows */
+  .optional-section {
+    border: 1.5px dashed var(--muted-light);
+    border-radius: 16px;
+    margin-left: -26px;
+    margin-right: -26px;
+    padding: 16px 26px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .optional-header { display: flex; align-items: flex-start; gap: 10px; }
+  .optional-badge {
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
+    background: var(--mint); color: var(--green);
+    border-radius: 99px; padding: 3px 10px;
+    white-space: nowrap; flex-shrink: 0; margin-top: 1px;
+  }
+  .optional-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  /* ===== SUMMARY ===== */
+  .summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 22px; }
+  @media(max-width:460px){ .summary { grid-template-columns: 1fr 1fr; } }
+  .sitem { background: var(--bg); border-radius: 16px; padding: 20px 14px 18px; text-align: center; }
+
+  /* 項目名: 2回り大きく → 1rem */
+  .sitem .sl { font-size: 1rem; color: var(--label-color); font-weight: 600; margin-bottom: 10px; }
+
+  /* 数字: ウェイト1段階下げ (900→700) */
+  .sitem .sv { font-family: 'Roboto', sans-serif; line-height: 1.1; }
+  .sv-num { font-size: 2rem; font-weight: 700; color: var(--green); }
+  /* 万円: sv-numよりやや小さく、同ウェイト */
+  .sv-man { font-size: 1.1rem; font-weight: 700; color: var(--green); margin-left: 3px; }
+
+  /* 65歳時の資産(◯年後): 一回り大きく */
+  .sitem .sv-sub { font-size: 0.92rem; color: var(--label-color); font-weight: 600; margin-top: 8px; }
+
+  /* 新NISA枠使い切り: 数字部分は sv-num と同サイズ・ウェイト、日本語は sv-man と同サイズ・ウェイト */
+  .nisa-done-num  { font-size: 2rem;  font-weight: 700; color: var(--green); font-family: 'Roboto', sans-serif; }
+  .nisa-done-unit { font-size: 0.95rem; font-weight: 700; color: var(--green); margin-left: 1px; margin-right: 2px; font-family: 'Roboto', 'ヒラギノ角ゴ Pro', sans-serif; vertical-align: middle; }
+  /* detail line(歳・ヶ月): sv-sub と同サイズ */
+  .nisa-done-detail { font-size: 0.92rem; color: var(--label-color); font-weight: 600; margin-top: 8px; }
+
+  /* ===== CHART ===== */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; }
+  .li { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; color: var(--text); }
+  .ld { width: 13px; height: 13px; border-radius: 3px; }
+  .chart-wrap { width: 100%; overflow-x: hidden; }
+  canvas { display: block; cursor: default; }
+  .note { font-size: 0.72rem; color: var(--muted); text-align: right; margin-top: 8px; }
+
+  /* ===== TOOLTIP ===== */
+  #tooltip {
+    position: fixed; background: #2c3a35; color: #fff; border-radius: 14px;
+    padding: 13px 16px; font-size: 0.84rem; pointer-events: none; opacity: 0;
+    transition: opacity .15s; z-index: 200; min-width: 225px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22); line-height: 1.9;
+  }
+  #tooltip.show { opacity: 1; }
+  #tooltip .ty { font-size: 0.96rem; font-weight: 700; color: var(--mint); margin-bottom: 3px; }
+  #tooltip .ttotal { font-size: 1.08rem; font-weight: 700; margin-bottom: 2px; }
+  #tooltip .tr { display: flex; align-items: center; gap: 7px; }
+  #tooltip .td { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  #tooltip .tsep { border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0; }
+
+  /* ===== DISCLAIMER ===== */
+  .disclaimer {
+    margin-top: 10px; padding: 14px 18px;
+    background: rgba(255,255,255,0.6); border-radius: 14px;
+    font-size: 0.65rem; color: var(--muted); line-height: 1.7;
+  }
+  .disclaimer p + p { margin-top: 5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 新NISA積立シミュレーター</h1>
+  <p>新NISA総枠 1,800万円を考慮した長期運用シミュレーション</p>
+</header>
+
+<div class="card">
+  <div class="card-label">入力条件</div>
+  <div class="input-rows">
+
+    <!-- 生年月日 (スライダーなし → slider-row は空でよい) -->
+    <div class="irow">
+      <div class="irow-label">
+        <span class="lname">生年月日</span>
+        <span class="ldesc">年・月を選択</span>
+      </div>
+      <div class="irow-right">
+        <div class="dob-row">
+          <select id="dobYear"></select><span class="dob-unit">年</span>
+          <select id="dobMonth"></select><span class="dob-unit">月</span>
+          <span class="age-display" id="ageDisplay"></span>
+        </div>
+        <!-- 空のスペーサー：他行のスライダーと高さをそろえるため -->
+        <div style="height:34px"></div>
+      </div>
+    </div>
+
+    <hr class="irow-divider">
+
+    <!-- 毎月の積立額 -->
+    <div class="irow">
+      <div class="irow-label">
+        <span class="lname">毎月の積立額</span>
+      </div>
+      <div class="irow-right">
+        <div class="val-row">
+          <input class="num-edit" type="number" id="inMonthly" min="0" max="30" step="0.1" value="5">
+          <span class="val-unit">万円</span>
+        </div>
+        <div class="slider-row">
+          <button class="pm-btn" data-target="slMonthly" data-step="-0.1">－</button>
+          <div class="range-wrap"><input type="range" id="slMonthly" min="0" max="30" step="0.1" value="5"></div>
+          <button class="pm-btn" data-target="slMonthly" data-step="0.1">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="irow-divider">
+
+    <!-- 利回り -->
+    <div class="irow">
+      <div class="irow-label">
+        <span class="lname">想定利回り（年率）</span>
+      </div>
+      <div class="irow-right">
+        <div class="val-row">
+          <input class="num-edit" type="number" id="inRate" min="0" max="10" step="0.1" value="5">
+          <span class="val-unit">%</span>
+        </div>
+        <div class="slider-row">
+          <button class="pm-btn" data-target="slRate" data-step="-0.1">－</button>
+          <div class="range-wrap"><input type="range" id="slRate" min="0" max="10" step="0.1" value="5"></div>
+          <button class="pm-btn" data-target="slRate" data-step="0.1">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="irow-divider">
+
+    <!-- 任意入力セクション -->
+    <div class="optional-section">
+      <div class="optional-header">
+        <span class="optional-badge">任意入力</span>
+        <span class="optional-desc">すでに新NISAで投資している方のみ入力してください。<br>まだ投資していない方は 0 のままでOKです。</span>
+      </div>
+
+      <!-- 新NISA投資累計額 -->
+      <div class="irow">
+        <div class="irow-label">
+          <span class="lname">新NISA投資累計額</span>
+          <span class="ldesc">これまでに新NISAへ投資した合計額</span>
+        </div>
+        <div class="irow-right">
+          <div class="val-row">
+            <input class="num-edit" type="number" id="inContrib" min="0" max="1800" step="1" value="0">
+            <span class="val-unit">万円</span>
+          </div>
+          <div class="slider-row">
+            <button class="pm-btn" data-target="slContrib" data-step="-1">－</button>
+            <div class="range-wrap"><input type="range" id="slContrib" min="0" max="1800" step="1" value="0"></div>
+            <button class="pm-btn" data-target="slContrib" data-step="1">＋</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 現在の評価額 -->
+      <div class="irow">
+        <div class="irow-label">
+          <span class="lname">現在の評価額</span>
+          <span class="ldesc">現在の新NISAの時価評価額</span>
+        </div>
+        <div class="irow-right">
+          <div class="val-row">
+            <input class="num-edit" type="number" id="inEval" min="0" max="9999" step="1" value="0">
+            <span class="val-unit">万円</span>
+          </div>
+          <div class="slider-row">
+            <button class="pm-btn" data-target="slEval" data-step="-10">－</button>
+            <div class="range-wrap"><input type="range" id="slEval" min="0" max="3600" step="1" value="0"></div>
+            <button class="pm-btn" data-target="slEval" data-step="10">＋</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /optional-section -->
+  </div>
+</div>
+
+<div class="card" id="resultCard">
+  <div class="card-label">シミュレーション結果</div>
+  <div class="summary" id="summary"></div>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:#a8d5ba"></div>元本</div>
+    <div class="li"><div class="ld" style="background:#4a8c6f"></div>運用収益</div>
+  </div>
+  <div class="chart-wrap">
+    <canvas id="chart"></canvas>
+  </div>
+  <div class="note">※ 新NISA枠（1,800万円）到達後は新規積立停止・運用のみ継続</div>
+</div>
+
+<div class="disclaimer">
+  <p>【免責事項】本シミュレーターは、一定の前提条件のもとで試算した参考値であり、将来の運用成果を保証するものではありません。実際の投資においては、元本割れのリスクを含む様々なリスクが存在します。</p>
+  <p>表示される数値は税金・手数料等を考慮していません。新NISAの制度内容は今後変更される可能性があります。投資判断はご自身の責任において行ってください。具体的な投資については、金融機関や専門家にご相談ください。</p>
+  <p>本シミュレーターの情報の正確性・完全性について、一切の保証を行いません。</p>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+const NISA_MAX = 18_000_000;
+let bars = [];
+let hoveredIdx = -1;
+let nisaFullInfo = null;
+
+function fmtYenParts(n) {
+  n = Math.round(n);
+  if (n >= 100_000_000) {
+    const oku = Math.floor(n / 100_000_000);
+    const man = Math.round((n % 100_000_000) / 10_000);
+    if (man === 0) return { num: oku.toLocaleString('ja-JP'), unit: '億円' };
+    return { num: oku.toLocaleString('ja-JP') + '億' + man.toLocaleString('ja-JP'), unit: '万円' };
+  }
+  return { num: Math.round(n / 10_000).toLocaleString('ja-JP'), unit: '万円' };
+}
+function fmtYen(n) { const { num, unit } = fmtYenParts(n); return num + unit; }
+function fmtAxisMan(n) {
+  if (n >= 100_000_000) return (n / 100_000_000).toFixed(1).replace(/\.0$/, '') + '億';
+  return Math.round(n / 10_000).toLocaleString('ja-JP') + '万';
+}
+function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+
+// ---- DOB ----
+const now = new Date();
+const currentYear  = now.getFullYear();
+const currentMonth = now.getMonth() + 1;
+
+const dobYearSel  = document.getElementById('dobYear');
+const dobMonthSel = document.getElementById('dobMonth');
+
+for (let y = currentYear - 18; y >= 1940; y--) {
+  const o = document.createElement('option');
+  o.value = y; o.textContent = y;
+  dobYearSel.appendChild(o);
+}
+dobYearSel.value = currentYear - 40;
+
+for (let m = 1; m <= 12; m++) {
+  const o = document.createElement('option');
+  o.value = m; o.textContent = m;
+  dobMonthSel.appendChild(o);
+}
+dobMonthSel.value = currentMonth;
+
+function getAgeFromDOB() {
+  const by = parseInt(dobYearSel.value);
+  const bm = parseInt(dobMonthSel.value);
+  let ageMonths = (currentYear - by) * 12 + (currentMonth - bm);
+  if (ageMonths < 0) ageMonths = 0;
+  return { ageYears: clamp(Math.floor(ageMonths / 12), 18, 64), ageMon: ageMonths % 12 };
+}
+
+function updateAgeDisplay() {
+  const { ageYears, ageMon } = getAgeFromDOB();
+  document.getElementById('ageDisplay').textContent =
+    `（現在 ${ageYears}歳${ageMon > 0 ? ageMon + 'ヶ月' : ''}）`;
+}
+
+dobYearSel.addEventListener('change',  () => { updateAgeDisplay(); simulate(); });
+dobMonthSel.addEventListener('change', () => { updateAgeDisplay(); simulate(); });
+updateAgeDisplay();
+
+// ---- Slider sync ----
+function updateSliderBg(sl) {
+  const pct = clamp(((parseFloat(sl.value) - parseFloat(sl.min)) / (parseFloat(sl.max) - parseFloat(sl.min))) * 100, 0, 100);
+  sl.style.setProperty('--pct', pct + '%');
+}
+
+function linkInputs(numId, slId, slMin, slMax, step) {
+  const num = document.getElementById(numId);
+  const sl  = document.getElementById(slId);
+  num.addEventListener('input', () => {
+    let v = parseFloat(num.value);
+    if (isNaN(v)) { simulate(); return; }
+    sl.value = clamp(v, slMin, slMax);
+    updateSliderBg(sl); simulate();
+  });
+  sl.addEventListener('input', () => {
+    num.value = parseFloat(sl.value).toFixed(step < 1 ? 1 : 0);
+    updateSliderBg(sl); simulate();
+  });
+  updateSliderBg(sl);
+}
+
+linkInputs('inContrib', 'slContrib', 0, 1800, 1);
+linkInputs('inEval',    'slEval',    0, 3600, 1);
+linkInputs('inMonthly', 'slMonthly', 0,   30, 0.1);
+linkInputs('inRate',    'slRate',    0,   10, 0.1);
+
+const numMap = { slContrib:'inContrib', slEval:'inEval', slMonthly:'inMonthly', slRate:'inRate' };
+
+document.querySelectorAll('.pm-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sl   = document.getElementById(btn.dataset.target);
+    const step = parseFloat(btn.dataset.step);
+    const next = clamp(parseFloat((parseFloat(sl.value) + step).toFixed(10)), parseFloat(sl.min), parseFloat(sl.max));
+    sl.value = next;
+    updateSliderBg(sl);
+    const numEl = document.getElementById(numMap[sl.id]);
+    if (numEl) numEl.value = next.toFixed(Math.abs(step) < 1 ? 1 : 0);
+    simulate();
+  });
+});
+
+// ---- Simulate ----
+function simulate() {
+  const { ageYears: age, ageMon: startMon } = getAgeFromDOB();
+  const contrib = (parseFloat(document.getElementById('inContrib').value) || 0) * 10_000;
+  const evalAmt = (parseFloat(document.getElementById('inEval').value)    || 0) * 10_000;
+  const monthly = (parseFloat(document.getElementById('inMonthly').value) || 0) * 10_000;
+  const annualR = (parseFloat(document.getElementById('inRate').value)    || 0) / 100;
+
+  const ageInMonths = age * 12 + startMon;
+  const monthsLeft  = Math.max(12, 65 * 12 - ageInMonths);
+  const mr = annualR / 12;
+
+  let balance     = evalAmt > 0 ? evalAmt : contrib;
+  let contributed = contrib;
+  let principal   = contrib;
+  nisaFullInfo    = null;
+
+  const data = [];
+  for (let absMonth = 1; absMonth <= monthsLeft; absMonth++) {
+    balance *= (1 + mr);
+    if (contributed < NISA_MAX && monthly > 0) {
+      const add = Math.min(monthly, NISA_MAX - contributed);
+      balance += add; principal += add; contributed += add;
+      if (contributed >= NISA_MAX && nisaFullInfo === null) {
+        const tam = ageInMonths + absMonth;
+        nisaFullInfo = {
+          simYear:  Math.floor((absMonth - 1) / 12) + 1,
+          simMonth: ((absMonth - 1) % 12) + 1,
+          age: Math.floor(tam / 12), ageMon: tam % 12
+        };
+      }
+    }
+    if (absMonth % 12 === 0) {
+      const tam = ageInMonths + absMonth;
+      data.push({
+        year: absMonth / 12,
+        age: Math.floor(tam / 12),
+        absEndMonth: absMonth,
+        principal, gain: balance - principal,
+        total: balance,
+        nisaLeft: Math.max(0, NISA_MAX - contributed),
+      });
+    }
+  }
+
+  bars = data;
+  hoveredIdx = -1;
+  renderSummary(data, ageInMonths, monthsLeft, contrib, monthly);
+  renderChart(data);
+}
+
+// ---- Summary ----
+function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly) {
+  if (!data.length) return;
+  const last      = data[data.length - 1];
+  const yearsLeft = Math.round(monthsLeft / 12);
+
+  function svHtml(n) {
+    const { num, unit } = fmtYenParts(n);
+    return `<span class="sv-num">${num}</span><span class="sv-man">${unit}</span>`;
+  }
+
+  let nisaCell;
+  if (nisaFullInfo) {
+    const { simYear, simMonth, age: fAge, ageMon: fAgeM } = nisaFullInfo;
+    // 数字部分: nisa-done-num (2rem 700), 日本語: nisa-done-unit (1.1rem 700)
+    nisaCell = `
+      <div>
+        <span class="nisa-done-num">${simYear}</span><span class="nisa-done-unit">年</span><span class="nisa-done-num">${simMonth}</span><span class="nisa-done-unit">ヶ月目</span>
+      </div>
+      <div class="nisa-done-detail">${fAge}歳${fAgeM}ヶ月</div>
+    `;
+  } else {
+    const futureContrib = Math.min(monthly * monthsLeft, Math.max(0, NISA_MAX - contrib));
+    const totalIn = contrib + futureContrib;
+    const { num, unit } = fmtYenParts(totalIn);
+    nisaCell = `
+      <div><span class="nisa-done-num" style="font-size:1.5rem">未到達</span></div>
+      <div class="nisa-done-detail">入金合計 <span style="color:var(--green);font-weight:700">${num}${unit}</span></div>
+    `;
+  }
+
+  document.getElementById('summary').innerHTML = `
+    <div class="sitem">
+      <div class="sl">65歳時の資産（${yearsLeft}年後）</div>
+      <div class="sv">${svHtml(last.total)}</div>
+    </div>
+    <div class="sitem">
+      <div class="sl">うち運用収益</div>
+      <div class="sv">${svHtml(last.gain)}</div>
+    </div>
+    <div class="sitem">
+      <div class="sl">新NISA枠使い切り</div>
+      <div class="sv">${nisaCell}</div>
+    </div>
+  `;
+}
+
+// ---- Chart ----
+function rRect(ctx, x, y, w, h, r) {
+  if (h <= 0 || w <= 0) return;
+  if (typeof r === 'number') r = [r,r,r,r];
+  ctx.beginPath();
+  ctx.moveTo(x+r[0], y);
+  ctx.lineTo(x+w-r[1], y); ctx.quadraticCurveTo(x+w, y, x+w, y+r[1]);
+  ctx.lineTo(x+w, y+h-r[2]); ctx.quadraticCurveTo(x+w, y+h, x+w-r[2], y+h);
+  ctx.lineTo(x+r[3], y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r[3]);
+  ctx.lineTo(x, y+r[0]); ctx.quadraticCurveTo(x, y, x+r[0], y);
+  ctx.closePath(); ctx.fill();
+}
+
+function renderChart(data) {
+  const hiIdx  = hoveredIdx;
+  const canvas = document.getElementById('chart');
+  const dpr    = window.devicePixelRatio || 1;
+  const cW     = canvas.parentElement.clientWidth;
+  const n      = data.length;
+  const BAR    = Math.max(4, (cW - 70) / n - Math.max(1, Math.min(4, (cW - 70) / n * 0.28)));
+  const GAP    = Math.max(1, (cW - 70) / n - BAR);
+  const W      = cW;
+  const H      = 300;
+  const PAD    = { t:18, r:14, b:42, l:64 };
+  const pH     = H - PAD.t - PAD.b;
+
+  canvas.width  = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  const maxVal = Math.max(...data.map(d => d.total), 1);
+
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD.t + pH - pH * i / 4;
+    ctx.strokeStyle = '#deeee8'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
+    ctx.fillStyle = '#7a9a90';
+    ctx.font = '500 10px Roboto, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(fmtAxisMan(maxVal * i / 4), PAD.l - 6, y + 3.5);
+  }
+
+  bars = data.map((d, i) => {
+    const x        = PAD.l + i * (BAR + GAP);
+    const baseY    = PAD.t + pH;
+    const totalH   = (d.total    / maxVal) * pH;
+    const principH = (d.principal / maxVal) * pH;
+    const gainH    = totalH - principH;
+    const isHov    = i === hiIdx;
+
+    if (isHov) {
+      ctx.fillStyle = 'rgba(74,140,111,0.09)';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x - 3, PAD.t, BAR + 6, pH, 5);
+      else ctx.rect(x - 3, PAD.t, BAR + 6, pH);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = isHov ? '#7ec9a0' : '#a8d5ba';
+    rRect(ctx, x, baseY - principH, BAR, principH, [0, 0, 4, 4]);
+    if (gainH > 0.5) {
+      ctx.fillStyle = isHov ? '#3a7a5f' : '#4a8c6f';
+      rRect(ctx, x, baseY - totalH, BAR, gainH, [4, 4, 0, 0]);
+    }
+
+    if (d.year === 1 || d.year % 5 === 0) {
+      ctx.fillStyle = '#7a9a90';
+      ctx.font = '500 9.5px Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(d.age + '歳', x + BAR / 2, H - PAD.b + 15);
+      ctx.strokeStyle = '#ccd6d1'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x + BAR/2, baseY); ctx.lineTo(x + BAR/2, baseY + 4); ctx.stroke();
+    }
+
+    return { ...d, _x: x, _w: BAR };
+  });
+}
+
+// ---- Tooltip ----
+const tip = document.getElementById('tooltip');
+
+function onPointer(e) {
+  const canvas = document.getElementById('chart');
+  const rect   = canvas.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  const lx = (cx - rect.left) * (parseFloat(canvas.style.width) / rect.width);
+
+  const idx = bars.findIndex(b => lx >= b._x - 3 && lx <= b._x + b._w + 3);
+  if (idx < 0) {
+    if (hoveredIdx !== -1) { hoveredIdx = -1; renderChart(bars); }
+    tip.classList.remove('show'); return;
+  }
+  if (hoveredIdx !== idx) { hoveredIdx = idx; renderChart(bars); }
+
+  const d = bars[idx];
+  const { ageYears, ageMon: startMon } = getAgeFromDOB();
+  const tam        = ageYears * 12 + startMon + d.absEndMonth;
+  const dispAge    = Math.floor(tam / 12);
+  const dispAgeMon = tam % 12;
+
+  tip.innerHTML = `
+    <div class="ty">${d.year}年目（${dispAge}歳${dispAgeMon}ヶ月）</div>
+    <div class="ttotal">合計：${fmtYen(d.total)}</div>
+    <div class="tsep"></div>
+    <div class="tr"><div class="td" style="background:#a8d5ba"></div>元本：${fmtYen(d.principal)}</div>
+    <div class="tr"><div class="td" style="background:#4a8c6f"></div>運用収益：${fmtYen(d.gain)}</div>
+    <div class="tsep"></div>
+    <div class="tr"><div class="td" style="background:#ccd6d1"></div>新NISA残枠：${fmtYen(d.nisaLeft)}</div>
+  `;
+
+  const TW = 235, TH = 182;
+  let tx = cx + 16, ty = cy - 20;
+  if (tx + TW > window.innerWidth)  tx = cx - TW - 16;
+  if (ty + TH > window.innerHeight) ty = cy - TH - 10;
+  if (ty < 4) ty = 4;
+  tip.style.left = tx + 'px'; tip.style.top = ty + 'px';
+  tip.classList.add('show');
+}
+
+function hideTip() {
+  if (hoveredIdx !== -1) { hoveredIdx = -1; renderChart(bars); }
+  tip.classList.remove('show');
+}
+
+const cvs = document.getElementById('chart');
+cvs.addEventListener('mousemove',  onPointer);
+cvs.addEventListener('mouseleave', hideTip);
+cvs.addEventListener('touchmove',  e => { e.preventDefault(); onPointer(e); }, { passive: false });
+cvs.addEventListener('touchend',   hideTip);
+window.addEventListener('resize', () => { if (bars.length) renderChart(bars); });
+
+simulate();
+</script>
+</body>
+</html>
