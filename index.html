@@ -952,23 +952,21 @@ const cvs = document.getElementById('chart');
 cvs.addEventListener('mousemove',  onPointer);
 cvs.addEventListener('mouseleave', hideTip);
 
-// タッチ開始座標を記録してスクロール方向を判定する
-let _touchStartX = 0, _touchStartY = 0;
+// スマホ：touchmove は一切キャンセルしない（スクロールを妨げない）
+// タップした位置のバーにツールチップを表示し、指が動いたら消す
+let _touchMoved = false;
 cvs.addEventListener('touchstart', e => {
-  _touchStartX = e.touches[0].clientX;
-  _touchStartY = e.touches[0].clientY;
-}, { passive: true });
-
-cvs.addEventListener('touchmove', e => {
-  const dx = Math.abs(e.touches[0].clientX - _touchStartX);
-  const dy = Math.abs(e.touches[0].clientY - _touchStartY);
-  // 横移動が縦移動より大きく、5px以上ならスクロール優先（preventDefault しない）
-  if (dx > dy && dx > 5) { hideTip(); return; }
-  e.preventDefault();
+  _touchMoved = false;
   onPointer(e);
-}, { passive: false });
-
-cvs.addEventListener('touchend', hideTip);
+}, { passive: true });
+cvs.addEventListener('touchmove', e => {
+  _touchMoved = true;
+  hideTip();
+}, { passive: true });
+cvs.addEventListener('touchend', e => {
+  // タップ（移動なし）のときはツールチップをしばらく残す
+  if (_touchMoved) hideTip();
+}, { passive: true });
 window.addEventListener('resize', () => { if (bars.length) renderChart(bars); });
 
 simulate();
