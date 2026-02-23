@@ -4,427 +4,537 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>新NISA積立シミュレーター</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #e8f5f1;
-    --card: #ffffff;
-    --mint: #a8d5ba;
-    --green: #4a8c6f;
-    --text: #44504c;
-    --muted: #8fada3;
-    --muted-light: #ccd6d1;
-    --label-color: #5a7a70;
-    --slider-track: 10px;
-    --thumb-size: 28px;
-    --card-px: 16px;
-  }
-  @media (min-width: 600px) {
-    :root { --card-px: 26px; }
-  }
+/* ══════════════════════════════════════════
+   DESIGN TOKENS — Mint Design System
+══════════════════════════════════════════ */
+:root {
+  --base-bg:     #e8f5f1;
+  --accent:      #a8d5ba;
+  --accent-deep: #4a8c6f;
+  --text-main:   #44504c;
+  --text-sub:    #ccd6d1;
+  --card-bg:     #ffffff;
+  --mint-light:  #d4ede3;
+  --mint-pale:   #f0faf5;
+  --shadow:      rgba(74,140,111,0.12);
+  --sub-text:    #7a9a8e;
+  --placeholder: #b8d4cc;
+  --sys-border:  #e2f0e9;
+  --label-color: #5a7a70;
+  --warn-color:  #e07a3a;
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  --slider-track: 8px;
+  --thumb-size: 24px;
+  --card-px: 20px;
+}
+@media (min-width: 600px) {
+  :root { --card-px: 32px; }
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Roboto', 'ヒラギノ角ゴ Pro', 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
-    min-height: 100vh;
-    padding: 16px 14px 36px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  @media (min-width: 640px) {
-    body { padding: 32px 20px 48px; }
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-  /* ===== HEADER ===== */
-  header { margin-bottom: clamp(16px, 4vw, 28px); }
-  header h1 {
-    font-size: clamp(1.2rem, 5vw, 1.7rem);
-    font-weight: 700;
-    color: var(--green);
-    letter-spacing: 0.02em;
-    margin-bottom: 5px;
-  }
-  header p {
-    font-size: clamp(0.75rem, 2.3vw, 0.88rem);
-    color: var(--muted);
-  }
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
+  background: var(--base-bg);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(168,213,186,0.18) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(74,140,111,0.07) 0%, transparent 45%);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 20px 16px 48px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) {
+  body { padding: 36px 24px 60px; }
+}
 
-  /* ===== CARD ===== */
-  .card {
-    background: var(--card);
-    border-radius: clamp(14px, 3vw, 22px);
-    padding: 18px var(--card-px) 20px;
-    box-shadow: 0 4px 28px rgba(74,140,111,0.09);
-    margin-bottom: 12px;
-  }
-  @media (min-width: 600px) {
-    .card { padding: 28px var(--card-px); margin-bottom: 18px; }
-  }
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--mint-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-  .card-label {
-    font-size: clamp(0.65rem, 1.9vw, 0.78rem);
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--mint);
-    margin-bottom: clamp(14px, 3vw, 20px);
-  }
+/* ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ */
+header {
+  margin-bottom: clamp(20px, 4vw, 32px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.header-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--mint-pale); border: 1px solid var(--mint-light);
+  color: var(--accent-deep); font-size: 11px; font-family: 'Roboto Mono', monospace;
+  padding: 3px 12px; border-radius: 20px; margin-bottom: 12px; font-weight: 500;
+  letter-spacing: 0.08em;
+}
+header h1 {
+  font-size: clamp(1.3rem, 5vw, 1.9rem);
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  position: relative;
+  display: inline-block;
+}
+header p {
+  font-size: clamp(0.75rem, 2.3vw, 0.88rem);
+  color: var(--sub-text);
+  line-height: 1.7;
+}
 
-  /* ===== INPUT ROWS ===== */
-  .input-rows { display: flex; flex-direction: column; gap: clamp(16px, 3.5vw, 22px); }
+/* ══════════════════════════════════════════
+   CARD (ds-card)
+══════════════════════════════════════════ */
+.card {
+  background: var(--card-bg);
+  border-radius: 28px;
+  padding: 24px var(--card-px) 28px;
+  box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
+  background-size: 200%;
+  animation: shimmerBar 3s linear infinite;
+  border-radius: 28px 28px 0 0;
+}
+@keyframes shimmerBar { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+@media (min-width: 600px) {
+  .card { padding: 32px var(--card-px); margin-bottom: 20px; }
+}
 
-  /* Mobile-first: 1列 → 560px以上で2列 */
+.card-label {
+  font-size: clamp(0.65rem, 1.9vw, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--placeholder);
+  margin-bottom: clamp(16px, 3vw, 24px);
+  display: flex; align-items: center; gap: 8px;
+}
+.card-label::before {
+  content: '';
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-deep); flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   INPUT ROWS
+══════════════════════════════════════════ */
+.input-rows { display: flex; flex-direction: column; gap: clamp(18px, 3.5vw, 26px); }
+
+.irow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 560px) {
   .irow {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-  @media (min-width: 560px) {
-    .irow {
-      grid-template-columns: 200px 1fr;
-      align-items: center;
-      gap: 16px;
-    }
-  }
-
-  .irow-label { display: flex; flex-direction: column; gap: 3px; }
-  .irow-label .lname {
-    font-size: clamp(0.88rem, 2.8vw, 1.05rem);
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.3;
-  }
-  .irow-label .ldesc {
-    font-size: clamp(0.65rem, 2vw, 0.75rem);
-    color: var(--muted);
-    line-height: 1.4;
-  }
-
-  .irow-right { display: flex; flex-direction: column; gap: 8px; }
-
-  /* value row */
-  .val-row { display: flex; align-items: baseline; gap: 6px; }
-  .num-edit {
-    font-size: clamp(1.5rem, 6vw, 2rem);
-    font-weight: 700;
-    color: var(--text);
-    font-family: 'Roboto', sans-serif;
-    border: none;
-    border-bottom: 2.5px solid var(--mint);
-    outline: none;
-    background: transparent;
-    width: 110px;
-    -moz-appearance: textfield;
-    padding: 0 3px 2px;
-    transition: border-color .2s;
-    line-height: 1.1;
-  }
-  .num-edit:focus { border-bottom-color: var(--green); }
-  .num-edit::-webkit-outer-spin-button,
-  .num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .val-unit {
-    font-size: clamp(0.82rem, 2.5vw, 1rem);
-    color: var(--muted);
-    font-weight: 500;
-  }
-
-  /* DOB セレクト */
-  .dob-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-  .dob-row select {
-    font-size: clamp(1.5rem, 6vw, 2rem);
-    font-weight: 700;
-    color: var(--text);
-    font-family: 'Roboto', 'ヒラギノ角ゴ Pro', sans-serif;
-    border: none;
-    border-bottom: 2.5px solid var(--mint);
-    background: transparent;
-    outline: none;
-    cursor: pointer;
-    padding: 0 4px 2px;
-    -webkit-appearance: none;
-    appearance: none;
-    transition: border-color .2s;
-    line-height: 1.1;
-    option { font-size: 0.85rem; font-weight: 400; }
-  }
-  .dob-row select:focus { border-bottom-color: var(--green); }
-  .dob-unit {
-    font-size: clamp(0.82rem, 2.5vw, 1rem);
-    color: var(--muted);
-    font-weight: 500;
-  }
-  .age-display {
-    font-size: clamp(0.75rem, 2.3vw, 0.88rem);
-    color: var(--label-color);
-    font-weight: 500;
-    margin-left: 4px;
-    white-space: nowrap;
-  }
-  .age-display.warn { color: #e07a3a; font-weight: 600; margin-left: 0; }
-  .eval-warn {
-    font-size: clamp(0.62rem, 1.8vw, 0.7rem);
-    color: #e07a3a;
-    margin-top: 2px;
-    display: none;
-  }
-  .eval-warn.show { display: block; }
-
-  /* ===== SLIDER ===== */
-  .slider-row {
-    display: flex;
+    grid-template-columns: 210px 1fr;
     align-items: center;
-    gap: 10px;
-    width: 100%;
+    gap: 20px;
   }
-  .pm-btn {
-    width: clamp(30px, 8vw, 34px);
-    height: clamp(30px, 8vw, 34px);
-    border-radius: 50%;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-size: clamp(1.1rem, 3.5vw, 1.3rem);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    line-height: 1;
-    box-shadow: 0 2px 8px rgba(74,140,111,0.3);
-    transition: background .15s, transform .1s;
-    user-select: none;
-  }
-  .pm-btn:hover { background: #3a7a5f; }
-  .pm-btn:active { transform: scale(0.92); }
+}
 
-  .range-wrap { flex: 1; min-width: 0; }
+.irow-label { display: flex; flex-direction: column; gap: 4px; }
+.irow-label .lname {
+  font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+.irow-label .ldesc {
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
+  color: var(--sub-text);
+  line-height: 1.5;
+}
 
-  input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: var(--slider-track);
-    background: linear-gradient(
-      to right,
-      var(--green) 0%, var(--green) var(--pct, 0%),
-      var(--muted-light) var(--pct, 0%), var(--muted-light) 100%
-    );
-    border-radius: 99px;
-    outline: none;
-    cursor: pointer;
-    display: block;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: var(--thumb-size);
-    height: var(--thumb-size);
-    border-radius: 50%;
-    background: var(--green);
-    border: 3px solid #fff;
-    box-shadow: 0 2px 10px rgba(74,140,111,0.45);
-    transition: transform .15s;
-    cursor: grab;
-  }
-  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
-  input[type="range"]::-moz-range-thumb {
-    width: var(--thumb-size);
-    height: var(--thumb-size);
-    border-radius: 50%;
-    background: var(--green);
-    border: 3px solid #fff;
-    box-shadow: 0 2px 10px rgba(74,140,111,0.45);
-    cursor: grab;
-  }
+.irow-right { display: flex; flex-direction: column; gap: 10px; }
 
-  .irow-divider { border: none; border-top: 1.5px solid var(--bg); }
+/* value row */
+.val-row { display: flex; align-items: baseline; gap: 8px; }
 
-  /* ===== OPTIONAL SECTION ===== */
-  .optional-section {
-    border-top: 1.5px solid var(--muted-light);
-    padding-top: clamp(14px, 3vw, 18px);
-    display: flex;
-    flex-direction: column;
-    gap: clamp(14px, 3vw, 18px);
-  }
-  .optional-header { display: flex; align-items: center; gap: 10px; }
-  /* モバイル：バッジの下に説明文 */
-  @media (max-width: 559px) {
-    .optional-header { flex-direction: column; align-items: flex-start; gap: 6px; }
-  }
-  .optional-badge {
-    font-size: clamp(0.6rem, 1.8vw, 0.68rem);
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    background: var(--mint);
-    color: var(--green);
-    border-radius: 99px;
-    padding: 3px 10px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .optional-desc {
-    font-size: clamp(0.7rem, 2.2vw, 0.78rem);
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  /* モバイルは縦並びレイアウトのため改行タグは常に非表示 */
-  .br-sp { display: none; }
+.num-edit {
+  font-size: clamp(1.6rem, 6vw, 2.1rem);
+  font-weight: 300;
+  color: var(--text-main);
+  font-family: 'Roboto', sans-serif;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  outline: none;
+  background: transparent;
+  width: 110px;
+  -moz-appearance: textfield;
+  padding: 0 4px 4px;
+  transition: border-color .25s ease;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+.num-edit:focus { border-bottom-color: var(--accent-deep); }
+.num-edit::-webkit-outer-spin-button,
+.num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-  /* ===== SUMMARY ===== */
-  /* Mobile: 2列、480px以上: 3列 */
-  .summary {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: clamp(14px, 3.5vw, 22px);
-  }
-  @media (min-width: 480px) {
-    .summary { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  }
-  /* モバイル2列時：3番目のカードをフルスパン */
-  @media (max-width: 479px) {
-    .sitem:last-child { grid-column: 1 / -1; }
-  }
+.val-unit {
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: var(--sub-text);
+  font-weight: 500;
+}
 
-  .sitem {
-    background: var(--bg);
-    border-radius: clamp(10px, 2.5vw, 16px);
-    padding: clamp(12px, 3vw, 20px) clamp(8px, 2vw, 14px) clamp(10px, 2.5vw, 18px);
-    text-align: center;
-  }
-  .sitem .sl {
-    font-size: clamp(0.72rem, 2.2vw, 1rem);
-    color: var(--label-color);
-    font-weight: 600;
-    margin-bottom: clamp(6px, 1.8vw, 10px);
-    line-height: 1.4;
-  }
-  .sitem .sv { font-family: 'Roboto', sans-serif; line-height: 1.1; }
-  .sv-num {
-    font-size: clamp(1.4rem, 5vw, 2rem);
-    font-weight: 700;
-    color: var(--green);
-  }
-  .sv-man {
-    font-size: clamp(0.85rem, 2.8vw, 1.1rem);
-    font-weight: 700;
-    color: var(--green);
-    margin-left: 3px;
-  }
-  .sitem .sv-sub {
-    font-size: clamp(0.75rem, 2.3vw, 0.92rem);
-    color: var(--label-color);
-    font-weight: 600;
-    margin-top: 8px;
-  }
+/* DOB select */
+.dob-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.dob-row select {
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  font-weight: 300;
+  color: var(--text-main);
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  padding: 0 4px 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color .25s ease;
+  line-height: 1.1;
+}
+.dob-row select:focus { border-bottom-color: var(--accent-deep); }
+.dob-unit {
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: var(--sub-text);
+  font-weight: 500;
+}
+.age-display {
+  font-size: clamp(0.75rem, 2.3vw, 0.88rem);
+  color: var(--label-color);
+  font-weight: 500;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.age-display.warn { color: var(--warn-color); font-weight: 600; margin-left: 0; }
+.eval-warn {
+  font-size: clamp(0.62rem, 1.8vw, 0.72rem);
+  color: var(--warn-color);
+  margin-top: 2px;
+  display: none;
+  padding: 6px 10px;
+  background: rgba(224,122,58,0.08);
+  border-radius: 8px;
+  /* border-left: 3px solid var(--warn-color); */
+}
+.eval-warn.show { display: block; }
 
-  .nisa-done-num {
-    font-size: clamp(1.4rem, 5vw, 2rem);
-    font-weight: 700;
-    color: var(--green);
-    font-family: 'Roboto', sans-serif;
-  }
-  .nisa-done-unit {
-    font-size: clamp(0.75rem, 2.5vw, 0.95rem);
-    font-weight: 700;
-    color: var(--green);
-    margin-left: 1px;
-    margin-right: 2px;
-    font-family: 'Roboto', 'ヒラギノ角ゴ Pro', sans-serif;
-    vertical-align: middle;
-  }
-  .nisa-done-detail {
-    font-size: clamp(0.75rem, 2.3vw, 0.92rem);
-    color: var(--label-color);
-    font-weight: 600;
-    margin-top: 8px;
-  }
+/* ══════════════════════════════════════════
+   SLIDER (ds-range style)
+══════════════════════════════════════════ */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
 
-  /* ===== CHART ===== */
-  .legend {
-    display: flex;
-    gap: clamp(10px, 3vw, 18px);
-    flex-wrap: wrap;
-    margin-bottom: clamp(8px, 2vw, 14px);
-  }
-  .li {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: clamp(0.72rem, 2.2vw, 0.84rem);
-    color: var(--text);
-  }
-  .ld { width: 13px; height: 13px; border-radius: 3px; }
-  .chart-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  canvas { display: block; cursor: default; }
-  .note {
-    font-size: clamp(0.6rem, 1.8vw, 0.72rem);
-    color: var(--muted);
-    text-align: right;
-    margin-top: 8px;
-  }
+.pm-btn {
+  width: clamp(30px, 8vw, 34px);
+  height: clamp(30px, 8vw, 34px);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: clamp(1.1rem, 3.5vw, 1.3rem);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  box-shadow: 0 2px 10px rgba(74,140,111,0.35);
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  user-select: none;
+}
+.pm-btn:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(74,140,111,0.45); }
+.pm-btn:active { transform: scale(0.92); }
 
-  /* ===== TOOLTIP ===== */
-  #tooltip {
-    position: fixed;
-    background: #2c3a35;
-    color: #fff;
-    border-radius: 14px;
-    padding: 13px 16px;
-    font-size: clamp(0.72rem, 2.2vw, 0.84rem);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity .15s;
-    z-index: 200;
-    min-width: 200px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.22);
-    line-height: 1.9;
-  }
-  #tooltip.show { opacity: 1; }
-  #tooltip .ty {
-    font-size: clamp(0.82rem, 2.5vw, 0.96rem);
-    font-weight: 700;
-    color: var(--mint);
-    margin-bottom: 3px;
-  }
-  #tooltip .ttotal {
-    font-size: clamp(0.88rem, 2.8vw, 1.08rem);
-    font-weight: 700;
-    margin-bottom: 2px;
-  }
-  #tooltip .tr { display: flex; align-items: center; gap: 7px; }
-  #tooltip .td { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-  #tooltip .tsep { border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0; }
+.range-wrap { flex: 1; min-width: 0; }
 
-  /* ===== DISCLAIMER ===== */
-  .disclaimer {
-    margin-top: 10px;
-    padding: 12px 14px;
-    background: rgba(255,255,255,0.6);
-    border-radius: 14px;
-    font-size: clamp(0.58rem, 1.8vw, 0.65rem);
-    color: var(--muted);
-    line-height: 1.7;
-  }
-  @media (min-width: 600px) {
-    .disclaimer { padding: 14px 18px; }
-  }
-  .disclaimer p + p { margin-top: 5px; }
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--slider-track);
+  background: linear-gradient(
+    to right,
+    var(--accent-deep) 0%, var(--accent-deep) var(--pct, 0%),
+    var(--mint-light) var(--pct, 0%), var(--mint-light) 100%
+  );
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  display: block;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(74,140,111,0.4);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: grab;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+input[type="range"]::-moz-range-thumb {
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(74,140,111,0.4);
+  cursor: grab;
+}
+
+/* ── Divider (ds-divider) ── */
+.irow-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mint-light), transparent);
+}
+
+/* ══════════════════════════════════════════
+   OPTIONAL SECTION
+══════════════════════════════════════════ */
+.optional-section {
+  border-top: 1px solid var(--sys-border);
+  padding-top: clamp(16px, 3vw, 22px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3vw, 22px);
+}
+.optional-header { display: flex; align-items: center; gap: 12px; }
+@media (max-width: 559px) {
+  .optional-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+/* ds-badge スタイル適用 */
+.optional-badge {
+  display: inline-flex; align-items: center;
+  background: var(--accent); color: #fff;
+  font-size: clamp(0.6rem, 1.8vw, 0.7rem);
+  letter-spacing: 0.14em; padding: 4px 14px;
+  border-radius: 20px; font-weight: 500;
+  box-shadow: 0 2px 10px rgba(168,213,186,0.5);
+  white-space: nowrap; flex-shrink: 0;
+}
+.optional-desc {
+  font-size: clamp(0.7rem, 2.2vw, 0.78rem);
+  color: var(--sub-text);
+  line-height: 1.6;
+}
+.br-sp { display: none; }
+
+/* ══════════════════════════════════════════
+   SUMMARY (ds-result ベース)
+══════════════════════════════════════════ */
+.summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: clamp(16px, 3.5vw, 24px);
+}
+@media (min-width: 480px) {
+  .summary { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+@media (max-width: 479px) {
+  .sitem:last-child { grid-column: 1 / -1; }
+}
+
+.sitem {
+  background: var(--mint-pale);
+  border-radius: 16px;
+  padding: clamp(14px, 3vw, 20px) clamp(10px, 2vw, 16px) clamp(12px, 2.5vw, 18px);
+  text-align: center;
+  border: 1.5px solid var(--mint-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.sitem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow);
+}
+.sitem.highlight {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.sitem .sl {
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+  color: var(--sub-text);
+  font-weight: 600;
+  margin-bottom: clamp(6px, 1.8vw, 10px);
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+}
+.sitem .sv { font-family: 'Roboto', sans-serif; line-height: 1.1; }
+.sv-num {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 300;
+  color: var(--accent-deep);
+}
+.sv-man {
+  font-size: clamp(0.85rem, 2.8vw, 1.1rem);
+  font-weight: 400;
+  color: var(--accent-deep);
+  margin-left: 3px;
+}
+
+.nisa-done-num {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 300;
+  color: var(--accent-deep);
+  font-family: 'Roboto', sans-serif;
+}
+.nisa-done-unit {
+  font-size: clamp(0.75rem, 2.5vw, 0.95rem);
+  font-weight: 400;
+  color: var(--accent-deep);
+  margin-left: 1px; margin-right: 2px;
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  vertical-align: middle;
+}
+.nisa-done-detail {
+  font-size: clamp(0.72rem, 2.3vw, 0.88rem);
+  color: var(--sub-text);
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════════════
+   CHART
+══════════════════════════════════════════ */
+.legend {
+  display: flex;
+  gap: clamp(12px, 3vw, 20px);
+  flex-wrap: wrap;
+  margin-bottom: clamp(10px, 2vw, 16px);
+  align-items: center;
+}
+.li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: clamp(0.72rem, 2.2vw, 0.82rem);
+  color: var(--sub-text);
+  font-weight: 500;
+}
+.ld { width: 12px; height: 12px; border-radius: 3px; }
+.chart-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+canvas { display: block; cursor: default; }
+
+/* ── ds-progress-bg ── */
+.ds-divider { height: 1px; background: linear-gradient(90deg,transparent,var(--mint-light),transparent); margin: 16px 0; }
+
+/* note-box style */
+.note {
+  font-size: clamp(0.6rem, 1.8vw, 0.72rem);
+  color: var(--sub-text);
+  text-align: right;
+  margin-top: 10px;
+  letter-spacing: 0.04em;
+}
+.note-br { display: none; }
+.header-br { display: none; }
+@media (max-width: 559px) {
+  .note-br { display: block; }
+  .header-br { display: block; }
+}
+
+/* ══════════════════════════════════════════
+   TOOLTIP
+══════════════════════════════════════════ */
+#tooltip {
+  position: fixed;
+  background: #2c3a35;
+  color: #fff;
+  border-radius: 16px;
+  padding: 14px 18px;
+  font-size: clamp(0.72rem, 2.2vw, 0.84rem);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 200;
+  min-width: 200px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25), 0 2px 8px rgba(74,140,111,0.2);
+  line-height: 1.9;
+  border: 1px solid rgba(168,213,186,0.2);
+}
+#tooltip.show { opacity: 1; }
+#tooltip .ty {
+  font-size: clamp(0.82rem, 2.5vw, 0.96rem);
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+#tooltip .ttotal {
+  font-size: clamp(0.88rem, 2.8vw, 1.08rem);
+  font-weight: 500;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 2px;
+}
+#tooltip .tr { display: flex; align-items: center; gap: 8px; }
+#tooltip .td { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+#tooltip .tsep { border-top: 1px solid rgba(255,255,255,0.12); margin: 5px 0; }
+
+/* ══════════════════════════════════════════
+   DISCLAIMER (note-box style)
+══════════════════════════════════════════ */
+.disclaimer {
+  margin-top: 12px;
+  padding: 14px 18px;
+  background: rgba(168,213,186,0.08);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  font-size: clamp(0.58rem, 1.8vw, 0.65rem);
+  color: var(--sub-text);
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+}
+@media (min-width: 600px) {
+  .disclaimer { padding: 16px 22px; }
+}
+.disclaimer p + p { margin-top: 6px; }
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes secFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
+.card:nth-child(2) { animation-delay: 0.08s; }
+.card:nth-child(3) { animation-delay: 0.14s; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🌿 新NISA積立シミュレーター</h1>
-  <p>新NISA総枠 1,800万円を考慮した長期運用シミュレーション</p>
+  <div class="header-badge">🌿 新NISA積立シミュレーター</div>
+  <h1>資産運用シミュレーション</h1>
+  <p>新NISA総枠 1,800万円を考慮した<br class="header-br">長期運用シミュレーション</p>
 </header>
 
+<!-- ── 入力カード ── -->
 <div class="card">
   <div class="card-label">入力条件</div>
   <div class="input-rows">
@@ -433,7 +543,7 @@
     <div class="irow">
       <div class="irow-label">
         <span class="lname">生年月日</span>
-        <span class="ldesc">年・月を選択</span>
+        <span class="ldesc">年・月を選択してください</span>
       </div>
       <div class="irow-right">
         <div class="dob-row">
@@ -534,17 +644,18 @@
   </div>
 </div>
 
+<!-- ── 結果カード ── -->
 <div class="card" id="resultCard">
   <div class="card-label">シミュレーション結果</div>
   <div class="summary" id="summary"></div>
   <div class="legend">
-    <div class="li"><div class="ld" style="background:#a8d5ba"></div>元本</div>
-    <div class="li"><div class="ld" style="background:#4a8c6f"></div>運用収益</div>
+    <div class="li"><div class="ld" style="background:var(--accent)"></div>元本</div>
+    <div class="li"><div class="ld" style="background:var(--accent-deep)"></div>運用収益</div>
   </div>
   <div class="chart-wrap">
     <canvas id="chart"></canvas>
   </div>
-  <div class="note">※ 新NISA枠（1,800万円）到達後は新規積立停止・運用のみ継続</div>
+  <div class="note">※ 新NISA枠（1,800万円）到達後は<br class="note-br">新規積立停止・運用のみ継続</div>
 </div>
 
 <div class="disclaimer">
@@ -586,7 +697,6 @@ const currentMonth = now.getMonth() + 1;
 const dobYearSel  = document.getElementById('dobYear');
 const dobMonthSel = document.getElementById('dobMonth');
 
-// 65歳未満になれる年の下限（その年生まれでも最低1ヶ月は64歳以下になれる）
 const minBirthYear = currentMonth < 12 ? currentYear - 65 : currentYear - 64;
 for (let y = currentYear - 18; y >= minBirthYear; y--) {
   const o = document.createElement('option');
@@ -602,7 +712,6 @@ for (let m = 1; m <= 12; m++) {
 }
 dobMonthSel.value = currentMonth;
 
-// 選択中の年に対して65歳以上になる月をdisabledにする
 function updateMonthOptions() {
   const y = parseInt(dobYearSel.value);
   Array.from(dobMonthSel.options).forEach(o => {
@@ -610,7 +719,6 @@ function updateMonthOptions() {
     const ageMonths = (currentYear - y) * 12 + (currentMonth - m);
     o.disabled = Math.floor(Math.max(0, ageMonths) / 12) >= 65;
   });
-  // 現在選択中の月が無効になっていたら、最初の有効な月へ移動
   const curOpt = Array.from(dobMonthSel.options).find(o => parseInt(o.value) === parseInt(dobMonthSel.value));
   if (curOpt && curOpt.disabled) {
     const first = Array.from(dobMonthSel.options).find(o => !o.disabled);
@@ -740,17 +848,19 @@ function simulate() {
     }
   }
 
+  const finalBalance   = balance;
+  const finalPrincipal = principal;
+
   checkEvalWarn();
   bars = data;
   hoveredIdx = -1;
-  renderSummary(data, ageInMonths, monthsLeft, contrib, monthly);
+  renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBalance, finalPrincipal);
   renderChart(data);
 }
 
 // ---- Summary ----
-function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly) {
+function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBalance, finalPrincipal) {
   if (!data.length) return;
-  const last      = data[data.length - 1];
   const yearsLeft = Math.round(monthsLeft / 12);
 
   function svHtml(n) {
@@ -773,18 +883,18 @@ function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly) {
     const { num, unit } = fmtYenParts(totalIn);
     nisaCell = `
       <div><span class="nisa-done-num" style="font-size:1.5rem">未到達</span></div>
-      <div class="nisa-done-detail">入金合計 <span style="color:var(--green);font-weight:700">${num}${unit}</span></div>
+      <div class="nisa-done-detail">入金合計 <span style="color:var(--accent-deep);font-weight:600">${num}${unit}</span></div>
     `;
   }
 
   document.getElementById('summary').innerHTML = `
-    <div class="sitem">
-      <div class="sl">65歳時の資産（${yearsLeft}年後）</div>
-      <div class="sv">${svHtml(last.total)}</div>
+    <div class="sitem highlight">
+      <div class="sl">65歳時の資産</div>
+      <div class="sv">${svHtml(finalBalance)}</div>
     </div>
     <div class="sitem">
       <div class="sl">うち運用収益</div>
-      <div class="sv">${svHtml(last.gain)}</div>
+      <div class="sv">${svHtml(finalBalance - finalPrincipal)}</div>
     </div>
     <div class="sitem">
       <div class="sl">新NISA枠使い切り</div>
@@ -808,14 +918,13 @@ function rRect(ctx, x, y, w, h, r) {
 
 function renderChart(data) {
   const isMobile   = window.innerWidth < 560;
-  const MOBILE_MAX = 25; // これを超えたらスクロール
+  const MOBILE_MAX = 25;
   const hiIdx  = hoveredIdx;
   const canvas = document.getElementById('chart');
   const dpr    = window.devicePixelRatio || 1;
   const containerW = canvas.parentElement.clientWidth;
   const n      = data.length;
 
-  /* モバイル時：左ラベルなし → PAD.l を最小に */
   const PAD = {
     t: 14,
     r: isMobile ? 6 : 14,
@@ -823,7 +932,6 @@ function renderChart(data) {
     l: isMobile ? 6 : 64,
   };
 
-  /* モバイルで25本超の場合、25本分の密度を保ちながらcanvasを拡幅 */
   let cW;
   if (isMobile && n > MOBILE_MAX) {
     const slotW = (containerW - PAD.l - PAD.r) / MOBILE_MAX;
@@ -848,20 +956,18 @@ function renderChart(data) {
 
   const maxVal = Math.max(...data.map(d => d.total), 1);
 
-  /* グリッド線 ＋ Y軸ラベル（デスクトップのみ） */
   for (let i = 0; i <= 4; i++) {
     const y = PAD.t + pH - pH * i / 4;
     ctx.strokeStyle = '#deeee8'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
     if (!isMobile) {
-      ctx.fillStyle = '#7a9a90';
+      ctx.fillStyle = '#7a9a8e';
       ctx.font = '500 10px Roboto, sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(fmtAxisMan(maxVal * i / 4), PAD.l - 6, y + 3.5);
     }
   }
 
-  /* X軸ラベルのステップ：モバイルは10年ごと */
   const labelStep = isMobile ? 10 : 5;
 
   bars = data.map((d, i) => {
@@ -880,19 +986,21 @@ function renderChart(data) {
       ctx.fill();
     }
 
+    // 元本: --accent (#a8d5ba)
     ctx.fillStyle = isHov ? '#7ec9a0' : '#a8d5ba';
     rRect(ctx, x, baseY - principH, BAR, principH, [0, 0, 4, 4]);
     if (gainH > 0.5) {
+      // 運用収益: --accent-deep (#4a8c6f)
       ctx.fillStyle = isHov ? '#3a7a5f' : '#4a8c6f';
       rRect(ctx, x, baseY - totalH, BAR, gainH, [4, 4, 0, 0]);
     }
 
     if (d.year === 1 || d.year % labelStep === 0) {
-      ctx.fillStyle = '#7a9a90';
+      ctx.fillStyle = '#7a9a8e';
       ctx.font = isMobile ? '500 8.5px Roboto, sans-serif' : '500 9.5px Roboto, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(d.age + '歳', x + BAR / 2, H - PAD.b + 13);
-      ctx.strokeStyle = '#ccd6d1'; ctx.lineWidth = 1;
+      ctx.strokeStyle = '#d4ede3'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x + BAR/2, baseY); ctx.lineTo(x + BAR/2, baseY + 4); ctx.stroke();
     }
 
@@ -924,13 +1032,13 @@ function onPointer(e) {
   const dispAgeMon = tam % 12;
 
   tip.innerHTML = `
-    <div class="ty">${d.year}年目（${dispAge}歳${dispAgeMon}ヶ月）</div>
+    <div class="ty">${d.year}年後（${dispAge}歳${dispAgeMon}ヶ月）</div>
     <div class="ttotal">合計：${fmtYen(d.total)}</div>
     <div class="tsep"></div>
     <div class="tr"><div class="td" style="background:#a8d5ba"></div>元本：${fmtYen(d.principal)}</div>
     <div class="tr"><div class="td" style="background:#4a8c6f"></div>運用収益：${fmtYen(d.gain)}</div>
     <div class="tsep"></div>
-    <div class="tr"><div class="td" style="background:#ccd6d1"></div>新NISA残枠：${fmtYen(d.nisaLeft)}</div>
+    <div class="tr"><div class="td" style="background:#d4ede3"></div>新NISA残枠：${fmtYen(d.nisaLeft)}</div>
   `;
 
   const TW = 220, TH = 182;
@@ -952,8 +1060,6 @@ const cvs = document.getElementById('chart');
 cvs.addEventListener('mousemove',  onPointer);
 cvs.addEventListener('mouseleave', hideTip);
 
-// スマホ：touchmove は一切キャンセルしない（スクロールを妨げない）
-// タップした位置のバーにツールチップを表示し、指が動いたら消す
 let _touchMoved = false;
 cvs.addEventListener('touchstart', e => {
   _touchMoved = false;
@@ -964,7 +1070,6 @@ cvs.addEventListener('touchmove', e => {
   hideTip();
 }, { passive: true });
 cvs.addEventListener('touchend', e => {
-  // タップ（移動なし）のときはツールチップをしばらく残す
   if (_touchMoved) hideTip();
 }, { passive: true });
 window.addEventListener('resize', () => { if (bars.length) renderChart(bars); });
