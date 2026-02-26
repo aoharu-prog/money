@@ -162,7 +162,7 @@ header p {
   line-height: 1.5;
 }
 
-.irow-right { display: flex; flex-direction: column; gap: 10px; }
+.irow-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 
 /* value row */
 .val-row { display: flex; align-items: center; gap: 8px; }
@@ -528,6 +528,9 @@ canvas { display: block; cursor: default; }
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   margin-left: auto;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px 4px;
 }
 .preset-chips::-webkit-scrollbar { display: none; }
 .preset-chip {
@@ -653,7 +656,7 @@ canvas { display: block; cursor: default; }
     <div class="optional-section">
       <div class="optional-header">
         <span class="optional-badge">任意入力</span>
-        <span class="optional-desc">すでに新NISAで投資している方のみ入力してください。<br class="br-sp">まだ投資していない方は入力不要です。</span>
+        <span class="optional-desc">新NISAですでに投資している方のみ入力してください。<br class="br-sp">まだ投資していない方は入力不要です。</span>
       </div>
 
       <!-- 新NISA投資累計額 -->
@@ -1134,7 +1137,10 @@ cvs.addEventListener('touchmove', e => {
 cvs.addEventListener('touchend', e => {
   if (_touchMoved) hideTip();
 }, { passive: true });
-window.addEventListener('resize', () => { if (bars.length) renderChart(bars); });
+window.addEventListener('resize', () => {
+  if (bars.length) renderChart(bars);
+  document.querySelectorAll('.preset-chips').forEach(updateChipsMask);
+});
 
 // ---- Count-up animation (easeOutQuart / 700ms — Mint Design System) ----
 const _cuPrev = {};
@@ -1181,8 +1187,27 @@ document.querySelectorAll('.preset-chip').forEach(chip => {
   });
 });
 
+// ---- Chips scroll fade hint ----
+const CHIPS_FADE = 'linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%)';
+
+function updateChipsMask(el) {
+  const overflows = el.scrollWidth > el.clientWidth + 2;
+  const atEnd     = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+  const mask = (overflows && !atEnd) ? CHIPS_FADE : '';
+  el.style.webkitMaskImage = mask;
+  el.style.maskImage       = mask;
+}
+
+function initChipsScrollHint() {
+  document.querySelectorAll('.preset-chips').forEach(el => {
+    el.addEventListener('scroll', () => updateChipsMask(el), { passive: true });
+    updateChipsMask(el);
+  });
+}
+
 simulate();
 updatePresetChips();
+initChipsScrollHint();
 </script>
 </body>
 </html>
