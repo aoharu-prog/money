@@ -165,7 +165,7 @@ header p {
 .irow-right { display: flex; flex-direction: column; gap: 10px; }
 
 /* value row */
-.val-row { display: flex; align-items: baseline; gap: 8px; }
+.val-row { display: flex; align-items: center; gap: 8px; }
 
 .num-edit {
   font-size: clamp(1.6rem, 6vw, 2.1rem);
@@ -518,6 +518,43 @@ canvas { display: block; cursor: default; }
 .disclaimer p + p { margin-top: 6px; }
 
 /* ══════════════════════════════════════════
+   PRESET CHIPS
+══════════════════════════════════════════ */
+.preset-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.preset-chip {
+  padding: 5px 14px;
+  border: 1.5px solid var(--mint-light);
+  border-radius: 20px;
+  font-size: clamp(0.7rem, 2.2vw, 0.78rem);
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--sub-text);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+.preset-chip:hover {
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+  background: var(--mint-pale);
+  transform: scale(1.05);
+}
+.preset-chip:active { transform: scale(0.95); }
+.preset-chip.active {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(74,140,111,0.35);
+}
+
+/* ══════════════════════════════════════════
    ANIMATIONS
 ══════════════════════════════════════════ */
 @keyframes secFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
@@ -565,6 +602,11 @@ canvas { display: block; cursor: default; }
         <div class="val-row">
           <input class="num-edit" type="number" id="inMonthly" min="0" max="30" step="0.1" value="5">
           <span class="val-unit">万円</span>
+          <div class="preset-chips">
+            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="3">3万円</button>
+            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="5">5万円</button>
+            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="10">10万円</button>
+          </div>
         </div>
         <div class="slider-row">
           <button class="pm-btn" data-target="slMonthly" data-step="-0.1">－</button>
@@ -585,6 +627,11 @@ canvas { display: block; cursor: default; }
         <div class="val-row">
           <input class="num-edit" type="number" id="inRate" min="0" max="10" step="0.1" value="5">
           <span class="val-unit">%</span>
+          <div class="preset-chips">
+            <button class="preset-chip" data-target="inRate" data-sl="slRate" data-value="3">3%</button>
+            <button class="preset-chip" data-target="inRate" data-sl="slRate" data-value="5">5%</button>
+            <button class="preset-chip" data-target="inRate" data-sl="slRate" data-value="7">7%</button>
+          </div>
         </div>
         <div class="slider-row">
           <button class="pm-btn" data-target="slRate" data-step="-0.1">－</button>
@@ -856,6 +903,7 @@ function simulate() {
   hoveredIdx = -1;
   renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBalance, finalPrincipal);
   renderChart(data);
+  updatePresetChips();
 }
 
 // ---- Summary ----
@@ -1074,7 +1122,32 @@ cvs.addEventListener('touchend', e => {
 }, { passive: true });
 window.addEventListener('resize', () => { if (bars.length) renderChart(bars); });
 
+// ---- Preset Chips ----
+function updatePresetChips() {
+  document.querySelectorAll('.preset-chip').forEach(chip => {
+    const numEl = document.getElementById(chip.dataset.target);
+    if (!numEl) return;
+    chip.classList.toggle('active', parseFloat(numEl.value) === parseFloat(chip.dataset.value));
+  });
+}
+
+document.querySelectorAll('.preset-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const numEl = document.getElementById(chip.dataset.target);
+    const slEl  = document.getElementById(chip.dataset.sl);
+    if (!numEl || !slEl) return;
+    const val = parseFloat(chip.dataset.value);
+    const step = parseFloat(slEl.step);
+    numEl.value = val.toFixed(step < 1 ? 1 : 0);
+    slEl.value = val;
+    updateSliderBg(slEl);
+    updatePresetChips();
+    simulate();
+  });
+});
+
 simulate();
+updatePresetChips();
 </script>
 </body>
 </html>
