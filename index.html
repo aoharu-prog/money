@@ -606,6 +606,8 @@ canvas { display: block; cursor: default; }
             <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="3">3万円</button>
             <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="5">5万円</button>
             <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="10">10万円</button>
+            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="15">15万円</button>
+            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="20">20万円</button>
           </div>
         </div>
         <div class="slider-row">
@@ -911,9 +913,9 @@ function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBal
   if (!data.length) return;
   const yearsLeft = Math.round(monthsLeft / 12);
 
-  function svHtml(n) {
+  function svHtml(n, key) {
     const { num, unit } = fmtYenParts(n);
-    return `<span class="sv-num">${num}</span><span class="sv-man">${unit}</span>`;
+    return `<span class="sv-num" data-key="${key}">${num}</span><span class="sv-man" data-key="${key}-unit">${unit}</span>`;
   }
 
   let nisaCell;
@@ -938,17 +940,23 @@ function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBal
   document.getElementById('summary').innerHTML = `
     <div class="sitem highlight">
       <div class="sl">65歳時の資産</div>
-      <div class="sv">${svHtml(finalBalance)}</div>
+      <div class="sv">${svHtml(finalBalance, 'total')}</div>
     </div>
     <div class="sitem">
       <div class="sl">うち運用収益</div>
-      <div class="sv">${svHtml(finalBalance - finalPrincipal)}</div>
+      <div class="sv">${svHtml(finalBalance - finalPrincipal, 'gain')}</div>
     </div>
     <div class="sitem">
       <div class="sl">新NISA枠使い切り</div>
       <div class="sv">${nisaCell}</div>
     </div>
   `;
+
+  [['total', finalBalance], ['gain', finalBalance - finalPrincipal]].forEach(([key, val]) => {
+    const numEl = document.querySelector(`.sv-num[data-key="${key}"]`);
+    const manEl = document.querySelector(`.sv-man[data-key="${key}-unit"]`);
+    if (numEl) animateCountUp(numEl, manEl, val);
+  });
 }
 
 // ---- Chart ----
@@ -1121,6 +1129,27 @@ cvs.addEventListener('touchend', e => {
   if (_touchMoved) hideTip();
 }, { passive: true });
 window.addEventListener('resize', () => { if (bars.length) renderChart(bars); });
+
+// ---- Count-up animation (easeOutQuart / 700ms — Mint Design System) ----
+const _cuPrev = {};
+const _cuRafs = {};
+
+function animateCountUp(numEl, manEl, toRaw, ms = 700) {
+  const key     = numEl.dataset.key;
+  const fromRaw = _cuPrev[key] ?? 0;
+  _cuPrev[key]  = toRaw;
+  if (_cuRafs[key]) cancelAnimationFrame(_cuRafs[key]);
+  const t0 = performance.now();
+  function step(now) {
+    const p    = Math.min((now - t0) / ms, 1);
+    const ease = 1 - Math.pow(1 - p, 4);
+    const { num, unit } = fmtYenParts(Math.round(fromRaw + (toRaw - fromRaw) * ease));
+    numEl.textContent = num;
+    if (manEl) manEl.textContent = unit;
+    if (p < 1) _cuRafs[key] = requestAnimationFrame(step);
+  }
+  _cuRafs[key] = requestAnimationFrame(step);
+}
 
 // ---- Preset Chips ----
 function updatePresetChips() {
