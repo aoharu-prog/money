@@ -791,14 +791,14 @@ for (let y = currentYear - 18; y >= minBirthYear; y--) {
   o.value = y; o.textContent = y;
   dobYearSel.appendChild(o);
 }
-dobYearSel.value = currentYear - 40;
+dobYearSel.value = 1992;
 
 for (let m = 1; m <= 12; m++) {
   const o = document.createElement('option');
   o.value = m; o.textContent = m;
   dobMonthSel.appendChild(o);
 }
-dobMonthSel.value = currentMonth;
+dobMonthSel.value = 1;
 
 function updateMonthOptions() {
   const y = parseInt(dobYearSel.value);
@@ -1013,7 +1013,7 @@ function rRect(ctx, x, y, w, h, r) {
 
 function renderChart(data) {
   const isMobile   = window.innerWidth < 560;
-  const MOBILE_MAX = 25;
+  const MOBILE_MAX = 20;
   const hiIdx  = hoveredIdx;
   const canvas = document.getElementById('chart');
   const dpr    = window.devicePixelRatio || 1;
