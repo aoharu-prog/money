@@ -137,6 +137,36 @@ function showToast(msg, duration = 2600, el = null) {
 }
 
 /* ══════════════════════════════════════════
+   チップスクロール
+══════════════════════════════════════════ */
+
+/**
+ * .ds-chip-scroll 要素の右端フェードマスクを更新する
+ * スクロール可能かつ末端に達していない場合のみマスクを表示
+ * @param {HTMLElement} el  .ds-chip-scroll 要素
+ */
+const _CHIPS_FADE = 'linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%)';
+
+function updateChipsMask(el) {
+  const overflows = el.scrollWidth > el.clientWidth + 2;
+  const atEnd     = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+  const mask = (overflows && !atEnd) ? _CHIPS_FADE : '';
+  el.style.webkitMaskImage = mask;
+  el.style.maskImage       = mask;
+}
+
+/**
+ * 指定セレクタにマッチする .ds-chip-scroll 要素にスクロールフェードを初期化する
+ * @param {string} [selector='.ds-chip-scroll']  対象セレクタ
+ */
+function initChipScroll(selector = '.ds-chip-scroll') {
+  document.querySelectorAll(selector).forEach(el => {
+    el.addEventListener('scroll', () => updateChipsMask(el), { passive: true });
+    updateChipsMask(el);
+  });
+}
+
+/* ══════════════════════════════════════════
    コンフェッティ
 ══════════════════════════════════════════ */
 

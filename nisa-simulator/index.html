@@ -4,33 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>新NISA積立シミュレーター</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/components.css">
 <style>
 /* ══════════════════════════════════════════
-   DESIGN TOKENS — Mint Design System
+   NISA固有トークン（共通変数は shared/tokens.css）
 ══════════════════════════════════════════ */
 :root {
-  --base-bg:     #e8f5f1;
-  --accent:      #a8d5ba;
-  --accent-deep: #4a8c6f;
-  --text-main:   #44504c;
-  --text-sub:    #ccd6d1;
-  --card-bg:     #ffffff;
-  --mint-light:  #d4ede3;
-  --mint-pale:   #f0faf5;
-  --shadow:      rgba(74,140,111,0.12);
-  --sub-text:    #7a9a8e;
-  --placeholder: #b8d4cc;
-  --sys-border:  #e2f0e9;
-  --label-color: #5a7a70;
-  --warn-color:  #e07a3a;
-
   --slider-track: 8px;
-  --thumb-size: 24px;
-  --card-px: 20px;
+  --thumb-size:   24px;
+  --card-px:      20px;
 }
 @media (min-width: 600px) {
   :root { --card-px: 32px; }
@@ -376,51 +358,6 @@ canvas { display: block; cursor: default; }
 }
 .disclaimer p + p { margin-top: 6px; }
 
-/* ══════════════════════════════════════════
-   PRESET CHIPS
-══════════════════════════════════════════ */
-.preset-chips {
-  display: flex;
-  gap: 6px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  margin-left: auto;
-  flex: 1 1 0;
-  min-width: 0;
-  padding: 4px 4px;
-}
-.preset-chips::-webkit-scrollbar { display: none; }
-.preset-chip {
-  padding: 5px 14px;
-  border: 1.5px solid var(--mint-light);
-  border-radius: 20px;
-  font-size: clamp(0.7rem, 2.2vw, 0.78rem);
-  font-weight: 500;
-  font-family: inherit;
-  color: var(--sub-text);
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  letter-spacing: 0.04em;
-  line-height: 1.4;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.preset-chip:hover {
-  border-color: var(--accent-deep);
-  color: var(--accent-deep);
-  background: var(--mint-pale);
-  transform: scale(1.05);
-}
-.preset-chip:active { transform: scale(0.95); }
-.preset-chip.active {
-  background: var(--accent-deep);
-  border-color: var(--accent-deep);
-  color: #fff;
-  box-shadow: 0 2px 10px rgba(74,140,111,0.35);
-}
 
 /* ══════════════════════════════════════════
    ANIMATIONS
@@ -470,12 +407,12 @@ canvas { display: block; cursor: default; }
         <div class="ds-val-row">
           <input class="ds-num-edit" type="number" id="inMonthly" min="0" max="30" step="0.1" value="5">
           <span class="ds-val-unit">万円</span>
-          <div class="preset-chips">
-            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="3">3万円</button>
-            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="5">5万円</button>
-            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="10">10万円</button>
-            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="15">15万円</button>
-            <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="20">20万円</button>
+          <div class="ds-chip-scroll">
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="3">3万円</button>
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="5">5万円</button>
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="10">10万円</button>
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="15">15万円</button>
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="20">20万円</button>
           </div>
         </div>
         <div class="slider-row">
@@ -497,10 +434,10 @@ canvas { display: block; cursor: default; }
         <div class="ds-val-row">
           <input class="ds-num-edit" type="number" id="inRate" min="0" max="10" step="0.1" value="5">
           <span class="ds-val-unit">%</span>
-          <div class="preset-chips">
-            <button class="preset-chip" data-target="inRate" data-sl="slRate" data-value="3">3%</button>
-            <button class="preset-chip" data-target="inRate" data-sl="slRate" data-value="5">5%</button>
-            <button class="preset-chip" data-target="inRate" data-sl="slRate" data-value="7">7%</button>
+          <div class="ds-chip-scroll">
+            <button class="ds-chip" data-target="inRate" data-sl="slRate" data-value="3">3%</button>
+            <button class="ds-chip" data-target="inRate" data-sl="slRate" data-value="5">5%</button>
+            <button class="ds-chip" data-target="inRate" data-sl="slRate" data-value="7">7%</button>
           </div>
         </div>
         <div class="slider-row">
@@ -1002,7 +939,7 @@ cvs.addEventListener('touchend', e => {
 }, { passive: true });
 window.addEventListener('resize', () => {
   if (bars.length) renderChart(bars);
-  document.querySelectorAll('.preset-chips').forEach(updateChipsMask);
+  document.querySelectorAll('.ds-chip-scroll').forEach(updateChipsMask);
 });
 
 // ---- Count-up animation (easeOutQuart / 700ms — Mint Design System) ----
@@ -1028,14 +965,14 @@ function animateCountUp(numEl, manEl, toRaw, ms = 700) {
 
 // ---- Preset Chips ----
 function updatePresetChips() {
-  document.querySelectorAll('.preset-chip').forEach(chip => {
+  document.querySelectorAll('.ds-chip').forEach(chip => {
     const numEl = document.getElementById(chip.dataset.target);
     if (!numEl) return;
     chip.classList.toggle('active', parseFloat(numEl.value) === parseFloat(chip.dataset.value));
   });
 }
 
-document.querySelectorAll('.preset-chip').forEach(chip => {
+document.querySelectorAll('.ds-chip').forEach(chip => {
   chip.addEventListener('click', () => {
     const numEl = document.getElementById(chip.dataset.target);
     const slEl  = document.getElementById(chip.dataset.sl);
@@ -1050,23 +987,6 @@ document.querySelectorAll('.preset-chip').forEach(chip => {
   });
 });
 
-// ---- Chips scroll fade hint ----
-const CHIPS_FADE = 'linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%)';
-
-function updateChipsMask(el) {
-  const overflows = el.scrollWidth > el.clientWidth + 2;
-  const atEnd     = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
-  const mask = (overflows && !atEnd) ? CHIPS_FADE : '';
-  el.style.webkitMaskImage = mask;
-  el.style.maskImage       = mask;
-}
-
-function initChipsScrollHint() {
-  document.querySelectorAll('.preset-chips').forEach(el => {
-    el.addEventListener('scroll', () => updateChipsMask(el), { passive: true });
-    updateChipsMask(el);
-  });
-}
 
 // ---- Optional section toggle ----
 document.getElementById('optionalToggle').addEventListener('click', () => {
@@ -1076,7 +996,7 @@ document.getElementById('optionalToggle').addEventListener('click', () => {
 
 simulate();
 updatePresetChips();
-initChipsScrollHint();
+initChipScroll('.ds-chip-scroll');
 </script>
 </body>
 </html>

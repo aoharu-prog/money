@@ -3,6 +3,7 @@
    base-design-system.html のスタイル定義を抽出
 ══════════════════════════════════════════ */
 @import './tokens.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
 
 /* ── Reset ── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -350,7 +351,36 @@ html { scroll-behavior: smooth; }
 }
 
 /* ══════════════════════════════════════════
-   ⑤ ds-sim-chart
+   ⑤ ds-chip-scroll / ds-chip
+   横スクロール可能なプリセットチップ群
+══════════════════════════════════════════ */
+.ds-chip-scroll {
+  display: flex; gap: 6px; flex-wrap: nowrap;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; margin-left: auto;
+  flex: 1 1 0; min-width: 0; padding: 4px;
+}
+.ds-chip-scroll::-webkit-scrollbar { display: none; }
+.ds-chip {
+  padding: 5px 14px;
+  border: 1.5px solid var(--mint-light); border-radius: 20px;
+  font-size: clamp(0.7rem, 2.2vw, 0.78rem); font-weight: 500;
+  font-family: inherit; color: var(--sub-text); background: transparent;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  letter-spacing: 0.04em; line-height: 1.4; white-space: nowrap; flex-shrink: 0;
+}
+.ds-chip:hover {
+  border-color: var(--accent-deep); color: var(--accent-deep);
+  background: var(--mint-pale); transform: scale(1.05);
+}
+.ds-chip:active { transform: scale(0.95); }
+.ds-chip.active {
+  background: var(--accent-deep); border-color: var(--accent-deep);
+  color: #fff; box-shadow: 0 2px 10px rgba(74,140,111,0.35);
+}
+
+/* ══════════════════════════════════════════
+   ⑥ ds-sim-chart
    積立シミュレーション棒グラフ
 ══════════════════════════════════════════ */
 .ds-chart-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
