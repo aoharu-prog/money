@@ -117,6 +117,37 @@ function updateSliderBg(sl) {
 }
 
 /* ══════════════════════════════════════════
+   インプット連動
+══════════════════════════════════════════ */
+
+/**
+ * number input と range input を双方向にリンクする
+ * @param {string}   numId     number input の id
+ * @param {string}   slId      range input の id
+ * @param {number}   slMin     スライダーの最小値
+ * @param {number}   slMax     スライダーの最大値
+ * @param {number}   step      ステップ幅（1未満の場合は小数点1桁表示）
+ * @param {function} [onChange] 値変更時に呼ぶコールバック（例: simulate）
+ */
+function linkInputs(numId, slId, slMin, slMax, step, onChange = null) {
+  const num = document.getElementById(numId);
+  const sl  = document.getElementById(slId);
+  num.addEventListener('input', () => {
+    let v = parseFloat(num.value);
+    if (isNaN(v)) { if (onChange) onChange(); return; }
+    sl.value = clamp(v, slMin, slMax);
+    updateSliderBg(sl);
+    if (onChange) onChange();
+  });
+  sl.addEventListener('input', () => {
+    num.value = parseFloat(sl.value).toFixed(step < 1 ? 1 : 0);
+    updateSliderBg(sl);
+    if (onChange) onChange();
+  });
+  updateSliderBg(sl);
+}
+
+/* ══════════════════════════════════════════
    トースト通知
 ══════════════════════════════════════════ */
 

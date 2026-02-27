@@ -5,21 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>新NISA積立シミュレーター</title>
 <link rel="stylesheet" href="../shared/components.css">
+<script src="../shared/base.js"></script>
 <style>
 /* ══════════════════════════════════════════
    NISA固有トークン（共通変数は shared/tokens.css）
 ══════════════════════════════════════════ */
 :root {
-  --slider-track: 8px;
-  --thumb-size:   24px;
+  --form-label-w: 210px;
   --card-px:      20px;
 }
 @media (min-width: 600px) {
   :root { --card-px: 32px; }
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
@@ -37,11 +34,6 @@ body {
   body { padding: 36px 24px 60px; }
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--mint-light); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
 /* ══════════════════════════════════════════
    HEADER
@@ -102,38 +94,6 @@ header p {
   background: var(--accent-deep); flex-shrink: 0;
 }
 
-/* ══════════════════════════════════════════
-   INPUT ROWS
-══════════════════════════════════════════ */
-.input-rows { display: flex; flex-direction: column; gap: clamp(18px, 3.5vw, 26px); }
-
-.irow {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-@media (min-width: 560px) {
-  .irow {
-    grid-template-columns: 210px 1fr;
-    align-items: center;
-    gap: 20px;
-  }
-}
-
-.irow-label { display: flex; flex-direction: column; gap: 4px; }
-.irow-label .lname {
-  font-size: clamp(0.9rem, 2.8vw, 1.05rem);
-  font-weight: 600;
-  color: var(--text-main);
-  line-height: 1.3;
-}
-.irow-label .ldesc {
-  font-size: clamp(0.65rem, 2vw, 0.75rem);
-  color: var(--sub-text);
-  line-height: 1.5;
-}
-
-.irow-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 
 /* ds-val-row / ds-num-edit / ds-val-unit — NISA固有オーバーライド */
 .ds-val-row { align-items: center; margin-bottom: 0; }
@@ -181,12 +141,6 @@ header p {
   font-size: clamp(1.1rem, 3.5vw, 1.3rem);
 }
 
-/* ── Divider (ds-divider) ── */
-.irow-divider {
-  border: none;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--mint-light), transparent);
-}
 
 /* ══════════════════════════════════════════
    OPTIONAL SECTION
@@ -265,36 +219,10 @@ header p {
 /* ══════════════════════════════════════════
    CHART
 ══════════════════════════════════════════ */
-.legend {
-  display: flex;
-  gap: clamp(12px, 3vw, 20px);
-  flex-wrap: wrap;
-  margin-bottom: clamp(10px, 2vw, 16px);
-  align-items: center;
-}
-.li {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: clamp(0.72rem, 2.2vw, 0.82rem);
-  color: var(--sub-text);
-  font-weight: 500;
-}
-.ld { width: 12px; height: 12px; border-radius: 3px; }
-.chart-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
 canvas { display: block; cursor: default; }
 
-/* ── ds-progress-bg ── */
-.ds-divider { height: 1px; background: linear-gradient(90deg,transparent,var(--mint-light),transparent); margin: 16px 0; }
-
-/* note-box style */
-.note {
-  font-size: clamp(0.6rem, 1.8vw, 0.72rem);
-  color: var(--sub-text);
-  text-align: right;
-  margin-top: 10px;
-  letter-spacing: 0.04em;
-}
+/* ── ds-divider NISA固有オーバーライド ── */
+.ds-divider { margin: 16px 0; }
 .note-br { display: none; }
 .header-br { display: none; }
 @media (max-width: 559px) {
@@ -302,42 +230,10 @@ canvas { display: block; cursor: default; }
   .header-br { display: block; }
 }
 
-/* ══════════════════════════════════════════
-   TOOLTIP
-══════════════════════════════════════════ */
-#tooltip {
-  position: fixed;
-  background: #2c3a35;
-  color: #fff;
-  border-radius: 16px;
-  padding: 14px 18px;
-  font-size: clamp(0.72rem, 2.2vw, 0.84rem);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .15s;
-  z-index: 200;
-  min-width: 200px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.25), 0 2px 8px rgba(74,140,111,0.2);
-  line-height: 1.9;
-  border: 1px solid rgba(168,213,186,0.2);
-}
-#tooltip.show { opacity: 1; }
-#tooltip .ty {
-  font-size: clamp(0.82rem, 2.5vw, 0.96rem);
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 4px;
-  letter-spacing: 0.04em;
-}
-#tooltip .ttotal {
-  font-size: clamp(0.88rem, 2.8vw, 1.08rem);
-  font-weight: 500;
-  font-family: 'Roboto', sans-serif;
-  margin-bottom: 2px;
-}
-#tooltip .tr { display: flex; align-items: center; gap: 8px; }
-#tooltip .td { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-#tooltip .tsep { border-top: 1px solid rgba(255,255,255,0.12); margin: 5px 0; }
+/* ── tooltip — NISA固有オーバーライド（共通スタイルは shared/components.css .ds-chart-tooltip）── */
+#tooltip { border-radius: 16px; padding: 14px 18px; min-width: 200px; line-height: 1.9; font-size: clamp(0.72rem, 2.2vw, 0.84rem); }
+#tooltip .tt-year  { font-size: clamp(0.82rem, 2.5vw, 0.96rem); }
+#tooltip .tt-total { font-size: clamp(0.88rem, 2.8vw, 1.08rem); }
 
 /* ══════════════════════════════════════════
    DISCLAIMER (note-box style)
@@ -360,9 +256,8 @@ canvas { display: block; cursor: default; }
 
 
 /* ══════════════════════════════════════════
-   ANIMATIONS
+   ANIMATIONS（@keyframes secFadeIn は shared/components.css）
 ══════════════════════════════════════════ */
-@keyframes secFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 .ds-card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
 .ds-card:nth-child(2) { animation-delay: 0.08s; }
 .ds-card:nth-child(3) { animation-delay: 0.14s; }
@@ -379,15 +274,15 @@ canvas { display: block; cursor: default; }
 <!-- ── 入力カード ── -->
 <div class="ds-card">
   <div class="card-label">入力条件</div>
-  <div class="input-rows">
+  <div class="ds-form-rows">
 
     <!-- 生年月日 -->
-    <div class="irow">
-      <div class="irow-label">
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
         <span class="lname">生年月日</span>
         <span class="ldesc">年・月を選択してください</span>
       </div>
-      <div class="irow-right">
+      <div class="ds-form-row-right">
         <div class="dob-row">
           <select id="dobYear" class="ds-select-underline"></select><span class="ds-select-unit">年</span>
           <select id="dobMonth" class="ds-select-underline"></select><span class="ds-select-unit">月</span>
@@ -396,14 +291,14 @@ canvas { display: block; cursor: default; }
       </div>
     </div>
 
-    <hr class="irow-divider">
+    <hr class="ds-divider">
 
     <!-- 毎月の積立額 -->
-    <div class="irow">
-      <div class="irow-label">
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
         <span class="lname">毎月の積立額</span>
       </div>
-      <div class="irow-right">
+      <div class="ds-form-row-right">
         <div class="ds-val-row">
           <input class="ds-num-edit" type="number" id="inMonthly" min="0" max="30" step="0.1" value="5">
           <span class="ds-val-unit">万円</span>
@@ -423,14 +318,14 @@ canvas { display: block; cursor: default; }
       </div>
     </div>
 
-    <hr class="irow-divider">
+    <hr class="ds-divider">
 
     <!-- 利回り -->
-    <div class="irow">
-      <div class="irow-label">
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
         <span class="lname">想定利回り（年率）</span>
       </div>
-      <div class="irow-right">
+      <div class="ds-form-row-right">
         <div class="ds-val-row">
           <input class="ds-num-edit" type="number" id="inRate" min="0" max="10" step="0.1" value="5">
           <span class="ds-val-unit">%</span>
@@ -459,12 +354,12 @@ canvas { display: block; cursor: default; }
         <span class="optional-desc">新NISAですでに投資している方のみ入力してください。<br class="br-sp">まだ投資していない方は入力不要です。</span>
 
       <!-- 新NISA投資累計額 -->
-      <div class="irow">
-        <div class="irow-label">
+      <div class="ds-form-row">
+        <div class="ds-form-row-label">
           <span class="lname">新NISA投資累計額</span>
           <span class="ldesc">これまでに新NISAへ投資した合計額</span>
         </div>
-        <div class="irow-right">
+        <div class="ds-form-row-right">
           <div class="ds-val-row">
             <input class="ds-num-edit" type="number" id="inContrib" min="0" max="1800" step="1" value="0">
             <span class="ds-val-unit">万円</span>
@@ -478,12 +373,12 @@ canvas { display: block; cursor: default; }
       </div>
 
       <!-- 現在の評価額 -->
-      <div class="irow">
-        <div class="irow-label">
+      <div class="ds-form-row">
+        <div class="ds-form-row-label">
           <span class="lname">現在の評価額</span>
           <span class="ldesc">現在の新NISAの時価評価額</span>
         </div>
-        <div class="irow-right">
+        <div class="ds-form-row-right">
           <div class="ds-val-row">
             <input class="ds-num-edit" type="number" id="inEval" min="0" max="9999" step="1" value="0">
             <span class="ds-val-unit">万円</span>
@@ -506,14 +401,14 @@ canvas { display: block; cursor: default; }
 <div class="ds-card" id="resultCard">
   <div class="card-label">シミュレーション結果</div>
   <div class="summary" id="summary"></div>
-  <div class="legend">
-    <div class="li"><div class="ld" style="background:var(--accent)"></div>元本</div>
-    <div class="li"><div class="ld" style="background:var(--accent-deep)"></div>運用収益</div>
+  <div class="ds-chart-legend">
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent)"></div>元本</div>
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent-deep)"></div>運用収益</div>
   </div>
-  <div class="chart-wrap">
+  <div class="ds-chart-wrap">
     <canvas id="chart"></canvas>
   </div>
-  <div class="note">※ 新NISA枠（1,800万円）到達後は<br class="note-br">新規積立停止・運用のみ継続</div>
+  <div class="ds-chart-note">※ 新NISA枠（1,800万円）到達後は<br class="note-br">新規積立停止・運用のみ継続</div>
 </div>
 
 <div class="disclaimer">
@@ -522,7 +417,7 @@ canvas { display: block; cursor: default; }
   <p>本シミュレーターの情報の正確性・完全性について、一切の保証を行いません。</p>
 </div>
 
-<div id="tooltip"></div>
+<div id="tooltip" class="ds-chart-tooltip"></div>
 
 <script>
 const NISA_MAX = 18_000_000;
@@ -530,22 +425,6 @@ let bars = [];
 let hoveredIdx = -1;
 let nisaFullInfo = null;
 
-function fmtYenParts(n) {
-  n = Math.round(n);
-  if (n >= 100_000_000) {
-    const oku = Math.floor(n / 100_000_000);
-    const man = Math.round((n % 100_000_000) / 10_000);
-    if (man === 0) return { num: oku.toLocaleString('ja-JP'), unit: '億円' };
-    return { num: oku.toLocaleString('ja-JP') + '億' + man.toLocaleString('ja-JP'), unit: '万円' };
-  }
-  return { num: Math.round(n / 10_000).toLocaleString('ja-JP'), unit: '万円' };
-}
-function fmtYen(n) { const { num, unit } = fmtYenParts(n); return num + unit; }
-function fmtAxisMan(n) {
-  if (n >= 100_000_000) return (n / 100_000_000).toFixed(1).replace(/\.0$/, '') + '億';
-  return Math.round(n / 10_000).toLocaleString('ja-JP') + '万';
-}
-function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
 
 // ---- DOB ----
 const now = new Date();
@@ -607,32 +486,11 @@ dobMonthSel.addEventListener('change', () => { updateAgeDisplay(); simulate(); }
 updateMonthOptions();
 updateAgeDisplay();
 
-// ---- Slider sync ----
-function updateSliderBg(sl) {
-  const pct = clamp(((parseFloat(sl.value) - parseFloat(sl.min)) / (parseFloat(sl.max) - parseFloat(sl.min))) * 100, 0, 100);
-  sl.style.setProperty('--pct', pct + '%');
-}
 
-function linkInputs(numId, slId, slMin, slMax, step) {
-  const num = document.getElementById(numId);
-  const sl  = document.getElementById(slId);
-  num.addEventListener('input', () => {
-    let v = parseFloat(num.value);
-    if (isNaN(v)) { simulate(); return; }
-    sl.value = clamp(v, slMin, slMax);
-    updateSliderBg(sl); simulate();
-  });
-  sl.addEventListener('input', () => {
-    num.value = parseFloat(sl.value).toFixed(step < 1 ? 1 : 0);
-    updateSliderBg(sl); simulate();
-  });
-  updateSliderBg(sl);
-}
-
-linkInputs('inContrib', 'slContrib', 0, 1800, 1);
-linkInputs('inEval',    'slEval',    0, 9999, 1);
-linkInputs('inMonthly', 'slMonthly', 0,   30, 0.1);
-linkInputs('inRate',    'slRate',    0,   10, 0.1);
+linkInputs('inContrib', 'slContrib', 0, 1800, 1,   simulate);
+linkInputs('inEval',    'slEval',    0, 9999, 1,   simulate);
+linkInputs('inMonthly', 'slMonthly', 0,   30, 0.1, simulate);
+linkInputs('inRate',    'slRate',    0,   10, 0.1, simulate);
 
 const numMap = { slContrib:'inContrib', slEval:'inEval', slMonthly:'inMonthly', slRate:'inRate' };
 
@@ -829,7 +687,7 @@ function renderChart(data) {
       ctx.fillStyle = '#7a9a8e';
       ctx.font = '500 10px Roboto, sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(fmtAxisMan(maxVal * i / 4), PAD.l - 6, y + 3.5);
+      ctx.fillText(fmtAxisYen(maxVal * i / 4), PAD.l - 6, y + 3.5);
     }
   }
 
@@ -897,13 +755,13 @@ function onPointer(e) {
   const dispAgeMon = tam % 12;
 
   tip.innerHTML = `
-    <div class="ty">${d.year}年後（${dispAge}歳${dispAgeMon}ヶ月）</div>
-    <div class="ttotal">合計：${fmtYen(d.total)}</div>
-    <div class="tsep"></div>
-    <div class="tr"><div class="td" style="background:#a8d5ba"></div>元本：${fmtYen(d.principal)}</div>
-    <div class="tr"><div class="td" style="background:#4a8c6f"></div>運用収益：${fmtYen(d.gain)}</div>
-    <div class="tsep"></div>
-    <div class="tr"><div class="td" style="background:#d4ede3"></div>新NISA残枠：${fmtYen(d.nisaLeft)}</div>
+    <div class="tt-year">${d.year}年後（${dispAge}歳${dispAgeMon}ヶ月）</div>
+    <div class="tt-total">合計：${fmtYen(d.total)}</div>
+    <div class="tt-sep"></div>
+    <div class="tt-row"><div class="tt-dot" style="background:#a8d5ba"></div>元本：${fmtYen(d.principal)}</div>
+    <div class="tt-row"><div class="tt-dot" style="background:#4a8c6f"></div>運用収益：${fmtYen(d.gain)}</div>
+    <div class="tt-sep"></div>
+    <div class="tt-row"><div class="tt-dot" style="background:#d4ede3"></div>新NISA残枠：${fmtYen(d.nisaLeft)}</div>
   `;
 
   const TW = 220, TH = 182;

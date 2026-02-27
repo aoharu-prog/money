@@ -170,6 +170,38 @@ html { scroll-behavior: smooth; }
 .ds-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--mint-light), transparent); margin: 20px 0; }
 
 /* ══════════════════════════════════════════
+   ds-form-row
+   ラベル＋インプットの横並びレイアウト
+   --form-label-w でラベル幅をカスタマイズ可能（デフォルト 200px）
+══════════════════════════════════════════ */
+.ds-form-rows { display: flex; flex-direction: column; gap: clamp(18px, 3.5vw, 26px); }
+.ds-form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 560px) {
+  .ds-form-row {
+    grid-template-columns: var(--form-label-w, 200px) 1fr;
+    align-items: center;
+    gap: 20px;
+  }
+}
+.ds-form-row-label { display: flex; flex-direction: column; gap: 4px; }
+.ds-form-row-label .lname {
+  font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+.ds-form-row-label .ldesc {
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
+  color: var(--sub-text);
+  line-height: 1.5;
+}
+.ds-form-row-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ══════════════════════════════════════════
    ds-toast
    フローティングトースト通知
 ══════════════════════════════════════════ */
