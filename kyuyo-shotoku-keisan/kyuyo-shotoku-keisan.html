@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>給与所得控除 かんたん計算</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --base-bg: #e8f5f1;
+    --accent: #a8d5ba;
+    --accent-deep: #4a8c6f;
+    --text-main: #44504c;
+    --text-sub: #ccd6d1;
+    --highlight: #4a8c6f;
+    --card-bg: #ffffff;
+    --mint-light: #d4ede3;
+    --mint-pale: #f0faf5;
+    --shadow: rgba(74,140,111,0.12);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background-color: var(--base-bg);
+    color: var(--text-main);
+    font-family: 'Hiragino Kaku Gothic ProN','ヒラギノ角ゴ ProN W3','Hiragino Sans',sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(168,213,186,0.3) 0%, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(74,140,111,0.12) 0%, transparent 35%);
+  }
+
+  /* ─ 背景パーティクル ─ */
+  #particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
+  .particle {
+    position:absolute; border-radius:50%; pointer-events:none;
+    animation: particleDrift linear infinite;
+  }
+  @keyframes particleDrift {
+    0%   { transform:translateY(100vh) scale(0) rotate(0deg); opacity:0; }
+    10%  { opacity:1; }
+    90%  { opacity:1; }
+    100% { transform:translateY(-20px) scale(1) rotate(360deg); opacity:0; }
+  }
+
+  /* ─ デコ ─ */
+  .deco-circle { position:fixed; border-radius:50%; pointer-events:none; z-index:0; }
+  .deco-circle-1 { width:400px; height:400px; top:-120px; right:-80px; background:radial-gradient(circle,rgba(168,213,186,0.22) 0%,transparent 70%); }
+  .deco-circle-2 { width:280px; height:280px; bottom:60px; left:-60px; background:radial-gradient(circle,rgba(74,140,111,0.14) 0%,transparent 70%); }
+  .deco-leaf {
+    position:fixed; opacity:0.06; pointer-events:none; z-index:0;
+    font-size:180px; bottom:20px; right:30px;
+    animation: floatLeaf 6s ease-in-out infinite;
+  }
+  @keyframes floatLeaf {
+    0%,100% { transform:translateY(0) rotate(-20deg); }
+    50%     { transform:translateY(-12px) rotate(-20deg); }
+  }
+
+  /* ─ ヘッダー ─ */
+  header {
+    position:relative; z-index:10; padding:48px 24px 0; text-align:center;
+    animation: fadeInDown 0.8s cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+
+  .badge {
+    display:inline-block; background:var(--accent); color:#fff;
+    font-size:11px; letter-spacing:0.14em; padding:4px 16px;
+    border-radius:20px; margin-bottom:16px; font-weight:500;
+    box-shadow:0 2px 12px rgba(168,213,186,0.5);
+    animation: pulseBadge 3s ease-in-out infinite;
+  }
+  @keyframes pulseBadge {
+    0%,100% { box-shadow:0 2px 12px rgba(168,213,186,0.5); }
+    50%     { box-shadow:0 4px 22px rgba(74,140,111,0.45); }
+  }
+  h1 { font-size:clamp(22px,5vw,32px); font-weight:600; color:var(--text-main); letter-spacing:0.06em; line-height:1.4; margin-bottom:8px; }
+  .subtitle { font-size:13px; color:#7a9a8e; letter-spacing:0.08em; font-family:'Roboto',sans-serif; }
+
+  /* ─ カード ─ */
+  .container { position:relative; z-index:10; max-width:560px; margin:36px auto 60px; padding:0 20px; }
+  .card {
+    background:var(--card-bg); border-radius:28px; padding:40px 36px;
+    box-shadow:0 8px 40px var(--shadow),0 1px 4px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,0.8);
+    position:relative; overflow:hidden;
+    animation: fadeInUp 0.7s 0.2s cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  @keyframes fadeInUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+  .card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:4px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-deep),var(--accent));
+    background-size:200% 100%; border-radius:28px 28px 0 0;
+    animation: shimmerBar 3s linear infinite;
+  }
+  @keyframes shimmerBar { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* ─ 年度切り替え ─ */
+  .year-toggle { display:flex; gap:8px; margin-bottom:32px; background:var(--mint-pale); padding:5px; border-radius:14px; }
+  .year-btn {
+    flex:1; padding:10px 8px; border:none; border-radius:10px;
+    font-family:'Roboto',sans-serif; font-size:13px; font-weight:500;
+    cursor:pointer; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    color:#7a9a8e; background:transparent; letter-spacing:0.05em;
+  }
+  .year-btn.active { background:var(--card-bg); color:var(--accent-deep); box-shadow:0 2px 10px var(--shadow); transform:scale(1.02); }
+  .year-btn:hover:not(.active) { background:rgba(168,213,186,0.2); }
+
+  /* ─ 入力 ─ */
+  .input-section { margin-bottom:20px; }
+  label { display:block; font-size:13px; font-weight:500; color:var(--text-main); letter-spacing:0.08em; margin-bottom:10px; }
+  .input-wrap { position:relative; display:flex; align-items:center; }
+  input[type="text"] {
+    width:100%; padding:18px 64px 18px 22px;
+    font-size:22px; font-family:'Roboto',sans-serif; font-weight:300;
+    color:var(--text-main); border:2px solid var(--mint-light);
+    border-radius:16px; outline:none; background:var(--mint-pale);
+    transition:all 0.3s ease; letter-spacing:0.04em;
+  }
+  /* プレースホルダーを明確に薄く */
+  input[type="text"]::placeholder { color:#b8d4cc; font-weight:300; font-size:18px; }
+  input[type="text"]:focus { border-color:var(--accent); background:var(--card-bg); box-shadow:0 0 0 4px rgba(168,213,186,0.25); }
+  .input-unit { position:absolute; right:20px; font-size:14px; color:#7a9a8e; pointer-events:none; font-family:'Hiragino Kaku Gothic ProN',sans-serif; }
+
+  /* ─ スライダー ─ */
+  .slider-wrap { margin-top:14px; }
+  input[type="range"] {
+    -webkit-appearance:none; appearance:none; width:100%; height:6px;
+    border-radius:3px; background:var(--mint-light); outline:none; cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none; width:24px; height:24px; border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+    cursor:pointer; box-shadow:0 2px 8px rgba(74,140,111,0.45);
+    transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1); border:2px solid #fff;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.3); }
+  input[type="range"]::-webkit-slider-thumb:active { transform:scale(1.1); }
+  .slider-labels { display:flex; justify-content:space-between; margin-top:5px; }
+  .slider-labels span { font-size:10px; font-family:'Roboto',sans-serif; color:var(--text-sub); }
+
+  /* ─ クイックボタン ─ */
+  .quick-label { font-size:11px; color:#7a9a8e; letter-spacing:0.1em; margin:14px 0 8px; }
+  .quick-btns { display:flex; flex-wrap:wrap; gap:8px; }
+  .quick-btn {
+    padding:7px 16px; border:1.5px solid var(--mint-light); border-radius:20px;
+    background:transparent; font-family:'Roboto',sans-serif; font-size:12px;
+    color:#7a9a8e; cursor:pointer; transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    letter-spacing:0.04em;
+  }
+  .quick-btn:hover { border-color:var(--accent-deep); color:var(--accent-deep); background:var(--mint-pale); transform:scale(1.08); }
+  .quick-btn:active { transform:scale(0.95); }
+  .quick-btn.selected { background:var(--accent-deep); color:#fff; border-color:var(--accent-deep); box-shadow:0 2px 12px rgba(74,140,111,0.35); }
+
+  /* ─ 区切り ─ */
+  .divider { height:1px; background:linear-gradient(90deg,transparent,var(--mint-light),transparent); margin:28px 0; }
+
+  /* ─ プレースホルダー ─ */
+  .result-placeholder { text-align:center; padding:20px 0 8px; transition:all 0.4s ease; }
+  .result-placeholder.hidden { display:none; }
+  .placeholder-icon { font-size:38px; margin-bottom:10px; animation:bouncePH 2.2s ease-in-out infinite; }
+  @keyframes bouncePH { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+  .placeholder-text { font-size:13px; color:#a0bdb5; letter-spacing:0.06em; line-height:1.9; }
+
+  /* ─ 結果 ─ */
+  .result-content { display:none; }
+  .result-content.visible { display:block; animation: fadeInUp 0.5s cubic-bezier(0.22,0.61,0.36,1) both; }
+  .result-label { font-size:11px; font-weight:500; letter-spacing:0.14em; color:#7a9a8e; margin-bottom:10px; text-transform:uppercase; }
+
+  .result-item {
+    background:var(--mint-pale); border-radius:16px; padding:20px 22px; margin-bottom:12px;
+    border:1.5px solid var(--mint-light); position:relative; overflow:hidden;
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .result-item:hover { transform:translateY(-2px); box-shadow:0 6px 20px var(--shadow); }
+  .result-item.highlight { background:linear-gradient(135deg,#f0faf6,#e8f5f1); border-color:var(--accent); box-shadow:0 4px 20px rgba(74,140,111,0.12); }
+  .result-name { font-size:12px; color:#7a9a8e; margin-bottom:6px; letter-spacing:0.08em; }
+  .result-value { font-family:'Roboto',sans-serif; font-size:30px; font-weight:300; color:var(--text-main); letter-spacing:0.02em; display:flex; align-items:baseline; gap:4px; }
+  .result-value.highlight-val { color:var(--highlight); font-weight:400; }
+  .result-value .unit { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:14px; font-weight:400; color:#7a9a8e; }
+
+  /* ─ バー ─ */
+  .ratio-bar-wrap { margin-top:10px; }
+  .ratio-bar-bg { height:6px; background:var(--mint-light); border-radius:3px; overflow:hidden; margin-bottom:4px; }
+  .ratio-bar-fill {
+    height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-deep));
+    border-radius:3px; width:0%; transition:width 1s cubic-bezier(0.22,0.61,0.36,1);
+    position:relative; overflow:hidden;
+  }
+  .ratio-bar-fill::after {
+    content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);
+    animation:barShimmer 2s ease-in-out infinite;
+  }
+  @keyframes barShimmer { 0%{left:-100%} 100%{left:200%} }
+  .ratio-text { font-family:'Roboto',sans-serif; font-size:11px; color:#7a9a8e; text-align:right; }
+
+  /* ─ ドーナツ ─ */
+  .donut-wrap {
+    display:flex; align-items:center; gap:20px; margin:16px 0 12px;
+    padding:18px 22px; background:var(--mint-pale); border-radius:16px; border:1.5px solid var(--mint-light);
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .donut-wrap:hover { transform:translateY(-2px); box-shadow:0 6px 20px var(--shadow); }
+  .donut-svg { flex-shrink:0; }
+  .donut-legend { flex:1; }
+  .donut-legend-item { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; }
+  .donut-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .donut-legend-val { font-family:'Roboto',sans-serif; font-size:11px; color:#7a9a8e; margin-left:auto; }
+
+  /* ─ 計算式 ─ */
+  .formula-box {
+    margin-top:12px; padding:16px 20px; background:var(--mint-pale); border-radius:12px;
+    font-size:12px; color:#7a9a8e; font-family:'Roboto',sans-serif; letter-spacing:0.04em;
+    line-height:1.8; border:1px dashed var(--mint-light);
+  }
+  .formula-box strong { color:var(--accent-deep); font-weight:500; font-family:'Hiragino Kaku Gothic ProN',sans-serif; }
+
+  /* ─ 法律メモ ─ */
+  .legal-note {
+    margin-top:14px; padding:14px 18px; background:rgba(168,213,186,0.1);
+    border-radius:12px; border-left:3px solid var(--accent);
+    font-size:11px; color:#7a9a8e; line-height:1.8; letter-spacing:0.05em;
+  }
+
+  /* ─ コンフェッティ ─ */
+  #confetti-wrap { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999; overflow:hidden; }
+  .confetti-piece { position:absolute; animation:confettiFall linear forwards; opacity:0; }
+  @keyframes confettiFall {
+    0%   { transform:translateY(-20px) rotate(0deg) scale(0); opacity:1; }
+    100% { transform:translateY(100vh) rotate(720deg) scale(0.4); opacity:0; }
+  }
+
+  /* ─ トースト ─ */
+  .toast {
+    position:fixed; bottom:30px; left:50%;
+    transform:translateX(-50%) translateY(80px);
+    background:var(--accent-deep); color:#fff; padding:12px 28px;
+    border-radius:40px; font-size:13px; letter-spacing:0.08em;
+    box-shadow:0 6px 24px rgba(74,140,111,0.4);
+    transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+    opacity:0; z-index:1000; white-space:nowrap;
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+  /* ─ フッター ─ */
+  footer { position:relative; z-index:10; text-align:center; padding:0 20px 40px; font-size:11px; color:#a0bdb5; letter-spacing:0.08em; line-height:2; }
+
+  @media(max-width:480px) {
+    .card { padding:28px 20px; border-radius:20px; }
+    .result-value { font-size:24px; }
+    h1 { font-size:20px; }
+    .donut-wrap { flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+<div id="confetti-wrap"></div>
+<div class="toast" id="toast"></div>
+<div class="deco-circle deco-circle-1"></div>
+<div class="deco-circle deco-circle-2"></div>
+<div class="deco-leaf">🌿</div>
+
+<header>
+  <div class="badge">✨ 年末調整・給与所得控除</div>
+  <h1>給与所得控除<br>かんたん計算</h1>
+  <p class="subtitle">Annual Salary Deduction Calculator</p>
+</header>
+
+<div class="container">
+  <div class="card">
+
+    <!-- 年度切り替え -->
+    <div class="year-toggle">
+      <button class="year-btn" id="btn-r6" onclick="setYear(6)">令和6年分</button>
+      <button class="year-btn active" id="btn-r7" onclick="setYear(7)">令和7年分（最新）</button>
+    </div>
+
+    <!-- 入力エリア -->
+    <div class="input-section">
+      <label>💴 額面年収を入力してください</label>
+      <div class="input-wrap">
+        <input type="text" id="salary-input" placeholder="例：5,000,000" inputmode="numeric"
+          oninput="onInputChange(this)" onblur="onInputBlur(this)" onfocus="onInputFocus(this)" />
+        <span class="input-unit">円</span>
+      </div>
+
+      <!-- スライダー -->
+      <div class="slider-wrap">
+        <input type="range" id="salary-slider" min="0" max="15000000" step="10000" value="0"
+          oninput="onSliderChange(this)" />
+        <div class="slider-labels">
+          <span>0</span><span>500万</span><span>1,000万</span><span>1,500万+</span>
+        </div>
+      </div>
+
+      <!-- クイックボタン -->
+      <div class="quick-label">よく使われる年収</div>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="setAmount(3000000,this)">300万</button>
+        <button class="quick-btn" onclick="setAmount(4000000,this)">400万</button>
+        <button class="quick-btn" onclick="setAmount(5000000,this)">500万</button>
+        <button class="quick-btn" onclick="setAmount(6000000,this)">600万</button>
+        <button class="quick-btn" onclick="setAmount(8000000,this)">800万</button>
+        <button class="quick-btn" onclick="setAmount(10000000,this)">1,000万</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 初期プレースホルダー -->
+    <div id="result-placeholder" class="result-placeholder">
+      <div class="placeholder-icon">🌿</div>
+      <div class="placeholder-text">
+        年収を入力すると<br>給与所得控除額と控除後の所得がわかります
+      </div>
+    </div>
+
+    <!-- 計算結果 -->
+    <div id="result-content" class="result-content">
+      <div class="result-label">📊 計算結果</div>
+
+      <!-- 控除額 -->
+      <div class="result-item">
+        <div class="result-name">給与所得控除額</div>
+        <div class="result-value">
+          <span id="deduction-num">0</span>
+          <span class="unit">円</span>
+        </div>
+        <div class="ratio-bar-wrap">
+          <div class="ratio-bar-bg"><div class="ratio-bar-fill" id="deduction-bar"></div></div>
+          <div class="ratio-text" id="deduction-ratio"></div>
+        </div>
+      </div>
+
+      <!-- 控除後の金額 -->
+      <div class="result-item highlight">
+        <div class="result-name">給与所得控除後の給与等の金額（所得）</div>
+        <div class="result-value highlight-val">
+          <span id="income-num">0</span>
+          <span class="unit">円</span>
+        </div>
+      </div>
+
+      <!-- ドーナツグラフ -->
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="88" height="88" viewBox="0 0 88 88">
+          <circle cx="44" cy="44" r="33" fill="none" stroke="#d4ede3" stroke-width="15"/>
+          <circle id="donut-ded" cx="44" cy="44" r="33" fill="none" stroke="#a8d5ba" stroke-width="15"
+            stroke-dasharray="0 207.3" stroke-linecap="round"
+            transform="rotate(-90 44 44)"
+            style="transition:stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1)"/>
+          <circle id="donut-inc" cx="44" cy="44" r="33" fill="none" stroke="#4a8c6f" stroke-width="15"
+            stroke-dasharray="0 207.3" stroke-linecap="round"
+            transform="rotate(-90 44 44)"
+            style="transition:stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1),stroke-dashoffset 1s cubic-bezier(0.22,0.61,0.36,1)"/>
+        </svg>
+        <div class="donut-legend">
+          <div class="donut-legend-item">
+            <div class="donut-dot" style="background:#4a8c6f"></div>
+            <span>控除後の所得</span>
+            <span class="donut-legend-val" id="legend-income">—</span>
+          </div>
+          <div class="donut-legend-item">
+            <div class="donut-dot" style="background:#a8d5ba"></div>
+            <span>給与所得控除額</span>
+            <span class="donut-legend-val" id="legend-deduction">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 計算式 -->
+      <div class="formula-box" id="formula-box"></div>
+      <!-- 法律メモ -->
+      <div class="legal-note" id="legal-note"></div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  所得税法 別表第五「年末調整等のための給与所得控除後の給与等の金額の表」に基づいて計算しています。<br>
+  令和7年（2025年）分：給与所得控除の最低保障額が <strong style="color:var(--accent-deep)">65万円</strong> に引き上げられました。<br>
+  本ツールはあくまで参考値です。正確な計算は税理士・国税庁へご確認ください。
+</footer>
+
+<script>
+/* ─ 背景パーティクル ─ */
+(function() {
+  const wrap = document.getElementById('particles');
+  const colors = ['rgba(168,213,186,0.4)','rgba(74,140,111,0.2)','rgba(208,237,220,0.5)','rgba(232,245,241,0.6)'];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const sz = 4 + Math.random() * 10;
+    p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${8+Math.random()*14}s;animation-delay:${-Math.random()*16}s;`;
+    wrap.appendChild(p);
+  }
+})();
+
+/* ─ コンフェッティ ─ */
+function fireConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  const colors = ['#a8d5ba','#4a8c6f','#d4ede3','#e8f5f1','#7fc49e','#2d7a5a'];
+  for (let i = 0; i < 50; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.cssText = `left:${10+Math.random()*80}%;top:${-10+Math.random()*5}px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.2+Math.random()*1.3}s;animation-delay:${Math.random()*0.5}s;border-radius:${Math.random()>0.5?'50%':'2px'};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
+    wrap.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
+  }
+}
+
+/* ─ トースト ─ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ─ 状態 ─ */
+let currentYear = 7;
+let currentRawValue = 0;
+let prevIncome = null;
+let rafId = null;
+
+/* ─ 年度 ─ */
+function setYear(y) {
+  currentYear = y;
+  document.getElementById('btn-r6').classList.toggle('active', y === 6);
+  document.getElementById('btn-r7').classList.toggle('active', y === 7);
+  showToast(y === 7 ? '🗓 令和7年分に切り替えました' : '🗓 令和6年分に切り替えました');
+  calculate();
+}
+
+/* ─ クイックボタン ─ */
+function setAmount(v, btn) {
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  currentRawValue = v;
+  document.getElementById('salary-input').value = fmtComma(v);
+  document.getElementById('salary-slider').value = Math.min(v, 15000000);
+  calculate();
+}
+
+/* ─ 入力 ─ */
+function fmtComma(n) { return n ? n.toLocaleString('ja-JP') : ''; }
+
+function onInputChange(el) {
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+  const pos = el.selectionStart, oldLen = el.value.length;
+  const raw = el.value.replace(/[^0-9]/g, '');
+  const num = parseInt(raw) || 0;
+  currentRawValue = num;
+  el.value = num ? fmtComma(num) : '';
+  const diff = el.value.length - oldLen;
+  try { el.setSelectionRange(pos + diff, pos + diff); } catch(e) {}
+  document.getElementById('salary-slider').value = Math.min(num, 15000000);
+  calculate();
+}
+
+function onSliderChange(el) {
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+  const num = parseInt(el.value) || 0;
+  currentRawValue = num;
+  document.getElementById('salary-input').value = fmtComma(num);
+  calculate();
+}
+
+function onInputFocus(el) { setTimeout(() => el.select(), 0); }
+function onInputBlur(el)  { el.value = currentRawValue ? fmtComma(currentRawValue) : ''; }
+
+/* ─ 計算ロジック（別表第五） ─ */
+function calcAfterDeduction(salary, year) {
+  const minG = year >= 7 ? 650000 : 550000;
+  if (salary < 6600000) {
+    const base = Math.floor(salary / 4000) * 4000;
+    let after;
+    if (base <= 1625000)      after = base - minG;
+    else if (base <= 1800000) after = base - Math.floor(Math.max(base * 0.4 - 100000, minG));
+    else if (base <= 3600000) after = Math.floor(base * 0.7 - 80000);
+    else                      after = Math.floor(base * 0.8 - 440000);
+    return Math.max(0, Math.floor(after / 200) * 200);
+  } else {
+    const ded = salary <= 8500000 ? salary * 0.1 + 1100000 : 1950000;
+    return Math.max(0, salary - Math.floor(ded));
+  }
+}
+
+/* ─ 数字アニメーション ─ */
+function animateNum(el, from, to, ms) {
+  if (rafId) cancelAnimationFrame(rafId);
+  const t0 = performance.now();
+  function step(now) {
+    const p = Math.min((now - t0) / ms, 1);
+    const ease = 1 - Math.pow(1 - p, 4);
+    el.textContent = Math.round(from + (to - from) * ease).toLocaleString('ja-JP');
+    if (p < 1) rafId = requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ─ ドーナツ ─ */
+function updateDonut(salary, deduction, income) {
+  const circ = 2 * Math.PI * 33; // ≈ 207.3
+  const dRatio = salary > 0 ? deduction / salary : 0;
+  const iRatio = salary > 0 ? income   / salary : 0;
+  const dLen = dRatio * circ, iLen = iRatio * circ;
+  document.getElementById('donut-ded').style.strokeDasharray = `${dLen} ${circ}`;
+  document.getElementById('donut-inc').style.strokeDasharray = `${iLen} ${circ}`;
+  document.getElementById('donut-inc').style.strokeDashoffset = -dLen;
+  document.getElementById('legend-income').textContent    = income.toLocaleString('ja-JP') + '円';
+  document.getElementById('legend-deduction').textContent = deduction.toLocaleString('ja-JP') + '円';
+}
+
+/* ─ メイン計算 ─ */
+function calculate() {
+  const salary = currentRawValue;
+  const ph  = document.getElementById('result-placeholder');
+  const rc  = document.getElementById('result-content');
+
+  if (salary <= 0) {
+    ph.classList.remove('hidden');
+    rc.classList.remove('visible');
+    return;
+  }
+
+  ph.classList.add('hidden');
+  const wasHidden = !rc.classList.contains('visible');
+  rc.classList.add('visible');
+
+  const income    = calcAfterDeduction(salary, currentYear);
+  const deduction = Math.max(0, salary - income);
+  const ratio     = salary > 0 ? Math.min(100, (deduction / salary) * 100) : 0;
+
+  // 数字アニメーション
+  const dedEl = document.getElementById('deduction-num');
+  const incEl = document.getElementById('income-num');
+  const fromDed = parseInt(dedEl.textContent.replace(/,/g,'')) || 0;
+  const fromInc = parseInt(incEl.textContent.replace(/,/g,'')) || 0;
+  animateNum(dedEl, fromDed, deduction, 700);
+  animateNum(incEl, fromInc, income,   700);
+
+  // バー
+  setTimeout(() => {
+    document.getElementById('deduction-bar').style.width = ratio.toFixed(1) + '%';
+  }, 80);
+  document.getElementById('deduction-ratio').textContent = `年収の約 ${ratio.toFixed(1)}% を控除`;
+
+  // ドーナツ
+  setTimeout(() => updateDonut(salary, deduction, income), 100);
+
+  // 計算式テキスト
+  const base = salary < 6600000 ? Math.floor(salary / 4000) * 4000 : salary;
+  const minGLabel = currentYear >= 7 ? '65万円' : '55万円';
+  let formula;
+  if      (base <= 1625000) formula = `最低保障額 ${minGLabel} を適用`;
+  else if (base <= 1800000) formula = `${base.toLocaleString()}円 × 40% − 100,000円（最低保障: ${minGLabel}）`;
+  else if (base <= 3600000) formula = `${base.toLocaleString()}円 × 70% − 80,000円（控除後の金額算出）`;
+  else if (base <= 6600000) formula = `${base.toLocaleString()}円 × 80% − 440,000円（控除後の金額算出）`;
+  else if (salary <= 8500000) formula = `控除額 = ${salary.toLocaleString()}円 × 10% + 1,100,000円`;
+  else    formula = `控除額 上限 195万円（年収 850万円超）`;
+
+  const areaNote = salary < 6600000 && salary !== base
+    ? `<br><span style="color:#a0bdb5;font-size:11px;">※ 別表第五の区間単位（4,000円）に合わせ ${salary.toLocaleString()}円 → 区間下限 ${base.toLocaleString()}円 で計算（同区間は控除後の金額が同じ）</span>`
+    : '';
+
+  document.getElementById('formula-box').innerHTML =
+    `<strong>計算式：</strong>${formula}${areaNote}<br><strong>計算結果：</strong>${salary.toLocaleString()}円 − ${deduction.toLocaleString()}円 = ${income.toLocaleString()}円`;
+
+  const basis = currentYear >= 7 ? '令和7年（2025年）分' : '令和6年（2024年）分';
+  document.getElementById('legal-note').innerHTML =
+    `📋 ${basis} 所得税法 別表第五に基づく計算です。<br>660万円未満は4,000円刻みの区間ごとに「控除後の給与等の金額」が固定されています。`;
+
+  // コンフェッティ＆トースト（年収が大きく変わったとき）
+  if (prevIncome !== null && Math.abs(income - prevIncome) > 200000) {
+    fireConfetti();
+    const diff = income - prevIncome;
+    if (diff > 0) showToast(`🎉 所得が ${diff.toLocaleString()}円 増えました！`);
+    else          showToast(`📉 所得が ${Math.abs(diff).toLocaleString()}円 変わりました`);
+  }
+  prevIncome = income;
+}
+
+/* 初期表示 */
+calculate();
+</script>
+</body>
+</html>

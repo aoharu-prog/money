@@ -1,0 +1,89 @@
+/* =========================================
+   Mint Design Tokens v1.0
+   ========================================= */
+
+   :root {
+
+    /* ===============================
+       Color System
+    =============================== */
+  
+    /* Base */
+    --color-bg-base:        #e8f5f1;
+    --color-bg-surface:     #ffffff;
+  
+    /* Mint Palette */
+    --color-mint-light:     #d4ede3;
+    --color-mint-pale:      #f0faf5;
+    --color-accent:         #a8d5ba;
+    --color-accent-deep:    #4a8c6f;
+  
+    /* Text */
+    --color-text-primary:   #44504c;
+    --color-text-secondary: #7a9a8e;
+    --color-text-subtle:    #ccd6d1;
+  
+    /* Utility */
+    --color-border:         #e2f0e9;
+    --color-shadow:         rgba(74,140,111,0.12);
+    --color-warning:        #e07a3a;
+    --color-placeholder:    #b8d4cc;
+  
+    /* System */
+    --color-sidebar-bg:     #f8fcfa;
+    --color-code-bg:        #1e2d28;
+    --color-code-fg:        #a8d5ba;
+  
+  
+    /* ===============================
+       Typography
+    =============================== */
+  
+    --font-base: 'Hiragino Kaku Gothic ProN',
+                 'ヒラギノ角ゴ ProN W3',
+                 'Hiragino Sans',
+                 sans-serif;
+  
+    --font-mono: 'Roboto Mono', monospace;
+  
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 20px;
+    --font-size-xl: 28px;
+    --font-size-2xl: 36px;
+  
+    --font-weight-regular: 400;
+    --font-weight-medium:  500;
+    --font-weight-bold:    700;
+  
+  
+    /* ===============================
+       Spacing System (8px Grid)
+    =============================== */
+  
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+  
+  
+    /* ===============================
+       Radius
+    =============================== */
+  
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-pill: 999px;
+  
+  
+    /* ===============================
+       Shadow
+    =============================== */
+  
+    --shadow-soft: 0 4px 12px var(--color-shadow);
+  }
