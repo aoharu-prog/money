@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iDeCo 節税・資産形成シミュレーター</title>
+<link rel="stylesheet" href="../shared/components.css">
+<script src="../shared/base.js"></script>
+<style>
+/* ══════════════════════════════════════════
+   iDeCo固有トークン（共通変数は shared/tokens.css）
+══════════════════════════════════════════ */
+:root {
+  --form-label-w: 220px;
+  --card-px:      20px;
+}
+@media (min-width: 600px) { :root { --card-px: 32px; } }
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
+  background: var(--base-bg);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(168,213,186,0.18) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(74,140,111,0.07) 0%, transparent 45%);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 20px 16px 48px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) { body { padding: 36px 24px 60px; } }
+
+/* ── Header ── */
+header {
+  margin-bottom: clamp(20px, 4vw, 32px);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.header-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--mint-pale); border: 1px solid var(--mint-light);
+  color: var(--accent-deep); font-size: 11px; font-family: 'Roboto Mono', monospace;
+  padding: 3px 12px; border-radius: 20px; margin-bottom: 12px; font-weight: 500; letter-spacing: 0.08em;
+}
+header h1 {
+  font-size: clamp(1.3rem, 5vw, 1.9rem); font-weight: 700; color: var(--text-main);
+  letter-spacing: 0.04em; margin-bottom: 6px;
+}
+header p { font-size: clamp(0.75rem, 2.3vw, 0.88rem); color: var(--sub-text); line-height: 1.7; }
+.header-br { display: none; }
+@media (max-width: 559px) { .header-br { display: block; } }
+
+/* ── ds-card オーバーライド ── */
+.ds-card { padding: 24px var(--card-px) 28px; margin-bottom: 16px; }
+@media (min-width: 600px) { .ds-card { padding: 32px var(--card-px); margin-bottom: 20px; } }
+
+.card-label {
+  font-size: clamp(0.65rem, 1.9vw, 0.75rem); font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--placeholder); margin-bottom: clamp(16px, 3vw, 24px);
+  display: flex; align-items: center; gap: 8px;
+}
+.card-label::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-deep); flex-shrink: 0;
+}
+
+/* ── 入力パーツ オーバーライド ── */
+.ds-val-row   { align-items: center; margin-bottom: 0; }
+.ds-num-edit  { font-size: clamp(1.6rem, 6vw, 2.1rem); width: 86px; letter-spacing: 0.02em; font-weight: 500; }
+.ds-val-unit  { font-size: clamp(0.82rem, 2.4vw, 0.95rem); }
+.dob-row      { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.ds-select-underline { font-size: clamp(1.5rem, 6vw, 2rem); font-weight: 500; }
+.ds-select-unit      { font-size: clamp(0.85rem, 2.5vw, 1rem); }
+.age-display {
+  font-size: clamp(0.75rem, 2.3vw, 0.88rem); color: var(--label-color);
+  font-weight: 500; margin-left: 4px; white-space: nowrap;
+}
+.slider-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ds-pm-btn {
+  width: clamp(30px, 8vw, 34px); height: clamp(30px, 8vw, 34px);
+  font-size: clamp(1.1rem, 3.5vw, 1.3rem);
+}
+.ds-divider { margin: 16px 0; }
+
+/* ── 職業セグメント ── */
+.occ-seg-scroll {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.occ-seg-scroll::-webkit-scrollbar { display: none; }
+.occ-seg-scroll .ds-segment { white-space: nowrap; }
+
+.occ-limit {
+  display: inline-block; margin-top: 8px;
+  font-size: clamp(0.68rem, 2vw, 0.78rem); font-weight: 500; color: var(--accent-deep);
+  background: rgba(168,213,186,0.12); border-radius: 8px; padding: 4px 10px;
+}
+
+/* ── 拠出額まわり ── */
+.monthly-preview {
+  margin-top: 5px;
+  font-size: clamp(0.7rem, 2.1vw, 0.8rem); color: var(--sub-text);
+}
+.monthly-preview .mval {
+  font-family: 'Roboto', sans-serif; font-weight: 600;
+  color: var(--accent-deep); font-size: clamp(0.78rem, 2.3vw, 0.88rem);
+}
+.inline-warn {
+  display: none; margin-top: 4px;
+  font-size: clamp(0.62rem, 1.8vw, 0.72rem); color: var(--warn-color);
+  background: rgba(224,122,58,0.08); border-radius: 8px; padding: 5px 10px;
+}
+.inline-warn.show { display: block; }
+
+/* ── 課税所得・税率 ── */
+.tax-row { display: flex; align-items: center; gap: 8px; margin-top: 7px; flex-wrap: wrap; }
+.tax-label { font-size: clamp(0.65rem, 1.9vw, 0.75rem); color: var(--sub-text); }
+.tax-badge {
+  font-size: clamp(0.68rem, 2vw, 0.78rem); font-weight: 600; color: var(--accent-deep);
+  background: rgba(168,213,186,0.15); border: 1px solid var(--mint-light);
+  border-radius: 20px; padding: 3px 10px;
+}
+
+/* ── 年金受取期間アコーディオン ── */
+.pension-opts {
+  overflow: hidden; max-height: 0; opacity: 0;
+  transition: max-height 0.35s cubic-bezier(0.22,0.61,0.36,1), opacity 0.25s ease;
+}
+.pension-opts.show { max-height: 100px; opacity: 1; }
+.pension-opts-inner { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.pension-opts-label { font-size: clamp(0.75rem, 2.2vw, 0.85rem); color: var(--sub-text); }
+
+/* ── サマリーグリッド（6カード）── */
+.summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: clamp(16px, 3.5vw, 24px);
+}
+@media (min-width: 480px) { .summary { grid-template-columns: repeat(3, 1fr); gap: 14px; } }
+@media (max-width: 479px) { .summary .boost-card { grid-column: 1 / -1; } }
+
+/* ブースト額がマイナスのとき */
+.boost-card.negative { background: rgba(224,122,58,0.06); border-color: var(--warn-color); }
+.boost-card.negative .ds-stat-num,
+.boost-card.negative .ds-stat-unit { color: var(--warn-color); }
+.boost-neg-msg {
+  font-size: clamp(0.6rem, 1.8vw, 0.7rem); color: var(--warn-color);
+  margin-top: 6px; line-height: 1.5;
+}
+
+/* ── グラフ ── */
+canvas { display: block; cursor: default; }
+
+/* ── ツールチップ（NISA 準拠オーバーライド）── */
+#tooltip { border-radius: 16px; padding: 14px 18px; min-width: 200px; line-height: 1.9; font-size: clamp(0.72rem, 2.2vw, 0.84rem); }
+#tooltip .tt-year  { font-size: clamp(0.82rem, 2.5vw, 0.96rem); }
+#tooltip .tt-total { font-size: clamp(0.88rem, 2.8vw, 1.08rem); }
+
+/* ── 免責事項 ── */
+.disclaimer {
+  margin-top: 12px; padding: 14px 18px;
+  background: rgba(168,213,186,0.08); border-left: 3px solid var(--accent);
+  border-radius: 12px; font-size: clamp(0.58rem, 1.8vw, 0.65rem);
+  color: var(--sub-text); line-height: 1.8; letter-spacing: 0.04em;
+}
+@media (min-width: 600px) { .disclaimer { padding: 16px 22px; } }
+.disclaimer p + p { margin-top: 6px; }
+
+/* ── カードアニメーション ── */
+.ds-card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
+.ds-card:nth-child(2) { animation-delay: 0.08s; }
+.ds-card:nth-child(3) { animation-delay: 0.14s; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">🏦 iDeCoシミュレーター</div>
+  <h1>iDeCo 節税・資産形成<br class="header-br">シミュレーション</h1>
+  <p>iDeCo加入による税制優遇効果と<br class="header-br">老後資産の増加額を試算します</p>
+</header>
+
+<!-- ── 入力カード ── -->
+<div class="ds-card">
+  <div class="card-label">入力条件</div>
+  <div class="ds-form-rows">
+
+    <!-- 職業 -->
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">職業・加入資格</span>
+        <span class="ldesc">年間拠出上限が変わります</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="occ-seg-scroll">
+          <div class="ds-segment" id="occSeg">
+            <button class="ds-seg-btn active" data-occ="emp_no">企業年金なし<br>会社員</button>
+            <button class="ds-seg-btn"        data-occ="emp_yes">企業年金あり<br>会社員</button>
+            <button class="ds-seg-btn"        data-occ="self">自営業</button>
+            <button class="ds-seg-btn"        data-occ="public">公務員</button>
+          </div>
+        </div>
+        <div class="occ-limit" id="occLimit"></div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <!-- 生年月日 -->
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">生年月日</span>
+        <span class="ldesc">年・月を選択してください</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="dob-row">
+          <select id="dobYear"  class="ds-select-underline"></select><span class="ds-select-unit">年</span>
+          <select id="dobMonth" class="ds-select-underline"></select><span class="ds-select-unit">月</span>
+          <span class="age-display" id="ageDisplay"></span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <!-- 積立終了年齢 -->
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">積立終了年齢</span>
+        <span class="ldesc">iDeCo拠出を続ける最終年齢</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inEndAge" min="20" max="75" step="1" value="60">
+          <span class="ds-val-unit">歳</span>
+          <span id="yearsDisp" style="font-size:clamp(0.75rem,2.2vw,0.85rem);color:var(--sub-text);margin-left:8px;"></span>
+        </div>
+        <div class="slider-row">
+          <button class="ds-pm-btn" id="endAgeMinus">－</button>
+          <input type="range" class="ds-stepper-range" id="slEndAge" min="20" max="75" step="1" value="60">
+          <button class="ds-pm-btn" id="endAgePlus">＋</button>
+        </div>
+        <div class="inline-warn" id="ageWarn">⚠ 積立終了年齢が現在年齢以下です。終了年齢を上げてください。</div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <!-- 年間iDeCo拠出額 -->
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">年間iDeCo拠出額</span>
+        <span class="ldesc">1年間の掛金合計</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inContrib" min="0" max="27.6" step="0.1" value="27.6">
+          <span class="ds-val-unit">万円/年</span>
+          <div class="ds-chip-scroll" id="contribChips"></div>
+        </div>
+        <div class="slider-row">
+          <button class="ds-pm-btn" id="contribMinus">－</button>
+          <input type="range" class="ds-stepper-range" id="slContrib" min="0" max="27.6" step="0.1" value="27.6">
+          <button class="ds-pm-btn" id="contribPlus">＋</button>
+        </div>
+        <div class="monthly-preview">月あたり <span class="mval" id="monthlyPreview">23,000</span> 円</div>
+        <div class="inline-warn" id="contribWarn">⚠ 上限額を超えています</div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <!-- 想定利回り -->
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">想定利回り（年率）</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inRate" min="0.1" max="10" step="0.1" value="5">
+          <span class="ds-val-unit">%</span>
+          <div class="ds-chip-scroll">
+            <button class="ds-chip rate-chip" data-value="3">3%</button>
+            <button class="ds-chip rate-chip active" data-value="5">5%</button>
+            <button class="ds-chip rate-chip" data-value="7">7%</button>
+          </div>
+        </div>
+        <div class="slider-row">
+          <button class="ds-pm-btn" id="rateMinus">－</button>
+          <input type="range" class="ds-stepper-range" id="slRate" min="0.1" max="10" step="0.1" value="5">
+          <button class="ds-pm-btn" id="ratePlus">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <!-- 課税所得 -->
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">課税所得</span>
+        <span class="ldesc">給与所得控除後の所得金額</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inIncome" min="0" max="5000" step="1" value="500" style="width:94px;">
+          <span class="ds-val-unit">万円</span>
+          <div class="ds-chip-scroll">
+            <button class="ds-chip income-chip" data-value="300">300万</button>
+            <button class="ds-chip income-chip active" data-value="500">500万</button>
+            <button class="ds-chip income-chip" data-value="700">700万</button>
+            <button class="ds-chip income-chip" data-value="1000">1,000万</button>
+          </div>
+        </div>
+        <div class="slider-row">
+          <button class="ds-pm-btn" id="incomeMinus">－</button>
+          <input type="range" class="ds-stepper-range" id="slIncome" min="0" max="5000" step="50" value="500">
+          <button class="ds-pm-btn" id="incomePlus">＋</button>
+        </div>
+        <div class="tax-row">
+          <span class="tax-label">限界税率（所得税＋住民税）：</span>
+          <span class="tax-badge" id="taxBadge">—</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <!-- 受取方法 -->
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">受取方法</span>
+        <span class="ldesc">受取時の課税方式</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-segment" id="receiveSeg">
+          <button class="ds-seg-btn active" data-receive="lump">一時金</button>
+          <button class="ds-seg-btn"        data-receive="pension">年金</button>
+        </div>
+        <div class="pension-opts" id="pensionOpts">
+          <div class="pension-opts-inner">
+            <span class="pension-opts-label">受取期間：</span>
+            <div class="ds-segment" id="pensionPeriodSeg">
+              <button class="ds-seg-btn active" data-years="10">10年</button>
+              <button class="ds-seg-btn"        data-years="15">15年</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 結果カード ── -->
+<div class="ds-card" id="resultCard">
+  <div class="card-label">シミュレーション結果</div>
+  <div class="summary" id="summary"></div>
+  <div class="ds-chart-legend">
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent)"></div>元本</div>
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent-deep)"></div>運用収益</div>
+  </div>
+  <div class="ds-chart-wrap">
+    <canvas id="chart"></canvas>
+  </div>
+  <div class="ds-chart-note">※ iDeCo拠出額の年次推移（税引前）</div>
+</div>
+
+<div class="disclaimer">
+  <p>【計算上の前提・免責事項】退職所得控除はiDeCo単独受取を想定した簡易計算です。退職金と同年に受け取る場合は控除が重複できません。年金受取の公的年金等控除は65歳未満基準（簡易モデル）を使用しています。本シミュレーターは概算であり、税務上の助言ではありません。</p>
+  <p>表示される数値は将来の運用成果を保証するものではありません。実際の税額・受取額は加入年数・受取時期・他の所得等によって異なります。投資判断・税務判断はご自身の責任において行い、必要に応じて専門家にご相談ください。</p>
+</div>
+
+<div id="tooltip" class="ds-chart-tooltip"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   iDeCo Simulator
+══════════════════════════════════════════ */
+
+// ── 職業マスター ──
+const OCC = {
+  emp_no:  { maxMan: 27.6, maxMon: 23000, chips: [12000, 18000, 23000] },
+  emp_yes: { maxMan: 14.4, maxMon: 12000, chips: [6000,  9000, 12000]  },
+  self:    { maxMan: 81.6, maxMon: 68000, chips: [30000, 50000, 68000] },
+  public:  { maxMan: 14.4, maxMon: 12000, chips: [6000,  9000, 12000]  },
+};
+
+let currentOcc     = 'emp_no';
+let currentReceive = 'lump';
+let currentPension = 10;
+
+// ── 所得税速算表 ──
+function incomeTaxFromTable(yen) {
+  const m = yen / 10000;
+  if (m <= 195)  return yen * 0.05;
+  if (m <= 330)  return yen * 0.10 - 97500;
+  if (m <= 695)  return yen * 0.20 - 427500;
+  if (m <= 900)  return yen * 0.23 - 636000;
+  if (m <= 1800) return yen * 0.33 - 1536000;
+  if (m <= 4000) return yen * 0.40 - 2796000;
+  return           yen * 0.45 - 4796000;
+}
+function marginalIncomeTaxRate(man) {
+  if (man <= 195)  return 0.05;
+  if (man <= 330)  return 0.10;
+  if (man <= 695)  return 0.20;
+  if (man <= 900)  return 0.23;
+  if (man <= 1800) return 0.33;
+  if (man <= 4000) return 0.40;
+  return 0.45;
+}
+function marginalRate(man) { return marginalIncomeTaxRate(man) + 0.10; }
+
+// ── 退職所得控除 ──
+function retirementDeduction(n) {
+  if (n <= 0)  return 0;
+  if (n <= 20) return Math.max(800000, 400000 * n);
+  return 8000000 + 700000 * (n - 20);
+}
+
+// ── 将来価値（年次複利）──
+function fv(A, r, n) {
+  if (n <= 0)  return 0;
+  if (r === 0) return A * n;
+  return A * ((Math.pow(1 + r, n) - 1) / r);
+}
+
+// ── DOB ──
+const now          = new Date();
+const currentYear  = now.getFullYear();
+const currentMonth = now.getMonth() + 1;
+const dobYearSel   = document.getElementById('dobYear');
+const dobMonthSel  = document.getElementById('dobMonth');
+
+for (let y = currentYear - 18; y >= currentYear - 65; y--) {
+  const o = document.createElement('option');
+  o.value = y; o.textContent = y;
+  dobYearSel.appendChild(o);
+}
+dobYearSel.value = 1992;
+for (let m = 1; m <= 12; m++) {
+  const o = document.createElement('option');
+  o.value = m; o.textContent = m;
+  dobMonthSel.appendChild(o);
+}
+dobMonthSel.value = 1;
+
+function updateMonthOpts() {
+  const y = parseInt(dobYearSel.value);
+  Array.from(dobMonthSel.options).forEach(o => {
+    const m = parseInt(o.value);
+    const am = (currentYear - y) * 12 + (currentMonth - m);
+    o.disabled = Math.floor(Math.max(0, am) / 12) >= 65;
+  });
+  const cur = Array.from(dobMonthSel.options).find(o => parseInt(o.value) === parseInt(dobMonthSel.value));
+  if (cur && cur.disabled) {
+    const first = Array.from(dobMonthSel.options).find(o => !o.disabled);
+    if (first) dobMonthSel.value = first.value;
+  }
+}
+function getAge() {
+  const by = parseInt(dobYearSel.value);
+  const bm = parseInt(dobMonthSel.value);
+  let am = (currentYear - by) * 12 + (currentMonth - bm);
+  if (am < 0) am = 0;
+  return { ageYears: clamp(Math.floor(am / 12), 18, 64), ageMon: am % 12 };
+}
+function updateAgeDisplay() {
+  const { ageYears, ageMon } = getAge();
+  document.getElementById('ageDisplay').textContent =
+    `（現在 ${ageYears}歳${ageMon > 0 ? ageMon + 'ヶ月' : ''}）`;
+  updateYearsDisp();
+}
+function updateYearsDisp() {
+  const { ageYears } = getAge();
+  const end = parseInt(document.getElementById('inEndAge').value) || 60;
+  const n   = end - ageYears;
+  document.getElementById('yearsDisp').textContent = n > 0 ? `→ ${n}年間` : '';
+}
+
+dobYearSel.addEventListener('change',  () => { updateMonthOpts(); updateAgeDisplay(); simulate(); });
+dobMonthSel.addEventListener('change', () => { updateAgeDisplay(); simulate(); });
+updateMonthOpts();
+updateAgeDisplay();
+
+// ── 積立終了年齢 ──
+linkInputs('inEndAge', 'slEndAge', 20, 75, 1, () => { updateYearsDisp(); simulate(); });
+document.getElementById('endAgeMinus').addEventListener('click', () => {
+  const sl = document.getElementById('slEndAge');
+  sl.value = clamp(+sl.value - 1, 20, 75);
+  document.getElementById('inEndAge').value = sl.value;
+  updateSliderBg(sl); updateYearsDisp(); simulate();
+});
+document.getElementById('endAgePlus').addEventListener('click', () => {
+  const sl = document.getElementById('slEndAge');
+  sl.value = clamp(+sl.value + 1, 20, 75);
+  document.getElementById('inEndAge').value = sl.value;
+  updateSliderBg(sl); updateYearsDisp(); simulate();
+});
+
+// ── 職業 ──
+function setOccupation(occ) {
+  currentOcc = occ;
+  const o = OCC[occ];
+  document.getElementById('occLimit').textContent =
+    `上限：${o.maxMan}万円/年（月 ${o.maxMon.toLocaleString('ja-JP')}円）`;
+  const sl = document.getElementById('slContrib');
+  const inp = document.getElementById('inContrib');
+  sl.max  = o.maxMan;
+  inp.max = o.maxMan;
+  if (parseFloat(inp.value) > o.maxMan) {
+    inp.value = o.maxMan.toFixed(1);
+    sl.value  = o.maxMan;
+  }
+  updateSliderBg(sl);
+  renderContribChips(occ);
+  updateContribUI();
+}
+function renderContribChips(occ) {
+  const cur  = parseFloat(document.getElementById('inContrib').value) || 0;
+  const wrap = document.getElementById('contribChips');
+  wrap.innerHTML = '';
+  OCC[occ].chips.forEach(monthly => {
+    const annualMan = parseFloat((monthly * 12 / 10000).toFixed(1));
+    const btn = document.createElement('button');
+    btn.className = 'ds-chip contrib-chip';
+    btn.dataset.val = annualMan;
+    btn.textContent = monthly.toLocaleString('ja-JP') + '円';
+    if (Math.abs(cur - annualMan) < 0.05) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      document.getElementById('inContrib').value = annualMan.toFixed(1);
+      document.getElementById('slContrib').value = annualMan;
+      updateSliderBg(document.getElementById('slContrib'));
+      syncContribChips(annualMan); updateContribUI(); simulate();
+    });
+    wrap.appendChild(btn);
+  });
+}
+function syncContribChips(val) {
+  document.querySelectorAll('.contrib-chip').forEach(c =>
+    c.classList.toggle('active', Math.abs(parseFloat(c.dataset.val) - val) < 0.05)
+  );
+}
+function updateContribUI() {
+  const val     = parseFloat(document.getElementById('inContrib').value) || 0;
+  const monthly = Math.round(val * 10000 / 12);
+  document.getElementById('monthlyPreview').textContent = monthly.toLocaleString('ja-JP');
+  const maxMan = OCC[currentOcc].maxMan;
+  const warn   = document.getElementById('contribWarn');
+  if (val > maxMan + 0.01) {
+    warn.textContent = `⚠ 上限（${maxMan}万円/年）を超えています`;
+    warn.classList.add('show');
+  } else {
+    warn.classList.remove('show');
+  }
+}
+
+document.getElementById('occSeg').addEventListener('click', e => {
+  const btn = e.target.closest('[data-occ]');
+  if (!btn) return;
+  document.querySelectorAll('#occSeg .ds-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  setOccupation(btn.dataset.occ);
+  simulate();
+});
+
+// ── 拠出額 ──
+linkInputs('inContrib', 'slContrib', 0, 27.6, 0.1, () => {
+  syncContribChips(parseFloat(document.getElementById('inContrib').value) || 0);
+  updateContribUI(); simulate();
+});
+document.getElementById('contribMinus').addEventListener('click', () => {
+  const sl = document.getElementById('slContrib');
+  sl.value = clamp(parseFloat(sl.value) - 0.1, 0, OCC[currentOcc].maxMan);
+  document.getElementById('inContrib').value = parseFloat(sl.value).toFixed(1);
+  updateSliderBg(sl);
+  syncContribChips(parseFloat(sl.value)); updateContribUI(); simulate();
+});
+document.getElementById('contribPlus').addEventListener('click', () => {
+  const sl = document.getElementById('slContrib');
+  sl.value = clamp(parseFloat(sl.value) + 0.1, 0, OCC[currentOcc].maxMan);
+  document.getElementById('inContrib').value = parseFloat(sl.value).toFixed(1);
+  updateSliderBg(sl);
+  syncContribChips(parseFloat(sl.value)); updateContribUI(); simulate();
+});
+
+// ── 利回り ──
+linkInputs('inRate', 'slRate', 0.1, 10, 0.1, () => {
+  syncRateChips(parseFloat(document.getElementById('inRate').value) || 5);
+  simulate();
+});
+document.getElementById('rateMinus').addEventListener('click', () => {
+  const sl = document.getElementById('slRate');
+  sl.value = clamp(parseFloat(sl.value) - 0.1, 0.1, 10);
+  document.getElementById('inRate').value = parseFloat(sl.value).toFixed(1);
+  updateSliderBg(sl); syncRateChips(parseFloat(sl.value)); simulate();
+});
+document.getElementById('ratePlus').addEventListener('click', () => {
+  const sl = document.getElementById('slRate');
+  sl.value = clamp(parseFloat(sl.value) + 0.1, 0.1, 10);
+  document.getElementById('inRate').value = parseFloat(sl.value).toFixed(1);
+  updateSliderBg(sl); syncRateChips(parseFloat(sl.value)); simulate();
+});
+document.querySelectorAll('.rate-chip').forEach(c => {
+  c.addEventListener('click', () => {
+    const v = parseFloat(c.dataset.value);
+    document.getElementById('inRate').value = v.toFixed(1);
+    document.getElementById('slRate').value = v;
+    updateSliderBg(document.getElementById('slRate'));
+    syncRateChips(v); simulate();
+  });
+});
+function syncRateChips(val) {
+  document.querySelectorAll('.rate-chip').forEach(c =>
+    c.classList.toggle('active', parseFloat(c.dataset.value) === Math.round(val * 10) / 10)
+  );
+}
+
+// ── 課税所得 ──
+linkInputs('inIncome', 'slIncome', 0, 5000, 50, () => {
+  updateTaxBadge(); syncIncomeChips(parseFloat(document.getElementById('inIncome').value) || 0); simulate();
+});
+document.getElementById('incomeMinus').addEventListener('click', () => {
+  const sl = document.getElementById('slIncome');
+  sl.value = clamp(parseFloat(sl.value) - 50, 0, 5000);
+  document.getElementById('inIncome').value = sl.value;
+  updateSliderBg(sl); updateTaxBadge(); syncIncomeChips(parseFloat(sl.value)); simulate();
+});
+document.getElementById('incomePlus').addEventListener('click', () => {
+  const sl = document.getElementById('slIncome');
+  sl.value = clamp(parseFloat(sl.value) + 50, 0, 5000);
+  document.getElementById('inIncome').value = sl.value;
+  updateSliderBg(sl); updateTaxBadge(); syncIncomeChips(parseFloat(sl.value)); simulate();
+});
+document.querySelectorAll('.income-chip').forEach(c => {
+  c.addEventListener('click', () => {
+    const v = parseFloat(c.dataset.value);
+    document.getElementById('inIncome').value = v;
+    document.getElementById('slIncome').value = v;
+    updateSliderBg(document.getElementById('slIncome'));
+    updateTaxBadge(); syncIncomeChips(v); simulate();
+  });
+});
+function updateTaxBadge() {
+  const man = parseFloat(document.getElementById('inIncome').value) || 0;
+  const it  = marginalIncomeTaxRate(man) * 100;
+  const t   = marginalRate(man) * 100;
+  document.getElementById('taxBadge').textContent =
+    `${t.toFixed(0)}%（所得税 ${it.toFixed(0)}% ＋ 住民税 10%）`;
+}
+function syncIncomeChips(val) {
+  document.querySelectorAll('.income-chip').forEach(c =>
+    c.classList.toggle('active', parseFloat(c.dataset.value) === val)
+  );
+}
+
+// ── 受取方法 ──
+document.getElementById('receiveSeg').addEventListener('click', e => {
+  const btn = e.target.closest('[data-receive]');
+  if (!btn) return;
+  document.querySelectorAll('#receiveSeg .ds-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentReceive = btn.dataset.receive;
+  document.getElementById('pensionOpts').classList.toggle('show', currentReceive === 'pension');
+  simulate();
+});
+document.getElementById('pensionPeriodSeg').addEventListener('click', e => {
+  const btn = e.target.closest('[data-years]');
+  if (!btn) return;
+  document.querySelectorAll('#pensionPeriodSeg .ds-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPension = parseInt(btn.dataset.years);
+  simulate();
+});
+
+// ── シミュレーション ──
+const _prev = {};
+
+function simulate() {
+  const { ageYears: age }  = getAge();
+  const endAge   = parseInt(document.getElementById('inEndAge').value) || 60;
+  const n        = endAge - age;
+  const annualMan = parseFloat(document.getElementById('inContrib').value) || 0;
+  const annualYen = annualMan * 10000;
+  const r         = (parseFloat(document.getElementById('inRate').value)   || 5)   / 100;
+  const incomeMan = parseFloat(document.getElementById('inIncome').value)  || 0;
+  const t         = marginalRate(incomeMan);
+
+  // バリデーション
+  document.getElementById('ageWarn').classList.toggle('show', n <= 0);
+  if (n <= 0) return;
+  const maxMan = OCC[currentOcc].maxMan;
+  if (annualMan > maxMan + 0.01) return;
+
+  // ── iDeCoあり ──
+  const FV = fv(annualYen, r, n);
+
+  let receiptTax = 0;
+  if (currentReceive === 'lump') {
+    // 一時金
+    const ded      = retirementDeduction(n);
+    const retInc   = Math.max(0, FV - ded);
+    const taxable  = retInc * 0.5;
+    if (taxable > 0) {
+      receiptTax = Math.max(0, incomeTaxFromTable(taxable)) + taxable * 0.10;
+    }
+  } else {
+    // 年金
+    const annual  = FV / currentPension;
+    const ded     = annual <= 1_300_000 ? 700_000 : annual * 0.25 + 375_000;
+    const misc    = Math.max(0, annual - ded);
+    if (misc > 0) receiptTax = misc * t * currentPension;
+  }
+  const fvIdeco = Math.max(0, FV - receiptTax);
+
+  // ── iDeCoなし ──
+  const Anet       = annualYen * (1 - t);
+  const fvNonGross = fv(Anet, r, n);
+  const gains_non  = Math.max(0, fvNonGross - Anet * n);
+  const fvNon      = fvNonGross - gains_non * 0.20315;
+
+  // ── 出力値 ──
+  const boost      = fvIdeco - fvNon;
+  const taxSaving  = annualYen * t;
+  const burden     = Anet;
+
+  renderSummary({ fvIdeco, fvNon, boost, taxSaving, burden, t, n });
+
+  // ── グラフデータ ──
+  const data = [];
+  for (let y = 1; y <= n; y++) {
+    const fvy = fv(annualYen, r, y);
+    data.push({ year: y, age: age + y, principal: annualYen * y, gain: Math.max(0, fvy - annualYen * y), total: fvy });
+  }
+  renderChart(data);
+}
+
+// ── サマリー描画 ──
+function renderSummary({ fvIdeco, fvNon, boost, taxSaving, burden, t, n }) {
+  const isNeg = boost < 0;
+  const svHtml = (v, key) => {
+    const { num, unit } = fmtYenParts(Math.abs(v));
+    return `<span class="ds-stat-num" data-key="${key}">${v < 0 ? '−' : ''}${num}</span>`
+         + `<span class="ds-stat-unit" data-key="${key}-u">${unit}</span>`;
+  };
+
+  document.getElementById('summary').innerHTML = `
+    <div class="ds-stat-card boost-card ${isNeg ? 'negative' : 'highlight'}">
+      <div class="ds-stat-label">iDeCoによる老後資産ブースト</div>
+      <div class="ds-stat-value">${svHtml(boost, 'boost')}</div>
+      ${isNeg ? '<div class="boost-neg-msg">⚠ このケースではiDeCoが不利です</div>' : ''}
+    </div>
+    <div class="ds-stat-card">
+      <div class="ds-stat-label">iDeCoあり最終額（税引後）</div>
+      <div class="ds-stat-value">${svHtml(fvIdeco, 'fideco')}</div>
+    </div>
+    <div class="ds-stat-card">
+      <div class="ds-stat-label">iDeCoなし最終額</div>
+      <div class="ds-stat-value">${svHtml(fvNon, 'fnon')}</div>
+    </div>
+    <div class="ds-stat-card">
+      <div class="ds-stat-label">年間節税額</div>
+      <div class="ds-stat-value">${svHtml(taxSaving, 'taxsave')}</div>
+    </div>
+    <div class="ds-stat-card">
+      <div class="ds-stat-label">実質負担額（年間）</div>
+      <div class="ds-stat-value">${svHtml(burden, 'burden')}</div>
+    </div>
+    <div class="ds-stat-card">
+      <div class="ds-stat-label">限界税率</div>
+      <div class="ds-stat-value">
+        <span class="ds-stat-num" style="font-size:clamp(1.4rem,5vw,2rem)">${(t * 100).toFixed(0)}</span>
+        <span class="ds-stat-unit">%</span>
+      </div>
+    </div>
+  `;
+
+  [['boost', boost], ['fideco', fvIdeco], ['fnon', fvNon], ['taxsave', taxSaving], ['burden', burden]]
+    .forEach(([key, val]) => {
+      const numEl  = document.querySelector(`.ds-stat-num[data-key="${key}"]`);
+      const unitEl = document.querySelector(`.ds-stat-unit[data-key="${key}-u"]`);
+      if (!numEl) return;
+      const from = _prev[key] ?? 0;
+      animateNum(numEl, from, Math.abs(val), 700, cur => {
+        const { num, unit } = fmtYenParts(Math.round(cur));
+        if (unitEl) unitEl.textContent = unit;
+        return (val < 0 ? '−' : '') + num;
+      });
+      _prev[key] = Math.abs(val);
+    });
+}
+
+// ── グラフ ──
+let bars = [];
+let hoveredIdx = -1;
+
+function rRect(ctx, x, y, w, h, r) {
+  if (h <= 0 || w <= 0) return;
+  if (typeof r === 'number') r = [r,r,r,r];
+  ctx.beginPath();
+  ctx.moveTo(x+r[0], y);
+  ctx.lineTo(x+w-r[1], y); ctx.quadraticCurveTo(x+w, y, x+w, y+r[1]);
+  ctx.lineTo(x+w, y+h-r[2]); ctx.quadraticCurveTo(x+w, y+h, x+w-r[2], y+h);
+  ctx.lineTo(x+r[3], y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r[3]);
+  ctx.lineTo(x, y+r[0]); ctx.quadraticCurveTo(x, y, x+r[0], y);
+  ctx.closePath(); ctx.fill();
+}
+
+function renderChart(data) {
+  const isMobile   = window.innerWidth < 560;
+  const MOBILE_MAX = 20;
+  const hiIdx      = hoveredIdx;
+  const canvas     = document.getElementById('chart');
+  const dpr        = window.devicePixelRatio || 1;
+  const containerW = canvas.parentElement.clientWidth;
+  const n          = data.length;
+
+  const PAD = { t: 14, r: isMobile ? 6 : 14, b: isMobile ? 34 : 42, l: isMobile ? 6 : 64 };
+  let cW;
+  if (isMobile && n > MOBILE_MAX) {
+    cW = Math.ceil(PAD.l + PAD.r + ((containerW - PAD.l - PAD.r) / MOBILE_MAX) * n);
+  } else {
+    cW = containerW;
+  }
+
+  const plotW = cW - PAD.l - PAD.r;
+  const BAR   = Math.max(3, plotW / n - Math.max(1, Math.min(4, plotW / n * 0.28)));
+  const GAP   = Math.max(1, plotW / n - BAR);
+  const H     = isMobile ? 220 : 300;
+  const pH    = H - PAD.t - PAD.b;
+
+  canvas.width  = cW * dpr; canvas.height = H * dpr;
+  canvas.style.width = cW + 'px'; canvas.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, cW, H);
+
+  const maxVal    = Math.max(...data.map(d => d.total), 1);
+  const labelStep = isMobile ? 10 : 5;
+
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD.t + pH - pH * i / 4;
+    ctx.strokeStyle = '#deeee8'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(cW - PAD.r, y); ctx.stroke();
+    if (!isMobile) {
+      ctx.fillStyle = '#7a9a8e';
+      ctx.font = '500 10px Roboto, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(fmtAxisYen(maxVal * i / 4), PAD.l - 6, y + 3.5);
+    }
+  }
+
+  bars = data.map((d, i) => {
+    const x       = PAD.l + i * (BAR + GAP);
+    const baseY   = PAD.t + pH;
+    const totalH  = (d.total     / maxVal) * pH;
+    const princH  = (d.principal / maxVal) * pH;
+    const gainH   = totalH - princH;
+    const isHov   = i === hiIdx;
+
+    if (isHov) {
+      ctx.fillStyle = 'rgba(74,140,111,0.09)';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x - 3, PAD.t, BAR + 6, pH, 5);
+      else               ctx.rect(x - 3, PAD.t, BAR + 6, pH);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = isHov ? '#7ec9a0' : '#a8d5ba';
+    rRect(ctx, x, baseY - princH, BAR, princH, [0, 0, 4, 4]);
+    if (gainH > 0.5) {
+      ctx.fillStyle = isHov ? '#3a7a5f' : '#4a8c6f';
+      rRect(ctx, x, baseY - totalH, BAR, gainH, [4, 4, 0, 0]);
+    }
+
+    if (d.year === 1 || d.year % labelStep === 0 || d.year === data.length) {
+      ctx.fillStyle = '#7a9a8e';
+      ctx.font = isMobile ? '500 8.5px Roboto, sans-serif' : '500 9.5px Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(d.age + '歳', x + BAR / 2, H - PAD.b + 13);
+      ctx.strokeStyle = '#d4ede3'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x + BAR / 2, baseY); ctx.lineTo(x + BAR / 2, baseY + 4); ctx.stroke();
+    }
+
+    return { ...d, _x: x, _w: BAR };
+  });
+}
+
+// ── ツールチップ ──
+const tip = document.getElementById('tooltip');
+
+function onPointer(e) {
+  const canvas = document.getElementById('chart');
+  const rect   = canvas.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  const lx = (cx - rect.left) * (parseFloat(canvas.style.width) / rect.width);
+
+  const idx = bars.findIndex(b => lx >= b._x - 3 && lx <= b._x + b._w + 3);
+  if (idx < 0) {
+    if (hoveredIdx !== -1) { hoveredIdx = -1; renderChart(bars); }
+    tip.classList.remove('show'); return;
+  }
+  if (hoveredIdx !== idx) { hoveredIdx = idx; renderChart(bars); }
+
+  const d = bars[idx];
+  tip.innerHTML = `
+    <div class="tt-year">${d.year}年後（${d.age}歳）</div>
+    <div class="tt-total">合計：${fmtYen(d.total)}</div>
+    <div class="tt-sep"></div>
+    <div class="tt-row"><div class="tt-dot" style="background:#a8d5ba"></div>元本：${fmtYen(d.principal)}</div>
+    <div class="tt-row"><div class="tt-dot" style="background:#4a8c6f"></div>運用収益：${fmtYen(d.gain)}</div>
+  `;
+
+  const TW = 220, TH = 140;
+  let tx = cx + 16, ty = cy - 20;
+  if (tx + TW > window.innerWidth)  tx = cx - TW - 16;
+  if (tx < 4) tx = 4;
+  if (ty + TH > window.innerHeight) ty = cy - TH - 10;
+  if (ty < 4) ty = 4;
+  tip.style.left = tx + 'px'; tip.style.top = ty + 'px';
+  tip.classList.add('show');
+}
+function hideTip() {
+  if (hoveredIdx !== -1) { hoveredIdx = -1; if (bars.length) renderChart(bars); }
+  tip.classList.remove('show');
+}
+
+const cvs = document.getElementById('chart');
+cvs.addEventListener('mousemove',  onPointer);
+cvs.addEventListener('mouseleave', hideTip);
+let _touchMoved = false;
+cvs.addEventListener('touchstart', e => { _touchMoved = false; onPointer(e); }, { passive: true });
+cvs.addEventListener('touchmove',  e => { _touchMoved = true; hideTip(); },   { passive: true });
+cvs.addEventListener('touchend',   e => { if (_touchMoved) hideTip(); },      { passive: true });
+window.addEventListener('resize', () => { if (bars.length) renderChart(bars); });
+
+// ── 初期化 ──
+setOccupation('emp_no');
+updateTaxBadge();
+initChipScroll();
+simulate();
+</script>
+</body>
+</html>
