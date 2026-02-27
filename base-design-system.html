@@ -1,0 +1,2444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌿 Mint Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════════ */
+:root {
+  --base-bg:     #e8f5f1;
+  --accent:      #a8d5ba;
+  --accent-deep: #4a8c6f;
+  --text-main:   #44504c;
+  --text-sub:    #ccd6d1;
+  --card-bg:     #ffffff;
+  --mint-light:  #d4ede3;
+  --mint-pale:   #f0faf5;
+  --shadow:      rgba(74,140,111,0.12);
+  --sub-text:    #7a9a8e;
+  --placeholder: #b8d4cc;
+  --warn-color:  #e07a3a;
+  --label-color: #5a7a70;
+
+  /* システムUI用 */
+  --sys-sidebar: #f8fcfa;
+  --sys-border:  #e2f0e9;
+  --sys-code-bg: #1e2d28;
+  --sys-code-fg: #a8d5ba;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN','ヒラギノ角ゴ ProN W3','Hiragino Sans',sans-serif;
+  background: var(--sys-sidebar);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ══════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════ */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--card-bg);
+  border-right: 1px solid var(--sys-border);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--sys-border);
+}
+.sidebar-logo .logo-icon { font-size: 28px; margin-bottom: 6px; }
+.sidebar-logo h2 {
+  font-size: 14px; font-weight: 700; color: var(--text-main);
+  letter-spacing: 0.06em; line-height: 1.3;
+}
+.sidebar-logo .logo-sub { font-size: 10px; color: var(--sub-text); letter-spacing: 0.12em; margin-top: 2px; font-family: 'Roboto', sans-serif; }
+
+.sidebar-nav { padding: 16px 0; flex: 1; }
+.nav-group { margin-bottom: 4px; }
+.nav-group-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.18em;
+  color: var(--placeholder); padding: 8px 24px 4px; text-transform: uppercase;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 24px; cursor: pointer;
+  font-size: 13px; color: var(--sub-text); border: none; background: none;
+  width: 100%; text-align: left;
+  transition: all 0.2s ease; border-radius: 0; letter-spacing: 0.03em;
+  position: relative;
+}
+.nav-item:hover { background: var(--mint-pale); color: var(--text-main); }
+.nav-item.active {
+  color: var(--accent-deep); background: #edf7f2; font-weight: 500;
+}
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--accent-deep); border-radius: 0 2px 2px 0;
+}
+.nav-icon { font-size: 14px; flex-shrink: 0; }
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* ══════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════ */
+.page-header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--sys-border);
+  padding: 32px 48px 28px;
+  position: relative; overflow: hidden;
+}
+.page-header::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
+  background-size: 200%; animation: shimmerBar 3s linear infinite;
+}
+@keyframes shimmerBar { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+.page-header .version-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--mint-pale); border: 1px solid var(--mint-light);
+  color: var(--accent-deep); font-size: 11px; font-family: 'Roboto Mono',monospace;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; font-weight: 500;
+}
+.page-header h1 { font-size: 28px; font-weight: 700; color: var(--text-main); letter-spacing: 0.04em; margin-bottom: 8px; }
+.page-header p  { font-size: 14px; color: var(--sub-text); line-height: 1.7; max-width: 560px; }
+
+/* ══════════════════════════════════════════
+   SECTION
+══════════════════════════════════════════ */
+.section {
+  display: none; padding: 40px 48px 60px; animation: secFadeIn 0.35s ease both;
+}
+.section.active { display: block; }
+@keyframes secFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.section-title {
+  font-size: 20px; font-weight: 700; color: var(--text-main);
+  letter-spacing: 0.04em; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-desc { font-size: 13px; color: var(--sub-text); line-height: 1.8; margin-bottom: 32px; }
+.block-title {
+  font-size: 13px; font-weight: 700; color: var(--text-main);
+  letter-spacing: 0.08em; margin-bottom: 12px; margin-top: 36px;
+  display: flex; align-items: center; gap: 8px;
+}
+.block-title:first-child { margin-top: 0; }
+.block-title .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent-deep); flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   CODE BLOCK
+══════════════════════════════════════════ */
+.code-block {
+  background: var(--sys-code-bg); border-radius: 12px;
+  position: relative; overflow: hidden; margin-bottom: 12px;
+}
+.code-block-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 16px 0; 
+}
+.code-lang {
+  font-size: 10px; font-family: 'Roboto Mono',monospace;
+  color: rgba(168,213,186,0.5); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.copy-btn {
+  background: rgba(168,213,186,0.15); border: 1px solid rgba(168,213,186,0.25);
+  color: var(--accent); font-size: 11px; font-family: 'Roboto Mono',monospace;
+  padding: 4px 12px; border-radius: 6px; cursor: pointer;
+  transition: all 0.2s ease; letter-spacing: 0.06em;
+}
+.copy-btn:hover { background: rgba(168,213,186,0.3); }
+.copy-btn.copied { color: #7fc49e; border-color: rgba(127,196,158,0.4); }
+pre {
+  padding: 16px 20px 18px; overflow-x: auto;
+  font-family: 'Roboto Mono',monospace; font-size: 12.5px; line-height: 1.75;
+  color: #c8e6d5; white-space: pre;
+}
+pre .kw  { color: #7fc49e; }    /* keyword */
+pre .str { color: #e8c97a; }    /* string */
+pre .num { color: #f0a07a; }    /* number */
+pre .cmt { color: #5a8070; }    /* comment */
+pre .fn  { color: #88cae0; }    /* function */
+pre .var { color: #c8e6d5; }    /* variable */
+pre .sel { color: #d4a8e0; }    /* selector */
+
+/* ══════════════════════════════════════════
+   DEMO AREA
+══════════════════════════════════════════ */
+.demo-area {
+  background: var(--base-bg);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 16px; padding: 32px; margin-bottom: 12px;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(168,213,186,0.2) 0%, transparent 50%),
+    radial-gradient(circle at 90% 90%, rgba(74,140,111,0.08) 0%, transparent 50%);
+}
+.demo-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+  color: var(--placeholder); text-transform: uppercase; margin-bottom: 16px;
+}
+
+/* ══════════════════════════════════════════
+   COLOR PALETTE
+══════════════════════════════════════════ */
+.color-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;
+}
+.color-swatch {
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--sys-border);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.color-swatch:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px var(--shadow);
+}
+.swatch-color { height: 72px; }
+.swatch-info { background: var(--card-bg); padding: 10px 12px; }
+.swatch-role { font-size: 10px; color: var(--sub-text); letter-spacing: 0.08em; margin-bottom: 3px; }
+.swatch-code {
+  font-size: 12px; font-family: 'Roboto Mono',monospace;
+  font-weight: 500; color: var(--text-main); margin-bottom: 2px;
+}
+.swatch-var  { font-size: 10px; font-family: 'Roboto Mono',monospace; color: var(--accent-deep); }
+.copied-flash {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--accent-deep); color: #fff;
+  padding: 10px 20px; border-radius: 30px; font-size: 12px;
+  letter-spacing: 0.08em; box-shadow: 0 4px 20px rgba(74,140,111,0.4);
+  opacity: 0; transform: translateY(10px);
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+}
+.copied-flash.show { opacity: 1; transform: translateY(0); }
+
+/* ══════════════════════════════════════════
+   TYPOGRAPHY
+══════════════════════════════════════════ */
+.type-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.type-table th {
+  text-align: left; padding: 8px 16px; font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--placeholder); border-bottom: 1px solid var(--sys-border);
+  font-weight: 600;
+}
+.type-table td { padding: 12px 16px; border-bottom: 1px solid var(--sys-border); color: var(--text-main); }
+.type-table tr:last-child td { border-bottom: none; }
+.type-table tr:hover td { background: var(--mint-pale); }
+.type-preview { color: var(--text-main); }
+.tag-pill {
+  display: inline-block; background: var(--mint-pale); border: 1px solid var(--mint-light);
+  color: var(--accent-deep); font-size: 10px; font-family: 'Roboto Mono',monospace;
+  padding: 2px 8px; border-radius: 4px;
+}
+
+/* ══════════════════════════════════════════
+   COMPONENTS DEMO
+══════════════════════════════════════════ */
+
+/* Badge */
+.ds-badge {
+  display: inline-block; background: var(--accent); color: #fff;
+  font-size: 11px; letter-spacing: 0.14em; padding: 4px 16px;
+  border-radius: 20px; font-weight: 500;
+  box-shadow: 0 2px 12px rgba(168,213,186,0.5);
+  animation: pulseBadge 3s ease-in-out infinite;
+}
+@keyframes pulseBadge {
+  0%,100%{box-shadow:0 2px 12px rgba(168,213,186,0.5)}
+  50%{box-shadow:0 4px 22px rgba(74,140,111,0.45)}
+}
+
+/* Card */
+.ds-card {
+  background: var(--card-bg); border-radius: 28px; padding: 28px;
+  box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
+  position: relative; overflow: hidden;
+}
+.ds-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:4px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-deep),var(--accent));
+  background-size:200%; animation:shimmerBar 3s linear infinite;
+  border-radius:28px 28px 0 0;
+}
+
+/* Input */
+.ds-input-wrap { position: relative; }
+.ds-input {
+  width: 100%; padding: 16px 56px 16px 20px;
+  font-size: 20px; font-family: 'Roboto',sans-serif; font-weight: 300;
+  color: var(--text-main); border: 2px solid var(--mint-light);
+  border-radius: 16px; outline: none; background: var(--mint-pale);
+  transition: all 0.3s ease; letter-spacing: 0.04em;
+}
+.ds-input::placeholder { color: var(--placeholder); font-weight: 300; font-size: 16px; }
+.ds-input:focus { border-color: var(--accent); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(168,213,186,0.25); }
+.ds-input-unit {
+  position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; color: var(--sub-text); pointer-events: none;
+}
+
+/* Buttons */
+.ds-btn-primary {
+  background: var(--accent-deep); color: #fff;
+  border: none; border-radius: 20px; padding: 10px 24px;
+  font-size: 13px; font-family: inherit; font-weight: 500; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 2px 12px rgba(74,140,111,0.35);
+}
+.ds-btn-primary:hover { transform: scale(1.05); box-shadow: 0 4px 18px rgba(74,140,111,0.45); }
+.ds-btn-primary:active { transform: scale(0.96); }
+
+.ds-btn-secondary {
+  background: transparent; color: var(--sub-text);
+  border: 1.5px solid var(--mint-light); border-radius: 20px; padding: 9px 22px;
+  font-size: 13px; font-family: inherit; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ds-btn-secondary:hover { border-color: var(--accent-deep); color: var(--accent-deep); background: var(--mint-pale); transform: scale(1.05); }
+.ds-btn-secondary:active { transform: scale(0.96); }
+
+.ds-btn-ghost {
+  background: transparent; color: var(--sub-text);
+  border: none; border-radius: 8px; padding: 8px 16px;
+  font-size: 13px; font-family: inherit; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ds-btn-ghost:hover { background: var(--mint-pale); color: var(--text-main); }
+
+/* Segment */
+.ds-segment {
+  display: flex; gap: 6px; background: var(--mint-pale);
+  padding: 5px; border-radius: 14px; width: fit-content;
+}
+.ds-seg-btn {
+  padding: 9px 20px; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  color: var(--sub-text); background: transparent; letter-spacing: 0.04em;
+  font-family: inherit;
+}
+.ds-seg-btn.active {
+  background: var(--card-bg); color: var(--accent-deep);
+  box-shadow: 0 2px 10px var(--shadow); transform: scale(1.02);
+}
+.ds-seg-btn:hover:not(.active) { background: rgba(168,213,186,0.2); }
+
+/* Result card */
+.ds-result {
+  background: var(--mint-pale); border-radius: 16px; padding: 18px 20px;
+  border: 1.5px solid var(--mint-light); margin-bottom: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ds-result:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.ds-result.highlight {
+  background: linear-gradient(135deg,#f0faf6,#e8f5f1);
+  border-color: var(--accent); box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-result-label { font-size: 11px; color: var(--sub-text); margin-bottom: 5px; letter-spacing: 0.08em; }
+.ds-result-value {
+  font-family: 'Roboto',sans-serif; font-size: 26px; font-weight: 300;
+  color: var(--text-main); display: flex; align-items: baseline; gap: 4px;
+}
+.ds-result-value.em { color: var(--highlight); font-weight: 400; }
+.ds-result-unit { font-family: 'Hiragino Kaku Gothic ProN',sans-serif; font-size: 13px; color: var(--sub-text); font-weight: 400; }
+
+/* Progress bar */
+.ds-progress-bg { height: 6px; background: var(--mint-light); border-radius: 3px; overflow: hidden; }
+.ds-progress-fill {
+  height: 100%; background: linear-gradient(90deg,var(--accent),var(--accent-deep));
+  border-radius: 3px; transition: width 1s cubic-bezier(0.22,0.61,0.36,1);
+  position: relative; overflow: hidden;
+}
+.ds-progress-fill::after {
+  content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);
+  animation:barShimmer 2s ease-in-out infinite;
+}
+@keyframes barShimmer { 0%{left:-100%} 100%{left:200%} }
+
+/* Divider */
+.ds-divider { height: 1px; background: linear-gradient(90deg,transparent,var(--mint-light),transparent); margin: 20px 0; }
+
+/* Toast */
+.ds-toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--accent-deep); color: #fff; padding: 12px 28px;
+  border-radius: 40px; font-size: 13px; letter-spacing: 0.08em;
+  box-shadow: 0 6px 24px rgba(74,140,111,0.4);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+  opacity: 0; z-index: 9999; white-space: nowrap; pointer-events: none;
+}
+.ds-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* Confetti */
+#ds-confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; overflow:hidden; }
+.ds-confetti-piece { position:absolute; animation:dsConfettiFall linear forwards; opacity:0; }
+@keyframes dsConfettiFall {
+  0%  { transform:translateY(-20px) rotate(0deg) scale(0);   opacity:1; }
+  100%{ transform:translateY(100vh) rotate(720deg) scale(0.4); opacity:0; }
+}
+
+/* Slider */
+.ds-range {
+  -webkit-appearance:none; appearance:none; width:100%; height:6px;
+  border-radius:3px; background:var(--mint-light); outline:none; cursor:pointer;
+}
+.ds-range::-webkit-slider-thumb {
+  -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  cursor:pointer; box-shadow:0 2px 8px rgba(74,140,111,0.4);
+  border:2px solid #fff; transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ds-range::-webkit-slider-thumb:hover { transform:scale(1.3); }
+
+/* Note box */
+.note-box {
+  background: rgba(168,213,186,0.1); border-left: 3px solid var(--accent);
+  border-radius: 12px; padding: 14px 18px; font-size: 12px;
+  color: var(--sub-text); line-height: 1.8; letter-spacing: 0.05em;
+}
+.dashed-box {
+  border: 1px dashed var(--mint-light); border-radius: 12px;
+  padding: 14px 18px; background: var(--mint-pale); font-size: 12px;
+  color: var(--sub-text); line-height: 1.8; font-family: 'Roboto Mono',monospace;
+}
+
+/* Spacing block */
+.spacing-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+.spacing-box { background:var(--accent); border-radius:4px; flex-shrink:0; }
+.spacing-label { font-size:12px; font-family:'Roboto Mono',monospace; color:var(--sub-text); }
+.spacing-val { font-size:11px; color:var(--accent-deep); margin-left:auto; font-family:'Roboto Mono',monospace; }
+
+/* Shadow demo */
+.shadow-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.shadow-card {
+  background:var(--card-bg); border-radius:16px; padding:20px; text-align:center;
+  font-size:11px; color:var(--sub-text); letter-spacing:0.06em; line-height:1.8;
+}
+.shadow-card .sc-name { font-weight:600; color:var(--text-main); margin-bottom:6px; font-size:12px; }
+
+/* Radius demo */
+.radius-grid { display:flex; flex-wrap:wrap; gap:12px; }
+.radius-box {
+  background:var(--mint-pale); border:1.5px solid var(--mint-light);
+  padding:12px 16px; font-size:11px; font-family:'Roboto Mono',monospace;
+  color:var(--accent-deep); display:flex; flex-direction:column; align-items:center; gap:4px;
+  min-width:80px;
+}
+.radius-box .rx-label { font-size:10px; color:var(--sub-text); }
+
+/* Animation demo tiles */
+.anim-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+.anim-tile {
+  background:var(--card-bg); border:1.5px solid var(--sys-border); border-radius:16px;
+  padding:24px 20px; text-align:center; cursor:pointer;
+  transition:border-color 0.2s ease;
+}
+.anim-tile:hover { border-color:var(--accent); }
+.anim-tile-icon { font-size:28px; margin-bottom:10px; min-height:40px; display:flex; align-items:center; justify-content:center; }
+.anim-tile-name { font-size:12px; font-weight:600; color:var(--text-main); margin-bottom:4px; }
+.anim-tile-desc { font-size:11px; color:var(--sub-text); line-height:1.6; }
+.anim-trigger-btn {
+  margin-top:12px; background:var(--mint-pale); border:1px solid var(--mint-light);
+  color:var(--accent-deep); font-size:11px; font-family:'Roboto Mono',monospace;
+  padding:5px 14px; border-radius:8px; cursor:pointer; letter-spacing:0.06em;
+  transition:all 0.2s ease;
+}
+.anim-trigger-btn:hover { background:var(--mint-light); }
+
+/* Live easing demo */
+.easing-demo { display:flex; flex-direction:column; gap:12px; }
+.easing-row { display:flex; align-items:center; gap:12px; }
+.easing-label { width:200px; font-size:11px; font-family:'Roboto Mono',monospace; color:var(--sub-text); flex-shrink:0; }
+.easing-track { flex:1; height:40px; background:var(--mint-pale); border-radius:8px; position:relative; overflow:hidden; cursor:pointer; border:1px solid var(--mint-light); }
+.easing-ball {
+  position:absolute; width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  top:50%; transform:translateY(-50%) translateX(4px);
+  box-shadow:0 2px 8px rgba(74,140,111,0.4);
+}
+.easing-name { font-size:11px; color:var(--accent-deep); font-weight:600; width:100px; font-family:'Roboto Mono',monospace; }
+
+/* Info table */
+.info-table { width:100%; border-collapse:collapse; }
+.info-table th {
+  text-align:left; padding:8px 16px; font-size:10px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--placeholder); border-bottom:1px solid var(--sys-border); font-weight:600;
+}
+.info-table td { padding:12px 16px; border-bottom:1px solid var(--sys-border); font-size:13px; color:var(--text-main); }
+.info-table tr:hover td { background:var(--mint-pale); }
+.info-table tr:last-child td { border:none; }
+
+/* Emoji usage */
+.emoji-grid { display:flex; flex-wrap:wrap; gap:8px; }
+.emoji-chip {
+  display:flex; align-items:center; gap:8px;
+  background:var(--card-bg); border:1px solid var(--sys-border);
+  border-radius:10px; padding:8px 14px; font-size:12px; color:var(--sub-text);
+}
+.emoji-chip .ec-em { font-size:18px; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--mint-light); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--accent); }
+
+/* Number counter demo */
+.counter-display {
+  font-family:'Roboto',sans-serif; font-size:48px; font-weight:300;
+  color:var(--accent-deep); letter-spacing:0.02em; text-align:center;
+  padding:20px; line-height:1;
+}
+
+/* Particles bg for demo */
+#demo-particles { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; border-radius:16px; }
+
+/* ══════════════════════════════════════════
+   ① INPUT STEPPER (ds-input-stepper)
+   数値入力 + スライダー + ±ボタン セット
+══════════════════════════════════════════ */
+.ds-val-row { display:flex; align-items:baseline; gap:8px; margin-bottom:10px; }
+.ds-num-edit {
+  font-size:clamp(1.5rem,5.5vw,2rem); font-weight:300;
+  color:var(--text-main); font-family:'Roboto',sans-serif;
+  border:none; border-bottom:2px solid var(--mint-light); outline:none;
+  background:transparent; width:100px; -moz-appearance:textfield;
+  padding:0 4px 4px; transition:border-color .25s ease; line-height:1.1;
+}
+.ds-num-edit:focus { border-bottom-color:var(--accent-deep); }
+.ds-num-edit::-webkit-outer-spin-button,
+.ds-num-edit::-webkit-inner-spin-button { -webkit-appearance:none; }
+.ds-val-unit { font-size:0.95rem; color:var(--sub-text); font-weight:500; }
+
+.ds-input-stepper { display:flex; align-items:center; gap:10px; width:100%; }
+.ds-pm-btn {
+  width:34px; height:34px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  color:#fff; border:none; cursor:pointer; font-size:1.25rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  box-shadow:0 2px 10px rgba(74,140,111,0.35);
+  transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1); user-select:none; line-height:1;
+}
+.ds-pm-btn:hover { transform:scale(1.1); box-shadow:0 4px 16px rgba(74,140,111,0.45); }
+.ds-pm-btn:active { transform:scale(0.92); }
+.ds-stepper-range {
+  flex:1; min-width:0;
+  -webkit-appearance:none; appearance:none; width:100%; height:8px;
+  border-radius:99px; outline:none; cursor:pointer; display:block;
+  background:linear-gradient(
+    to right,
+    var(--accent-deep) 0%, var(--accent-deep) var(--pct, 30%),
+    var(--mint-light) var(--pct, 30%), var(--mint-light) 100%
+  );
+}
+.ds-stepper-range::-webkit-slider-thumb {
+  -webkit-appearance:none; width:24px; height:24px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  border:2px solid #fff; box-shadow:0 2px 8px rgba(74,140,111,0.4);
+  transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1); cursor:grab;
+}
+.ds-stepper-range::-webkit-slider-thumb:hover { transform:scale(1.25); }
+.ds-stepper-range::-moz-range-thumb {
+  width:24px; height:24px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  border:2px solid #fff; box-shadow:0 2px 8px rgba(74,140,111,0.4); cursor:grab;
+}
+
+/* ══════════════════════════════════════════
+   ② WARNING INLINE (ds-warning-inline)
+   オレンジ系インライン警告ボックス
+══════════════════════════════════════════ */
+.ds-warning-inline {
+  display:flex; align-items:flex-start; gap:8px;
+  padding:10px 14px;
+  background:rgba(224,122,58,0.08);
+  border-left:3px solid var(--warn-color);
+  border-radius:10px;
+  font-size:12px; color:var(--warn-color);
+  line-height:1.7; letter-spacing:0.04em;
+}
+.ds-warning-inline .wi-icon { flex-shrink:0; font-size:15px; margin-top:1px; }
+
+/* ══════════════════════════════════════════
+   ③ SELECT UNDERLINE (ds-select-underline)
+   アンダーラインスタイルのセレクトボックス
+══════════════════════════════════════════ */
+.ds-select-row { display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; }
+.ds-select-underline {
+  font-size:clamp(1.4rem,5vw,1.8rem); font-weight:300;
+  color:var(--text-main);
+  font-family:'Roboto','Hiragino Kaku Gothic ProN',sans-serif;
+  border:none; border-bottom:2px solid var(--mint-light);
+  background:transparent; outline:none; cursor:pointer;
+  padding:0 4px 4px; -webkit-appearance:none; appearance:none;
+  transition:border-color .25s ease; line-height:1.1;
+}
+.ds-select-underline:focus { border-bottom-color:var(--accent-deep); }
+.ds-select-unit { font-size:0.95rem; color:var(--sub-text); font-weight:500; }
+
+/* ══════════════════════════════════════════
+   ④ SUMMARY GRID / STAT CARD
+   KPI・サマリーグリッドレイアウト
+══════════════════════════════════════════ */
+.ds-summary-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+@media (min-width:480px) {
+  .ds-summary-grid { grid-template-columns:repeat(3,1fr); gap:14px; }
+}
+@media (max-width:479px) {
+  .ds-summary-grid .ds-stat-card:last-child { grid-column:1 / -1; }
+}
+.ds-stat-card {
+  background:var(--mint-pale); border-radius:16px;
+  padding:clamp(14px,3vw,20px) clamp(10px,2vw,16px);
+  text-align:center; border:1.5px solid var(--mint-light);
+  transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ds-stat-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px var(--shadow); }
+.ds-stat-card.highlight {
+  background:linear-gradient(135deg,#f0faf6,#e8f5f1);
+  border-color:var(--accent); box-shadow:0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-stat-label {
+  font-size:clamp(0.7rem,2.2vw,0.82rem); color:var(--sub-text);
+  font-weight:600; margin-bottom:8px; line-height:1.4; letter-spacing:0.04em;
+}
+.ds-stat-num {
+  font-family:'Roboto',sans-serif; font-size:clamp(1.4rem,5vw,2rem);
+  font-weight:300; color:var(--accent-deep); line-height:1.1;
+}
+.ds-stat-unit { font-size:clamp(0.8rem,2.5vw,1rem); font-weight:400; color:var(--accent-deep); margin-left:2px; }
+.ds-stat-detail { font-size:clamp(0.68rem,2.2vw,0.8rem); color:var(--sub-text); font-weight:500; margin-top:6px; }
+.ds-stat-detail-num {
+  font-family:'Roboto',sans-serif; font-size:clamp(1.4rem,5vw,2rem);
+  font-weight:300; color:var(--accent-deep);
+}
+.ds-stat-detail-unit {
+  font-size:clamp(0.72rem,2.4vw,0.9rem); font-weight:400;
+  color:var(--accent-deep); margin:0 2px;
+  font-family:'Roboto','Hiragino Kaku Gothic ProN',sans-serif; vertical-align:middle;
+}
+
+/* ══════════════════════════════════════════
+   ⑤ SIMULATION CHART (ds-sim-chart)
+   積立シミュレーション棒グラフ
+══════════════════════════════════════════ */
+.ds-chart-legend { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px; align-items:center; }
+.ds-chart-li { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--sub-text); font-weight:500; }
+.ds-chart-ld { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+.ds-chart-wrap { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:12px; }
+.ds-chart-note { font-size:11px; color:var(--sub-text); text-align:right; margin-top:8px; letter-spacing:0.04em; }
+.ds-chart-tooltip {
+  position:fixed; background:#2c3a35; color:#fff;
+  border-radius:14px; padding:12px 16px;
+  font-size:12px; pointer-events:none;
+  opacity:0; transition:opacity .15s; z-index:9999;
+  min-width:190px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.22),0 2px 8px rgba(74,140,111,0.2);
+  line-height:1.8; border:1px solid rgba(168,213,186,0.2);
+}
+.ds-chart-tooltip.show { opacity:1; }
+.ds-chart-tooltip .tt-year { font-size:13px; font-weight:600; color:var(--accent); margin-bottom:3px; }
+.ds-chart-tooltip .tt-total { font-size:14px; font-weight:500; font-family:'Roboto',sans-serif; margin-bottom:2px; }
+.ds-chart-tooltip .tt-row { display:flex; align-items:center; gap:8px; }
+.ds-chart-tooltip .tt-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+.ds-chart-tooltip .tt-sep { border-top:1px solid rgba(255,255,255,0.12); margin:4px 0; }
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar { width:200px; }
+  .section { padding:24px; }
+  .page-header { padding:24px; }
+  .shadow-grid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:600px){
+  body { flex-direction:column; }
+  .sidebar { width:100%; height:auto; position:static; flex-direction:row; overflow-x:auto; }
+  .sidebar-logo { display:none; }
+  .sidebar-nav { display:flex; padding:8px; gap:4px; }
+  .nav-group-label { display:none; }
+  .nav-group { display:flex; }
+  .nav-item { white-space:nowrap; padding:8px 14px; border-radius:8px; }
+  .nav-item.active::before { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div id="ds-confetti"></div>
+<div class="ds-toast" id="ds-toast"></div>
+<div class="copied-flash" id="copied-flash">✓ コピーしました</div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌿</div>
+    <h2>Mint Design<br>System</h2>
+    <div class="logo-sub">v1.0 · 30代女性向けFintechUI</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Foundation</div>
+      <button class="nav-item active" onclick="showSection('colors')">
+        <span class="nav-icon">🎨</span>カラーパレット
+      </button>
+      <button class="nav-item" onclick="showSection('typography')">
+        <span class="nav-icon">🔤</span>タイポグラフィ
+      </button>
+      <button class="nav-item" onclick="showSection('spacing')">
+        <span class="nav-icon">📐</span>スペーシング
+      </button>
+      <button class="nav-item" onclick="showSection('elevation')">
+        <span class="nav-icon">🪞</span>シャドウ・枠線
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Components</div>
+      <button class="nav-item" onclick="showSection('components')">
+        <span class="nav-icon">🧩</span>UIコンポーネント
+      </button>
+      <button class="nav-item" onclick="showSection('forms')">
+        <span class="nav-icon">✏️</span>フォーム入力
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Motion</div>
+      <button class="nav-item" onclick="showSection('animation')">
+        <span class="nav-icon">✨</span>アニメーション
+      </button>
+      <button class="nav-item" onclick="showSection('interactions')">
+        <span class="nav-icon">👆</span>インタラクション
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Fintech</div>
+      <button class="nav-item" onclick="showSection('fintech')">
+        <span class="nav-icon">📊</span>Fintechパターン
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Guidelines</div>
+      <button class="nav-item" onclick="showSection('mobile')">
+        <span class="nav-icon">📱</span>モバイルファースト
+      </button>
+      <button class="nav-item" onclick="showSection('principles')">
+        <span class="nav-icon">💡</span>デザイン原則
+      </button>
+    </div>
+  </nav>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="version-badge">🌿 mint-ds v1.0</div>
+    <h1>Mint Design System</h1>
+    <p>30代女性向けFintechアプリのデザインシステムです。「難しくない・怖くない・触っていて楽しい」を軸に設計された、ミントグリーンベースの清潔感あるUIフレームワーク。各セクションのコードはそのままコピーして使えます。</p>
+  </div>
+
+  <!-- ══ SECTION: COLORS ══ -->
+  <section class="section active" id="sec-colors">
+    <div class="section-title">🎨 カラーパレット</div>
+    <div class="section-desc">淡いミントグリーンを基調とした9色のシステムカラー。CSS変数として定義し、一貫したテーマを維持します。スウォッチをクリックするとカラーコードをコピーできます。</div>
+
+    <div class="block-title"><div class="dot"></div>システムカラー</div>
+    <div class="color-grid" id="color-grid"></div>
+
+    <div class="block-title"><div class="dot"></div>補助カラー（直接指定）</div>
+    <div class="color-grid" id="aux-color-grid"></div>
+
+    <div class="block-title"><div class="dot"></div>CSS変数定義</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">css</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="sel">:root</span> {
+  <span class="kw">--base-bg</span>:     <span class="str">#e8f5f1</span>;  <span class="cmt">/* ベース背景（淡いミント）*/</span>
+  <span class="kw">--accent</span>:      <span class="str">#a8d5ba</span>;  <span class="cmt">/* アクセント（若葉ミント）*/</span>
+  <span class="kw">--accent-deep</span>: <span class="str">#4a8c6f</span>;  <span class="cmt">/* アクセント深（深みミント）*/</span>
+  <span class="kw">--text-main</span>:   <span class="str">#44504c</span>;  <span class="cmt">/* メイン文字（チャコールグレー）*/</span>
+  <span class="kw">--text-sub</span>:    <span class="str">#ccd6d1</span>;  <span class="cmt">/* サブ文字（極薄グレー）*/</span>
+  <span class="kw">--card-bg</span>:     <span class="str">#ffffff</span>;  <span class="cmt">/* カード背景（純白）*/</span>
+  <span class="kw">--mint-light</span>:  <span class="str">#d4ede3</span>;  <span class="cmt">/* ボーダー・バー背景 */</span>
+  <span class="kw">--mint-pale</span>:   <span class="str">#f0faf5</span>;  <span class="cmt">/* 入力・カード背景 */</span>
+  <span class="kw">--shadow</span>:      <span class="str">rgba(74,140,111,0.12)</span>; <span class="cmt">/* グリーン系シャドウ */</span>
+}</pre>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: TYPOGRAPHY ══ -->
+  <section class="section" id="sec-typography">
+    <div class="section-title">🔤 タイポグラフィ</div>
+    <div class="section-desc">日本語はヒラギノ角ゴ（システムフォント）、数字・英字はRoboto（Google Fonts）。数字をLight（300）で細く表示することで、数字が苦手なユーザーへの圧迫感を減らします。</div>
+
+    <div class="block-title"><div class="dot"></div>フォント読み込み</div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">&lt;!-- Google Fonts --&gt;</span>
+<span class="kw">&lt;link</span> <span class="var">rel</span>=<span class="str">"preconnect"</span> <span class="var">href</span>=<span class="str">"https://fonts.googleapis.com"</span><span class="kw">&gt;</span>
+<span class="kw">&lt;link</span> <span class="var">rel</span>=<span class="str">"preconnect"</span> <span class="var">href</span>=<span class="str">"https://fonts.gstatic.com"</span> <span class="var">crossorigin</span><span class="kw">&gt;</span>
+<span class="kw">&lt;link</span> <span class="var">href</span>=<span class="str">"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"</span> <span class="var">rel</span>=<span class="str">"stylesheet"</span><span class="kw">&gt;</span>
+
+<span class="cmt">/* CSS: 日本語ベース */</span>
+<span class="sel">body</span> {
+  <span class="kw">font-family</span>: <span class="str">'Hiragino Kaku Gothic ProN'</span>, <span class="str">'ヒラギノ角ゴ ProN W3'</span>,
+               <span class="str">'Hiragino Sans'</span>, <span class="str">sans-serif</span>;
+}
+<span class="cmt">/* 数字・英字要素に個別指定 */</span>
+<span class="sel">.number, input</span> { <span class="kw">font-family</span>: <span class="str">'Roboto'</span>, <span class="str">sans-serif</span>; }</pre>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>タイプスケール</div>
+    <div class="demo-area">
+      <div class="demo-label">LIVE PREVIEW</div>
+      <table class="type-table">
+        <thead><tr><th>用途</th><th>サイズ</th><th>Weight</th><th>フォント</th><th>プレビュー</th></tr></thead>
+        <tbody id="type-table-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: SPACING ══ -->
+  <section class="section" id="sec-spacing">
+    <div class="section-title">📐 スペーシング & 角丸</div>
+    <div class="section-desc">8の倍数ベースのスペーシングシステム。角丸は要素の重要度・サイズに応じて階層的に設定します。</div>
+
+    <div class="block-title"><div class="dot"></div>スペーシングスケール</div>
+    <div class="demo-area" id="spacing-demo"></div>
+
+    <div class="block-title"><div class="dot"></div>角丸（border-radius）</div>
+    <div class="demo-area">
+      <div class="demo-label">RADIUS SYSTEM</div>
+      <div class="radius-grid" id="radius-grid"></div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: ELEVATION ══ -->
+  <section class="section" id="sec-elevation">
+    <div class="section-title">🪞 シャドウ・グラデーション・枠線</div>
+    <div class="section-desc">黒い影の代わりにテーマカラーのグリーン系シャドウを使用。重たくならず、空気感のある奥行きを演出します。</div>
+
+    <div class="block-title"><div class="dot"></div>シャドウスケール</div>
+    <div class="demo-area">
+      <div class="shadow-grid" id="shadow-grid"></div>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>グラデーション</div>
+    <div class="demo-area" id="gradient-demo"></div>
+
+    <div class="block-title"><div class="dot"></div>枠線</div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">/* 通常のカード・入力 */</span>
+<span class="kw">border</span>: <span class="num">1.5px</span> <span class="str">solid</span> <span class="str">#d4ede3</span>;
+
+<span class="cmt">/* フォーカス・ハイライト */</span>
+<span class="kw">border</span>: <span class="num">2px</span> <span class="str">solid</span> <span class="str">#a8d5ba</span>;
+
+<span class="cmt">/* 点線（計算式・補足） */</span>
+<span class="kw">border</span>: <span class="num">1px</span> <span class="str">dashed</span> <span class="str">#d4ede3</span>;
+
+<span class="cmt">/* 左アクセントライン */</span>
+<span class="kw">border-left</span>: <span class="num">3px</span> <span class="str">solid</span> <span class="str">#a8d5ba</span>;
+
+<span class="cmt">/* フォーカスリング */</span>
+<span class="kw">box-shadow</span>: <span class="num">0 0 0 4px</span> <span class="str">rgba(168,213,186,0.25)</span>;</pre>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: COMPONENTS ══ -->
+  <section class="section" id="sec-components">
+    <div class="section-title">🧩 UIコンポーネント</div>
+    <div class="section-desc">再利用可能なコンポーネント一覧。クリックして動作を確認できます。</div>
+
+    <div class="block-title"><div class="dot"></div>バッジ</div>
+    <div class="demo-area" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <span class="ds-badge">✨ 年末調整・給与所得控除</span>
+      <span class="ds-badge" style="background:var(--accent-deep);animation:none;">令和7年分（最新）</span>
+      <span class="ds-badge" style="background:var(--mint-light);color:var(--accent-deep);animation:none;box-shadow:none;">Draft</span>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>ボタン</div>
+    <div class="demo-area" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="ds-btn-primary" onclick="demoToast('🎉 ボタンをクリックしました！')">Primary</button>
+      <button class="ds-btn-secondary" onclick="demoToast('👆 セカンダリーボタン')">Secondary</button>
+      <button class="ds-btn-ghost" onclick="demoToast('👻 ゴーストボタン')">Ghost</button>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>セグメントコントロール（年度切り替え等）</div>
+    <div class="demo-area">
+      <div class="ds-segment">
+        <button class="ds-seg-btn" onclick="toggleSeg(this)">令和6年分</button>
+        <button class="ds-seg-btn active" onclick="toggleSeg(this)">令和7年分（最新）</button>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">html + css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">&lt;!-- セグメントコントロール --&gt;</span>
+<span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"year-toggle"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;button</span> <span class="var">class</span>=<span class="str">"year-btn"</span>        <span class="var">onclick</span>=<span class="str">"setYear(6)"</span><span class="kw">&gt;</span>令和6年分<span class="kw">&lt;/button&gt;</span>
+  <span class="kw">&lt;button</span> <span class="var">class</span>=<span class="str">"year-btn active"</span> <span class="var">onclick</span>=<span class="str">"setYear(7)"</span><span class="kw">&gt;</span>令和7年分（最新）<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+
+<span class="sel">.year-toggle</span> {
+  <span class="kw">display</span>: <span class="str">flex</span>; <span class="kw">gap</span>: <span class="num">8px</span>; <span class="kw">background</span>: <span class="str">var(--mint-pale)</span>;
+  <span class="kw">padding</span>: <span class="num">5px</span>; <span class="kw">border-radius</span>: <span class="num">14px</span>;
+}
+<span class="sel">.year-btn</span> {
+  <span class="kw">flex</span>: <span class="num">1</span>; <span class="kw">padding</span>: <span class="num">10px 8px</span>; <span class="kw">border</span>: <span class="str">none</span>; <span class="kw">border-radius</span>: <span class="num">10px</span>;
+  <span class="kw">cursor</span>: <span class="str">pointer</span>; <span class="kw">transition</span>: <span class="str">all 0.3s cubic-bezier(0.34,1.56,0.64,1)</span>;
+  <span class="kw">color</span>: <span class="str">#7a9a8e</span>; <span class="kw">background</span>: <span class="str">transparent</span>;
+}
+<span class="sel">.year-btn.active</span> {
+  <span class="kw">background</span>: <span class="str">var(--card-bg)</span>; <span class="kw">color</span>: <span class="str">var(--accent-deep)</span>;
+  <span class="kw">box-shadow</span>: <span class="num">0 2px 10px</span> <span class="str">var(--shadow)</span>; <span class="kw">transform</span>: <span class="str">scale(1.02)</span>;
+}</pre>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>結果カード</div>
+    <div class="demo-area">
+      <div class="ds-result">
+        <div class="ds-result-label">給与所得控除額</div>
+        <div class="ds-result-value"><span>1,292,000</span><span class="ds-result-unit">円</span></div>
+        <div style="margin-top:10px;">
+          <div class="ds-progress-bg"><div class="ds-progress-fill" style="width:26%"></div></div>
+          <div style="font-size:11px;color:var(--sub-text);text-align:right;margin-top:4px;font-family:'Roboto',sans-serif;">年収の約 26.0% を控除</div>
+        </div>
+      </div>
+      <div class="ds-result highlight">
+        <div class="ds-result-label">給与所得控除後の給与等の金額（所得）</div>
+        <div class="ds-result-value em"><span>3,668,000</span><span class="ds-result-unit">円</span></div>
+      </div>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>ノートボックス</div>
+    <div class="demo-area" style="display:flex;flex-direction:column;gap:10px;">
+      <div class="note-box">📋 令和7年（2025年）分 所得税法 別表第五に基づく計算です。</div>
+      <div class="dashed-box">計算式：4,960,000円 × 80% − 440,000円 = 3,528,000円</div>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>② WarningInline — インライン警告ボックス</div>
+    <div class="demo-area" style="display:flex;flex-direction:column;gap:10px;">
+      <div class="ds-warning-inline">
+        <span class="wi-icon">⚠</span>
+        <span>評価額が投資累計額を下回っています（含み損の状態）</span>
+      </div>
+      <div class="ds-warning-inline">
+        <span class="wi-icon">⚠</span>
+        <span>新NISA枠（1,800万円）はすでに使い切っています。新規積立はできません。</span>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">html + css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">&lt;!-- WarningInline --&gt;</span>
+<span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-warning-inline"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;span</span> <span class="var">class</span>=<span class="str">"wi-icon"</span><span class="kw">&gt;</span>⚠<span class="kw">&lt;/span&gt;</span>
+  <span class="kw">&lt;span&gt;</span>評価額が投資累計額を下回っています<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+
+<span class="sel">.ds-warning-inline</span> {
+  <span class="kw">display</span>: <span class="str">flex</span>; <span class="kw">gap</span>: <span class="num">8px</span>;
+  <span class="kw">padding</span>: <span class="num">10px 14px</span>;
+  <span class="kw">background</span>: <span class="str">rgba(224,122,58,0.08)</span>;
+  <span class="kw">border-left</span>: <span class="num">3px</span> <span class="str">solid var(--warn-color)</span>;
+  <span class="kw">border-radius</span>: <span class="num">10px</span>;
+  <span class="kw">font-size</span>: <span class="num">12px</span>; <span class="kw">color</span>: <span class="str">var(--warn-color)</span>;
+  <span class="kw">line-height</span>: <span class="num">1.7</span>;
+}
+<span class="cmt">/* 表示切り替えは .show クラスで制御 */</span>
+<span class="sel">.ds-warning-inline</span> { <span class="kw">display</span>: <span class="str">none</span>; }
+<span class="sel">.ds-warning-inline.show</span> { <span class="kw">display</span>: <span class="str">flex</span>; }</pre>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: FORMS ══ -->
+  <section class="section" id="sec-forms">
+    <div class="section-title">✏️ フォーム入力</div>
+    <div class="section-desc">入力フォームの3つのモード（テキスト・スライダー・クイックボタン）は同一の値を共有します。プレースホルダーは文字色・サイズともに入力値より控えめに設定します。</div>
+
+    <div class="block-title"><div class="dot"></div>テキスト入力（数字）</div>
+    <div class="demo-area">
+      <div class="ds-input-wrap">
+        <input class="ds-input" type="text" placeholder="例：5,000,000" inputmode="numeric" id="demo-input" oninput="syncDemo(this)">
+        <span class="ds-input-unit">円</span>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="sel">input[type="text"]</span> {
+  <span class="kw">padding</span>: <span class="num">18px 64px 18px 22px</span>;
+  <span class="kw">font-size</span>: <span class="num">22px</span>; <span class="kw">font-family</span>: <span class="str">'Roboto'</span>; <span class="kw">font-weight</span>: <span class="num">300</span>;
+  <span class="kw">border</span>: <span class="num">2px</span> <span class="str">solid var(--mint-light)</span>;
+  <span class="kw">border-radius</span>: <span class="num">16px</span>; <span class="kw">background</span>: <span class="str">var(--mint-pale)</span>;
+  <span class="kw">transition</span>: <span class="str">all 0.3s ease</span>;
+}
+<span class="sel">input::placeholder</span> {
+  <span class="kw">color</span>: <span class="str">#b8d4cc</span>; <span class="cmt">/* 入力値より明確に薄く */</span>
+  <span class="kw">font-weight</span>: <span class="num">300</span>;
+  <span class="kw">font-size</span>: <span class="num">18px</span>; <span class="cmt">/* 入力値(22px)より小さく */</span>
+}
+<span class="sel">input:focus</span> {
+  <span class="kw">border-color</span>: <span class="str">var(--accent)</span>;
+  <span class="kw">background</span>: <span class="str">var(--card-bg)</span>;
+  <span class="kw">box-shadow</span>: <span class="num">0 0 0 4px</span> <span class="str">rgba(168,213,186,0.25)</span>;
+}</pre>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>スライダー</div>
+    <div class="demo-area">
+      <input class="ds-range" type="range" min="0" max="15000000" step="10000" value="5000000" id="demo-slider" oninput="syncDemoSlider(this)">
+      <div style="font-size:11px;color:var(--sub-text);font-family:'Roboto',sans-serif;margin-top:6px;display:flex;justify-content:space-between;">
+        <span>0</span><span>500万</span><span>1,000万</span><span>1,500万+</span>
+      </div>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>クイックボタン</div>
+    <div class="demo-area">
+      <div style="font-size:11px;color:var(--sub-text);letter-spacing:0.1em;margin-bottom:8px;">よく使われる年収</div>
+      <div id="quick-btns-demo" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>① InputStepper — ±ボタン付きスライダー</div>
+    <div class="demo-area">
+      <div class="demo-label">LIVE DEMO — Fintechアプリで頻出のセット</div>
+      <div class="ds-val-row">
+        <input class="ds-num-edit" type="number" id="ds-stepper-num" min="0" max="30" step="0.1" value="5" oninput="dsSyncStepper(this)">
+        <span class="ds-val-unit">万円 / 月</span>
+      </div>
+      <div class="ds-input-stepper">
+        <button class="ds-pm-btn" onclick="dsStepperChange(-0.1)">－</button>
+        <input class="ds-stepper-range" type="range" id="ds-stepper-sl" min="0" max="30" step="0.1" value="5" oninput="dsSyncSlider(this)">
+        <button class="ds-pm-btn" onclick="dsStepperChange(0.1)">＋</button>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">html + css + js</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">&lt;!-- InputStepper --&gt;</span>
+<span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-val-row"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;input</span> <span class="var">class</span>=<span class="str">"ds-num-edit"</span> <span class="var">type</span>=<span class="str">"number"</span> <span class="var">id</span>=<span class="str">"inMonthly"</span>
+         <span class="var">min</span>=<span class="str">"0"</span> <span class="var">max</span>=<span class="str">"30"</span> <span class="var">step</span>=<span class="str">"0.1"</span> <span class="var">value</span>=<span class="str">"5"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;span</span> <span class="var">class</span>=<span class="str">"ds-val-unit"</span><span class="kw">&gt;</span>万円<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-input-stepper"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;button</span> <span class="var">class</span>=<span class="str">"ds-pm-btn"</span> <span class="var">data-target</span>=<span class="str">"slMonthly"</span> <span class="var">data-step</span>=<span class="str">"-0.1"</span><span class="kw">&gt;</span>－<span class="kw">&lt;/button&gt;</span>
+  <span class="kw">&lt;input</span> <span class="var">class</span>=<span class="str">"ds-stepper-range"</span> <span class="var">type</span>=<span class="str">"range"</span> <span class="var">id</span>=<span class="str">"slMonthly"</span>
+         <span class="var">min</span>=<span class="str">"0"</span> <span class="var">max</span>=<span class="str">"30"</span> <span class="var">step</span>=<span class="str">"0.1"</span> <span class="var">value</span>=<span class="str">"5"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;button</span> <span class="var">class</span>=<span class="str">"ds-pm-btn"</span> <span class="var">data-target</span>=<span class="str">"slMonthly"</span> <span class="var">data-step</span>=<span class="str">"0.1"</span><span class="kw">&gt;</span>＋<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+
+<span class="cmt">/* JS: スライダー背景をリアルタイム更新 */</span>
+<span class="fn">function</span> <span class="fn">updateStepperBg</span>(<span class="var">sl</span>) {
+  <span class="kw">const</span> <span class="var">pct</span> = ((<span class="var">sl</span>.<span class="var">value</span> - <span class="var">sl</span>.<span class="var">min</span>) / (<span class="var">sl</span>.<span class="var">max</span> - <span class="var">sl</span>.<span class="var">min</span>)) * <span class="num">100</span>;
+  <span class="var">sl</span>.<span class="fn">style</span>.<span class="fn">setProperty</span>(<span class="str">'--pct'</span>, <span class="var">pct</span> + <span class="str">'%'</span>);
+}</pre>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>③ SelectUnderline — アンダーラインスタイルのセレクト</div>
+    <div class="demo-area">
+      <div class="demo-label">LIVE DEMO — 生年月日・年月選択の定番スタイル</div>
+      <div class="ds-select-row" id="dob-demo-row">
+        <select class="ds-select-underline" id="ds-dob-year"></select>
+        <span class="ds-select-unit">年</span>
+        <select class="ds-select-underline" id="ds-dob-month"></select>
+        <span class="ds-select-unit">月</span>
+        <span style="font-size:13px;color:var(--label-color);font-weight:500;" id="ds-dob-age"></span>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">html + css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">&lt;!-- SelectUnderline — 生年月日例 --&gt;</span>
+<span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-select-row"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;select</span> <span class="var">class</span>=<span class="str">"ds-select-underline"</span> <span class="var">id</span>=<span class="str">"dobYear"</span><span class="kw">&gt;&lt;/select&gt;</span>
+  <span class="kw">&lt;span</span> <span class="var">class</span>=<span class="str">"ds-select-unit"</span><span class="kw">&gt;</span>年<span class="kw">&lt;/span&gt;</span>
+  <span class="kw">&lt;select</span> <span class="var">class</span>=<span class="str">"ds-select-underline"</span> <span class="var">id</span>=<span class="str">"dobMonth"</span><span class="kw">&gt;&lt;/select&gt;</span>
+  <span class="kw">&lt;span</span> <span class="var">class</span>=<span class="str">"ds-select-unit"</span><span class="kw">&gt;</span>月<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+
+<span class="sel">.ds-select-underline</span> {
+  <span class="kw">font-size</span>: <span class="fn">clamp</span>(<span class="num">1.4rem</span>, <span class="num">5vw</span>, <span class="num">1.8rem</span>);
+  <span class="kw">font-weight</span>: <span class="num">300</span>;
+  <span class="kw">border</span>: <span class="str">none</span>;
+  <span class="kw">border-bottom</span>: <span class="num">2px</span> <span class="str">solid var(--mint-light)</span>;
+  <span class="kw">background</span>: <span class="str">transparent</span>;
+  <span class="kw">-webkit-appearance</span>: <span class="str">none</span>;
+  <span class="kw">appearance</span>: <span class="str">none</span>;
+  <span class="kw">padding</span>: <span class="num">0 4px 4px</span>;
+  <span class="kw">transition</span>: <span class="str">border-color .25s ease</span>;
+}
+<span class="sel">.ds-select-underline:focus</span> {
+  <span class="kw">border-bottom-color</span>: <span class="str">var(--accent-deep)</span>;
+  <span class="kw">outline</span>: <span class="str">none</span>;
+}</pre>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>カンマ区切り入力（JS）</div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="fn">function</span> <span class="fn">onInputChange</span>(<span class="var">el</span>) {
+  <span class="kw">const</span> <span class="var">pos</span>    = <span class="var">el</span>.<span class="fn">selectionStart</span>;
+  <span class="kw">const</span> <span class="var">oldLen</span> = <span class="var">el</span>.<span class="var">value</span>.<span class="fn">length</span>;
+  <span class="cmt">// 数字以外を除去</span>
+  <span class="kw">const</span> <span class="var">raw</span> = <span class="var">el</span>.<span class="var">value</span>.<span class="fn">replace</span>(<span class="str">/[^0-9]/g</span>, <span class="str">''</span>);
+  <span class="kw">const</span> <span class="var">num</span> = <span class="fn">parseInt</span>(<span class="var">raw</span>) || <span class="num">0</span>;
+  <span class="var">el</span>.<span class="var">value</span> = <span class="var">num</span> ? <span class="var">num</span>.<span class="fn">toLocaleString</span>(<span class="str">'ja-JP'</span>) : <span class="str">''</span>;
+  <span class="cmt">// カーソル位置補正（カンマ挿入分のずれ）</span>
+  <span class="kw">const</span> <span class="var">diff</span> = <span class="var">el</span>.<span class="var">value</span>.<span class="fn">length</span> - <span class="var">oldLen</span>;
+  <span class="var">el</span>.<span class="fn">setSelectionRange</span>(<span class="var">pos</span> + <span class="var">diff</span>, <span class="var">pos</span> + <span class="var">diff</span>);
+}</pre>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: ANIMATION ══ -->
+  <section class="section" id="sec-animation">
+    <div class="section-title">✨ アニメーション</div>
+    <div class="section-desc">12種類のアニメーションを使い分け、UI全体に「生き物感」を与えます。タイルをクリックしてライブ確認できます。</div>
+
+    <div class="block-title"><div class="dot"></div>イージング関数（クリックして比較）</div>
+    <div class="demo-area">
+      <div class="demo-label">CLICK TO ANIMATE</div>
+      <div class="easing-demo" id="easing-demo"></div>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>数字カウントアップ（クリックして試す）</div>
+    <div class="demo-area" style="text-align:center;">
+      <div class="counter-display" id="counter-display">0</div>
+      <button class="ds-btn-primary" style="margin-top:8px;" onclick="demoCounter()">▶ カウントアップ</button>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="fn">function</span> <span class="fn">animateNum</span>(<span class="var">el</span>, <span class="var">from</span>, <span class="var">to</span>, <span class="var">ms</span>) {
+  <span class="kw">const</span> <span class="var">t0</span> = <span class="fn">performance</span>.<span class="fn">now</span>();
+  <span class="fn">function</span> <span class="fn">step</span>(<span class="var">now</span>) {
+    <span class="kw">const</span> <span class="var">p</span>    = <span class="fn">Math.min</span>((<span class="var">now</span> - <span class="var">t0</span>) / <span class="var">ms</span>, <span class="num">1</span>);
+    <span class="kw">const</span> <span class="var">ease</span> = <span class="num">1</span> - <span class="fn">Math.pow</span>(<span class="num">1</span> - <span class="var">p</span>, <span class="num">4</span>); <span class="cmt">// easeOutQuart</span>
+    <span class="var">el</span>.<span class="var">textContent</span> = <span class="fn">Math.round</span>(<span class="var">from</span> + (<span class="var">to</span> - <span class="var">from</span>) * <span class="var">ease</span>)
+                         .<span class="fn">toLocaleString</span>(<span class="str">'ja-JP'</span>);
+    <span class="kw">if</span> (<span class="var">p</span> &lt; <span class="num">1</span>) <span class="fn">requestAnimationFrame</span>(<span class="var">step</span>);
+  }
+  <span class="fn">requestAnimationFrame</span>(<span class="var">step</span>);
+}</pre>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>全アニメーション一覧</div>
+    <div class="anim-grid" id="anim-grid"></div>
+  </section>
+
+  <!-- ══ SECTION: INTERACTIONS ══ -->
+  <section class="section" id="sec-interactions">
+    <div class="section-title">👆 インタラクション</div>
+    <div class="section-desc">ユーザーの操作に対して、複数レイヤーのフィードバックを返します。「触って楽しい」を実現するための設計です。</div>
+
+    <div class="block-title"><div class="dot"></div>フィードバック設計</div>
+    <div class="demo-area">
+      <table class="info-table">
+        <thead><tr><th>操作</th><th>フィードバック</th></tr></thead>
+        <tbody>
+          <tr><td>数字入力</td><td>カウントアップ + バーアニメーション + ドーナツ更新</td></tr>
+          <tr><td>クイックボタン</td><td>ボタンハイライト（スプリング）+ 数字更新</td></tr>
+          <tr><td>年収が大きく変化</td><td>コンフェッティ + トースト通知</td></tr>
+          <tr><td>年度切り替え</td><td>セグメント切り替え（スプリング）+ トースト通知</td></tr>
+          <tr><td>カードホバー</td><td>2px浮き上がり + グリーン影強調</td></tr>
+          <tr><td>ページロード</td><td>ヘッダー：上からフェードイン → カード：下からフェードイン（0.2s遅延）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>コンフェッティ（クリックして試す）</div>
+    <div class="demo-area" style="text-align:center;">
+      <button class="ds-btn-primary" onclick="demoConfetti()">🎉 コンフェッティを発火</button>
+      <p style="font-size:12px;color:var(--sub-text);margin-top:12px;">実際のアプリでは年収変化が20万円超のときに発火します</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="fn">function</span> <span class="fn">fireConfetti</span>() {
+  <span class="kw">const</span> <span class="var">wrap</span>   = <span class="fn">document</span>.<span class="fn">getElementById</span>(<span class="str">'confetti-wrap'</span>);
+  <span class="kw">const</span> <span class="var">colors</span> = [<span class="str">'#a8d5ba'</span>,<span class="str">'#4a8c6f'</span>,<span class="str">'#d4ede3'</span>,
+                   <span class="str">'#e8f5f1'</span>,<span class="str">'#7fc49e'</span>,<span class="str">'#2d7a5a'</span>];
+  <span class="kw">for</span> (<span class="kw">let</span> <span class="var">i</span> = <span class="num">0</span>; <span class="var">i</span> &lt; <span class="num">50</span>; <span class="var">i</span>++) {
+    <span class="kw">const</span> <span class="var">c</span> = <span class="fn">document</span>.<span class="fn">createElement</span>(<span class="str">'div'</span>);
+    <span class="var">c</span>.<span class="var">style</span>.<span class="var">cssText</span> = <span class="str">`
+      position:absolute;
+      left: </span><span class="num">${10 + Math.random()*80}</span><span class="str">%;
+      width: </span><span class="num">${6 + Math.random()*8}</span><span class="str">px;
+      height: </span><span class="num">${6 + Math.random()*8}</span><span class="str">px;
+      background: </span><span class="num">${colors[Math.floor(Math.random()*colors.length)]}</span><span class="str">;
+      border-radius: </span><span class="num">${Math.random() > 0.5 ? '50%' : '2px'}</span><span class="str">;
+      animation: confettiFall </span><span class="num">${1.2+Math.random()*1.3}</span><span class="str">s linear forwards;
+    `</span>;
+    <span class="var">wrap</span>.<span class="fn">appendChild</span>(<span class="var">c</span>);
+    <span class="fn">setTimeout</span>(() => <span class="var">c</span>.<span class="fn">remove</span>(), <span class="num">3000</span>);
+  }
+}</pre>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>トースト通知（クリックして試す）</div>
+    <div class="demo-area" style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="ds-btn-secondary" onclick="demoToast('🎉 所得が 200,000円 増えました！')">成功トースト</button>
+      <button class="ds-btn-secondary" onclick="demoToast('🗓 令和7年分に切り替えました')">情報トースト</button>
+      <button class="ds-btn-secondary" onclick="demoToast('📉 所得が 150,000円 変わりました')">変化トースト</button>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">css + javascript</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">/* CSS */</span>
+<span class="sel">.toast</span> {
+  <span class="kw">position</span>: <span class="str">fixed</span>; <span class="kw">bottom</span>: <span class="num">30px</span>; <span class="kw">left</span>: <span class="num">50%</span>;
+  <span class="kw">transform</span>: <span class="fn">translateX</span>(<span class="num">-50%</span>) <span class="fn">translateY</span>(<span class="num">80px</span>);
+  <span class="kw">background</span>: <span class="str">var(--accent-deep)</span>; <span class="kw">color</span>: <span class="str">#fff</span>;
+  <span class="kw">padding</span>: <span class="num">12px 28px</span>; <span class="kw">border-radius</span>: <span class="num">40px</span>;
+  <span class="kw">opacity</span>: <span class="num">0</span>; <span class="kw">pointer-events</span>: <span class="str">none</span>;
+  <span class="kw">transition</span>: <span class="str">transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease</span>;
+}
+<span class="sel">.toast.show</span> {
+  <span class="kw">transform</span>: <span class="fn">translateX</span>(<span class="num">-50%</span>) <span class="fn">translateY</span>(<span class="num">0</span>); <span class="kw">opacity</span>: <span class="num">1</span>;
+}
+
+<span class="cmt">/* JS */</span>
+<span class="kw">let</span> <span class="var">toastTimer</span>;
+<span class="fn">function</span> <span class="fn">showToast</span>(<span class="var">msg</span>) {
+  <span class="kw">const</span> <span class="var">t</span> = <span class="fn">document</span>.<span class="fn">getElementById</span>(<span class="str">'toast'</span>);
+  <span class="var">t</span>.<span class="var">textContent</span> = <span class="var">msg</span>;
+  <span class="var">t</span>.<span class="var">classList</span>.<span class="fn">add</span>(<span class="str">'show'</span>);
+  <span class="fn">clearTimeout</span>(<span class="var">toastTimer</span>);
+  <span class="var">toastTimer</span> = <span class="fn">setTimeout</span>(() => <span class="var">t</span>.<span class="var">classList</span>.<span class="fn">remove</span>(<span class="str">'show'</span>), <span class="num">2600</span>);
+}</pre>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: FINTECH PATTERNS ══ -->
+  <section class="section" id="sec-fintech">
+    <div class="section-title">📊 Fintechパターン</div>
+    <div class="section-desc">資産運用・金融シミュレーション画面で繰り返し使われるUIパターンです。SummaryGrid / StatCard、シミュレーション棒グラフをコンポーネントとして定義します。</div>
+
+    <!-- ④ SummaryGrid / StatCard -->
+    <div class="block-title"><div class="dot"></div>④ SummaryGrid / StatCard — KPI・サマリーグリッド</div>
+    <div class="demo-area">
+      <div class="demo-label">LIVE DEMO — 3カラムグリッド（モバイルは2カラム）</div>
+      <div class="ds-summary-grid">
+        <div class="ds-stat-card highlight">
+          <div class="ds-stat-label">65歳時の資産（29年後）</div>
+          <div><span class="ds-stat-num">4,106</span><span class="ds-stat-unit">万円</span></div>
+        </div>
+        <div class="ds-stat-card">
+          <div class="ds-stat-label">うち運用収益</div>
+          <div><span class="ds-stat-num">2,306</span><span class="ds-stat-unit">万円</span></div>
+        </div>
+        <div class="ds-stat-card">
+          <div class="ds-stat-label">新NISA枠使い切り</div>
+          <div>
+            <span class="ds-stat-detail-num">19</span><span class="ds-stat-detail-unit">年</span><span class="ds-stat-detail-num">4</span><span class="ds-stat-detail-unit">ヶ月目</span>
+          </div>
+          <div class="ds-stat-detail">54歳3ヶ月</div>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">html + css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">&lt;!-- SummaryGrid / StatCard --&gt;</span>
+<span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-summary-grid"</span><span class="kw">&gt;</span>
+  <span class="cmt">&lt;!-- ハイライトカード（1番目・強調表示） --&gt;</span>
+  <span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-stat-card highlight"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-stat-label"</span><span class="kw">&gt;</span>65歳時の資産<span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;div&gt;&lt;span</span> <span class="var">class</span>=<span class="str">"ds-stat-num"</span><span class="kw">&gt;</span>4,106<span class="kw">&lt;/span&gt;&lt;span</span> <span class="var">class</span>=<span class="str">"ds-stat-unit"</span><span class="kw">&gt;</span>万円<span class="kw">&lt;/span&gt;&lt;/div&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+  <span class="cmt">&lt;!-- 通常カード --&gt;</span>
+  <span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-stat-card"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;div</span> <span class="var">class</span>=<span class="str">"ds-stat-label"</span><span class="kw">&gt;</span>うち運用収益<span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;div&gt;&lt;span</span> <span class="var">class</span>=<span class="str">"ds-stat-num"</span><span class="kw">&gt;</span>2,306<span class="kw">&lt;/span&gt;&lt;span</span> <span class="var">class</span>=<span class="str">"ds-stat-unit"</span><span class="kw">&gt;</span>万円<span class="kw">&lt;/span&gt;&lt;/div&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+
+<span class="sel">.ds-summary-grid</span> {
+  <span class="kw">display</span>: <span class="str">grid</span>;
+  <span class="kw">grid-template-columns</span>: <span class="num">1fr 1fr</span>; <span class="cmt">/* モバイル: 2列 */</span>
+  <span class="kw">gap</span>: <span class="num">12px</span>;
+}
+<span class="sel">@media (min-width: 480px)</span> {
+  <span class="sel">.ds-summary-grid</span> {
+    <span class="kw">grid-template-columns</span>: <span class="str">repeat(3, 1fr)</span>; <span class="cmt">/* タブレット以上: 3列 */</span>
+    <span class="kw">gap</span>: <span class="num">14px</span>;
+  }
+}</pre>
+    </div>
+
+    <!-- ⑤ Simulation Chart -->
+    <div class="block-title" style="margin-top:36px;"><div class="dot"></div>⑤ SimulationChart — 積立シミュレーション棒グラフ</div>
+    <div class="demo-area">
+      <div class="demo-label">LIVE DEMO — ホバーでツールチップ表示（30年分データ）</div>
+      <div class="ds-chart-legend">
+        <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent)"></div>元本</div>
+        <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent-deep)"></div>運用収益</div>
+      </div>
+      <div class="ds-chart-wrap">
+        <canvas id="ds-chart"></canvas>
+      </div>
+      <div class="ds-chart-note">※ 新NISA枠（1,800万円）到達後は新規積立停止・運用のみ継続</div>
+    </div>
+    <div id="ds-chart-tooltip" class="ds-chart-tooltip"></div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">javascript — canvas 棒グラフ描画</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="fn">function</span> <span class="fn">renderSimChart</span>(<span class="var">data</span>, <span class="var">canvas</span>) {
+  <span class="kw">const</span> <span class="var">dpr</span>  = <span class="var">window</span>.<span class="var">devicePixelRatio</span> || <span class="num">1</span>;
+  <span class="kw">const</span> <span class="var">cW</span>   = <span class="var">canvas</span>.<span class="var">parentElement</span>.<span class="var">clientWidth</span>;
+  <span class="kw">const</span> <span class="var">PAD</span>  = { <span class="var">t</span>:<span class="num">14</span>, <span class="var">r</span>:<span class="num">14</span>, <span class="var">b</span>:<span class="num">42</span>, <span class="var">l</span>:<span class="num">64</span> };
+  <span class="kw">const</span> <span class="var">n</span>    = <span class="var">data</span>.<span class="var">length</span>;
+  <span class="kw">const</span> <span class="var">plotW</span>= <span class="var">cW</span> - <span class="var">PAD</span>.<span class="var">l</span> - <span class="var">PAD</span>.<span class="var">r</span>;
+  <span class="kw">const</span> <span class="var">BAR</span>  = <span class="fn">Math.max</span>(<span class="num">3</span>, <span class="var">plotW</span>/<span class="var">n</span> - <span class="fn">Math.max</span>(<span class="num">1</span>, <span class="var">plotW</span>/<span class="var">n</span>*<span class="num">0.28</span>));
+  <span class="kw">const</span> <span class="var">GAP</span>  = <span class="fn">Math.max</span>(<span class="num">1</span>, <span class="var">plotW</span>/<span class="var">n</span> - <span class="var">BAR</span>);
+
+  <span class="kw">const</span> <span class="var">ctx</span> = <span class="var">canvas</span>.<span class="fn">getContext</span>(<span class="str">'2d'</span>);
+  <span class="kw">const</span> <span class="var">max</span> = <span class="fn">Math.max</span>(...<span class="var">data</span>.<span class="fn">map</span>(<span class="var">d</span> => <span class="var">d</span>.<span class="var">total</span>));
+
+  <span class="var">data</span>.<span class="fn">forEach</span>((<span class="var">d</span>, <span class="var">i</span>) => {
+    <span class="kw">const</span> <span class="var">x</span>        = <span class="var">PAD</span>.<span class="var">l</span> + <span class="var">i</span> * (<span class="var">BAR</span>+<span class="var">GAP</span>);
+    <span class="kw">const</span> <span class="var">pH</span>       = <span class="num">300</span> - <span class="var">PAD</span>.<span class="var">t</span> - <span class="var">PAD</span>.<span class="var">b</span>;
+    <span class="kw">const</span> <span class="var">totalH</span>   = (<span class="var">d</span>.<span class="var">total</span>     / <span class="var">max</span>) * <span class="var">pH</span>;
+    <span class="kw">const</span> <span class="var">principH</span> = (<span class="var">d</span>.<span class="var">principal</span> / <span class="var">max</span>) * <span class="var">pH</span>;
+    <span class="cmt">// 元本: --accent</span>
+    <span class="var">ctx</span>.<span class="var">fillStyle</span> = <span class="str">'#a8d5ba'</span>;
+    <span class="fn">rRect</span>(<span class="var">ctx</span>, <span class="var">x</span>, <span class="var">baseY</span>-<span class="var">principH</span>, <span class="var">BAR</span>, <span class="var">principH</span>, [<span class="num">0</span>,<span class="num">0</span>,<span class="num">4</span>,<span class="num">4</span>]);
+    <span class="cmt">// 運用収益: --accent-deep</span>
+    <span class="var">ctx</span>.<span class="var">fillStyle</span> = <span class="str">'#4a8c6f'</span>;
+    <span class="fn">rRect</span>(<span class="var">ctx</span>, <span class="var">x</span>, <span class="var">baseY</span>-<span class="var">totalH</span>, <span class="var">BAR</span>, <span class="var">totalH</span>-<span class="var">principH</span>, [<span class="num">4</span>,<span class="num">4</span>,<span class="num">0</span>,<span class="num">0</span>]);
+  });
+}</pre>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: MOBILE FIRST ══ -->
+  <section class="section" id="sec-mobile">
+    <div class="section-title">📱 モバイルファースト</div>
+    <div class="section-desc">このデザインシステムはスマホユーザーを最優先に設計されています。ターゲットである30代女性の多くが「スマホで気軽に確認」するため、モバイル体験を基準にPCへ拡張する戦略をとります。</div>
+
+    <!-- ブレークポイント -->
+    <div class="block-title"><div class="dot"></div>ブレークポイント定義</div>
+    <div class="demo-area">
+      <div class="demo-label">BREAKPOINTS</div>
+      <div id="breakpoint-demo"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">css — mobile-first</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">/* ベース = モバイル（〜479px）に書く */</span>
+<span class="sel">.card</span> {
+  <span class="kw">padding</span>: <span class="num">28px 20px</span>;
+  <span class="kw">border-radius</span>: <span class="num">20px</span>;
+}
+
+<span class="cmt">/* タブレット以上に上書き */</span>
+<span class="sel">@media (min-width: 480px)</span> {
+  <span class="sel">.card</span> {
+    <span class="kw">padding</span>: <span class="num">40px 36px</span>;
+    <span class="kw">border-radius</span>: <span class="num">28px</span>;
+  }
+}
+
+<span class="cmt">/* PC以上にさらに上書き */</span>
+<span class="sel">@media (min-width: 768px)</span> {
+  <span class="sel">.container</span> { <span class="kw">max-width</span>: <span class="num">560px</span>; }
+}</pre>
+    </div>
+
+    <!-- タッチターゲット -->
+    <div class="block-title"><div class="dot"></div>タッチターゲットサイズ</div>
+    <div class="demo-area">
+      <div class="demo-label">TOUCH TARGET — 最小44px × 44px</div>
+      <div id="touch-target-demo"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">/* Apple HIG / Google Material 推奨: 最小 44×44px */</span>
+
+<span class="cmt">/* ✅ クイックボタン — padding で高さを確保 */</span>
+<span class="sel">.quick-btn</span> {
+  <span class="kw">min-height</span>: <span class="num">44px</span>;
+  <span class="kw">padding</span>: <span class="num">11px 20px</span>;
+}
+
+<span class="cmt">/* ✅ スライダーのつまみ — 十分な当たり判定 */</span>
+<span class="sel">input[type="range"]::-webkit-slider-thumb</span> {
+  <span class="kw">width</span>: <span class="num">24px</span>; <span class="kw">height</span>: <span class="num">24px</span>; <span class="cmt">/* 実サイズ */</span>
+  <span class="cmt">/* 視覚は24pxでも、タップ領域はブラウザが44pxに拡張 */</span>
+}
+
+<span class="cmt">/* ✅ 入力フィールド — 高さを十分に確保 */</span>
+<span class="sel">input[type="text"]</span> {
+  <span class="kw">padding</span>: <span class="num">18px 64px 18px 22px</span>; <span class="cmt">/* 縦56px相当 */</span>
+}</pre>
+    </div>
+
+    <!-- フォントサイズ -->
+    <div class="block-title"><div class="dot"></div>モバイルフォントサイズ戦略</div>
+    <div class="demo-area">
+      <div class="demo-label">FLUID TYPOGRAPHY — clamp() ベース</div>
+      <div id="fluid-type-demo"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">/* clamp(最小, 流動値, 最大) で画面幅に自動追従 */</span>
+<span class="sel">h1</span>          { <span class="kw">font-size</span>: <span class="fn">clamp</span>(<span class="num">20px</span>, <span class="num">5vw</span>, <span class="num">32px</span>); }
+<span class="sel">.result-val</span> { <span class="kw">font-size</span>: <span class="fn">clamp</span>(<span class="num">22px</span>, <span class="num">6vw</span>, <span class="num">30px</span>); }
+<span class="sel">.input-num</span>  { <span class="kw">font-size</span>: <span class="fn">clamp</span>(<span class="num">18px</span>, <span class="num">5vw</span>, <span class="num">22px</span>); }
+
+<span class="cmt">/* iOS ズーム防止: input は 16px 以上必須 */</span>
+<span class="sel">input</span> { <span class="kw">font-size</span>: <span class="num">16px</span>; } <span class="cmt">/* 16px未満だと自動ズームが発生 */</span>
+
+<span class="cmt">/* NG 例 */</span>
+<span class="sel">input</span> { <span class="kw">font-size</span>: <span class="num">14px</span>; } <span class="cmt">/* ← iOS Safariが自動ズームしてしまう */</span></pre>
+    </div>
+
+    <!-- レイアウト変化 -->
+    <div class="block-title"><div class="dot"></div>レイアウト変化（モバイル → PC）</div>
+    <div class="demo-area" id="layout-compare-demo">
+      <div class="demo-label">LAYOUT COMPARISON — クリックで切り替え</div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="ds-btn-secondary" onclick="setLayoutView('mobile')" id="btn-mobile-view" style="font-size:12px;">📱 モバイル</button>
+        <button class="ds-btn-secondary" onclick="setLayoutView('pc')" id="btn-pc-view" style="font-size:12px;">🖥 PC</button>
+      </div>
+      <div id="layout-preview"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">css — レイアウト変化</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">/* モバイル（ベース） */</span>
+<span class="sel">.donut-wrap</span>     { <span class="kw">flex-direction</span>: <span class="str">column</span>; }
+<span class="sel">.result-value</span>   { <span class="kw">font-size</span>: <span class="num">24px</span>; }
+<span class="sel">.card</span>           { <span class="kw">border-radius</span>: <span class="num">20px</span>; <span class="kw">padding</span>: <span class="num">28px 20px</span>; }
+<span class="sel">.quick-btns</span>     { <span class="kw">gap</span>: <span class="num">8px</span>; }
+
+<span class="cmt">/* タブレット以上 (min-width: 480px) */</span>
+<span class="sel">@media (min-width: 480px)</span> {
+  <span class="sel">.donut-wrap</span>   { <span class="kw">flex-direction</span>: <span class="str">row</span>; }
+  <span class="sel">.result-value</span> { <span class="kw">font-size</span>: <span class="num">30px</span>; }
+  <span class="sel">.card</span>         { <span class="kw">border-radius</span>: <span class="num">28px</span>; <span class="kw">padding</span>: <span class="num">40px 36px</span>; }
+}
+
+<span class="cmt">/* PCレイアウト: コンテナ幅を制限 */</span>
+<span class="sel">@media (min-width: 768px)</span> {
+  <span class="sel">.container</span>    { <span class="kw">max-width</span>: <span class="num">560px</span>; <span class="kw">margin</span>: <span class="num">36px auto</span>; }
+}</pre>
+    </div>
+
+    <!-- スクロール・タップ最適化 -->
+    <div class="block-title"><div class="dot"></div>スクロール・タップ最適化</div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">css + html</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">/* タップ時のハイライト除去 */</span>
+<span class="sel">button, input, a</span> {
+  <span class="kw">-webkit-tap-highlight-color</span>: <span class="str">transparent</span>;
+}
+
+<span class="cmt">/* スムーズスクロール */</span>
+<span class="sel">html</span> { <span class="kw">scroll-behavior</span>: <span class="str">smooth</span>; }
+
+<span class="cmt">/* 数字入力: モバイルキーボードをテンキーに */</span>
+<span class="kw">&lt;input</span> <span class="var">type</span>=<span class="str">"text"</span> <span class="var">inputmode</span>=<span class="str">"numeric"</span> <span class="kw">/&gt;</span>
+<span class="cmt">/* ↑ type="number" より type="text" + inputmode="numeric" が
+   カンマ区切り表示のためにベター */</span>
+
+<span class="cmt">/* overflow: hidden で横スクロール防止 */</span>
+<span class="sel">body</span> { <span class="kw">overflow-x</span>: <span class="str">hidden</span>; }
+
+<span class="cmt">/* 長押しメニュー抑制（UI要素） */</span>
+<span class="sel">.card, .result-item</span> {
+  <span class="kw">-webkit-user-select</span>: <span class="str">none</span>;
+  <span class="kw">user-select</span>: <span class="str">none</span>;
+}</pre>
+    </div>
+
+    <!-- モバイルチェックリスト -->
+    <div class="block-title"><div class="dot"></div>モバイルファースト実装チェックリスト</div>
+    <div class="demo-area">
+      <div class="demo-label">CHECKLIST</div>
+      <div id="mobile-checklist"></div>
+    </div>
+
+    <!-- Safe Area -->
+    <div class="block-title"><div class="dot"></div>Safe Area（ノッチ・ホームバー対応）</div>
+    <div class="code-block">
+      <div class="code-block-header"><span class="code-lang">html + css</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cmt">&lt;!-- viewport に viewport-fit=cover を追加 --&gt;</span>
+<span class="kw">&lt;meta</span> <span class="var">name</span>=<span class="str">"viewport"</span>
+  <span class="var">content</span>=<span class="str">"width=device-width, initial-scale=1.0, viewport-fit=cover"</span><span class="kw">&gt;</span>
+
+<span class="cmt">/* Safe Area 対応: フッター・固定要素に適用 */</span>
+<span class="sel">footer</span> {
+  <span class="kw">padding-bottom</span>: <span class="fn">calc</span>(<span class="num">40px</span> + <span class="fn">env</span>(<span class="str">safe-area-inset-bottom</span>));
+}
+
+<span class="cmt">/* トースト通知 — ホームバーと被らないよう */</span>
+<span class="sel">.toast</span> {
+  <span class="kw">bottom</span>: <span class="fn">calc</span>(<span class="num">30px</span> + <span class="fn">env</span>(<span class="str">safe-area-inset-bottom</span>));
+}
+
+<span class="cmt">/* 固定ナビ等がある場合 */</span>
+<span class="sel">.fixed-nav</span> {
+  <span class="kw">padding-top</span>: <span class="fn">env</span>(<span class="str">safe-area-inset-top</span>);
+}</pre>
+    </div>
+  </section>
+
+  <!-- ══ SECTION: PRINCIPLES ══ -->
+  <section class="section" id="sec-principles">
+    <div class="section-title">💡 デザイン原則</div>
+    <div class="section-desc">このデザインシステムを貫く10の原則。新しい機能・コンポーネントを追加する際の判断基準として使用してください。</div>
+
+    <div id="principles-list"></div>
+
+    <div class="block-title" style="margin-top:36px;"><div class="dot"></div>絵文字活用ガイド</div>
+    <div class="demo-area">
+      <div class="demo-label">STRATEGIC EMOJI USE</div>
+      <div class="emoji-grid" id="emoji-grid"></div>
+    </div>
+
+    <div class="block-title"><div class="dot"></div>想定ターゲット</div>
+    <div class="demo-area">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--placeholder);margin-bottom:10px;">TARGET USER</div>
+          <div style="font-size:13px;line-height:2;color:var(--text-main);">
+            👩 30代女性・会社員<br>
+            💭 お金・税金が苦手<br>
+            📱 スマホで気軽に確認<br>
+            ⏰ 年末調整シーズンに使用
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--placeholder);margin-bottom:10px;">DESIGN MISSION</div>
+          <div style="font-size:13px;line-height:2;color:var(--text-main);">
+            ✅ 難しくない<br>
+            ✅ 怖くない<br>
+            ✅ 触っていて楽しい<br>
+            ✅ 毎日見たくなる
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ════════════════════════
+   DATA
+════════════════════════ */
+const COLORS = [
+  { role:'ベース背景',    var:'--base-bg',     hex:'#e8f5f1', desc:'ページ全体の背景' },
+  { role:'アクセント',    var:'--accent',      hex:'#a8d5ba', desc:'バッジ・バー・フォーカス' },
+  { role:'アクセント深',  var:'--accent-deep', hex:'#4a8c6f', desc:'ボタン・ハイライト数値' },
+  { role:'メイン文字',    var:'--text-main',   hex:'#44504c', desc:'見出し・入力値' },
+  { role:'サブ文字',      var:'--text-sub',    hex:'#ccd6d1', desc:'補足ラベル' },
+  { role:'カード背景',    var:'--card-bg',     hex:'#ffffff', desc:'純白のカード面' },
+  { role:'ミントライト',  var:'--mint-light',  hex:'#d4ede3', desc:'ボーダー・バー背景' },
+  { role:'ミントペール',  var:'--mint-pale',   hex:'#f0faf5', desc:'入力背景・カード内背景' },
+];
+const AUX_COLORS = [
+  { role:'サブテキスト',      var:'—',   hex:'#7a9a8e', desc:'ラベル・説明文' },
+  { role:'フッター',          var:'—',   hex:'#a0bdb5', desc:'注釈・フッター' },
+  { role:'プレースホルダー',  var:'—',   hex:'#b8d4cc', desc:'入力例テキスト' },
+  { role:'シャドウ（薄）',    var:'—',   hex:'rgba(74,140,111,0.12)', desc:'カード影' },
+];
+const TYPE_SCALE = [
+  { el:'h1',         size:'clamp(22px,5vw,32px)', wt:'700', font:'ヒラギノ', sample:'給与所得控除', preview:true, psize:24 },
+  { el:'メイン数値', size:'30px', wt:'300 (Light)', font:'Roboto',   sample:'3,668,000', preview:true, psize:30 },
+  { el:'入力値',     size:'22px', wt:'300',         font:'Roboto',   sample:'5,000,000',  preview:true, psize:22 },
+  { el:'ラベル',     size:'13px', wt:'500',         font:'ヒラギノ', sample:'額面年収を入力してください', preview:true, psize:13 },
+  { el:'バッジ',     size:'11px', wt:'500',         font:'ヒラギノ', sample:'✨ 年末調整', preview:true, psize:11 },
+  { el:'補足文',     size:'11px', wt:'400',         font:'ヒラギノ', sample:'所得税法 別表第五に基づく計算です', preview:true, psize:11 },
+  { el:'コード',     size:'12.5px', wt:'400',       font:'Roboto Mono', sample:'--accent-deep: #4a8c6f', preview:true, psize:12 },
+];
+const SPACINGS = [
+  { name:'xs', px:4 }, { name:'sm', px:8 }, { name:'md', px:12 },
+  { name:'lg', px:16 }, { name:'xl', px:20 }, { name:'2xl', px:24 },
+  { name:'3xl', px:28 }, { name:'4xl', px:32 }, { name:'5xl', px:40 },
+  { name:'6xl', px:48 },
+];
+const RADII = [
+  { name:'バッジ・ピル',  val:'20px' }, { name:'カード（大）', val:'28px' },
+  { name:'入力・カード',  val:'16px' }, { name:'タブ（外）',   val:'14px' },
+  { name:'タブ（内）',    val:'10px' }, { name:'ノート',       val:'12px' },
+  { name:'コード',        val:'12px' }, { name:'アイコン',     val:'8px'  },
+];
+const SHADOWS = [
+  { name:'Card Main', css:'0 8px 40px rgba(74,140,111,0.12),\n0 1px 4px rgba(0,0,0,0.04),\ninset 0 1px 0 rgba(255,255,255,0.8)', desc:'メインカード' },
+  { name:'Card Hover', css:'0 6px 20px rgba(74,140,111,0.12)', desc:'ホバー時' },
+  { name:'Button', css:'0 2px 12px rgba(74,140,111,0.35)', desc:'選択ボタン・Primary' },
+  { name:'Badge', css:'0 2px 12px rgba(168,213,186,0.5)', desc:'バッジ' },
+  { name:'Focus Ring', css:'0 0 0 4px rgba(168,213,186,0.25)', desc:'入力フォーカス' },
+  { name:'Highlight', css:'0 4px 20px rgba(74,140,111,0.1)', desc:'ハイライトカード' },
+];
+const GRADIENTS = [
+  { name:'シマーバー', css:'linear-gradient(90deg, #a8d5ba, #4a8c6f, #a8d5ba)', desc:'カード天辺・アニメーション付き', h:16, br:8 },
+  { name:'プログレスバー', css:'linear-gradient(90deg, #a8d5ba, #4a8c6f)', desc:'バー・スライダーつまみ', h:16, br:8 },
+  { name:'ハイライトカード', css:'linear-gradient(135deg, #f0faf6, #e8f5f1)', desc:'強調カード背景', h:60, br:12 },
+  { name:'区切り線', css:'linear-gradient(90deg, transparent, #d4ede3, transparent)', desc:'セクション分割', h:2, br:0 },
+  { name:'ページ背景（重ね）', css:'radial-gradient(circle at 15% 15%, rgba(168,213,186,0.3) 0%, transparent 40%)', desc:'背景グラデーション', h:80, br:12 },
+];
+const ANIMATIONS = [
+  { name:'fadeInDown', icon:'⬇️', desc:'ヘッダー登場', css:'0.8s cubic-bezier(0.22,0.61,0.36,1)' },
+  { name:'fadeInUp',   icon:'⬆️', desc:'カード登場（0.2s遅延）', css:'0.7s cubic-bezier(0.22,0.61,0.36,1)' },
+  { name:'shimmerBar', icon:'✨', desc:'カード天辺の光', css:'3s linear infinite' },
+  { name:'barShimmer', icon:'💫', desc:'バーの光沢', css:'2s ease-in-out infinite' },
+  { name:'pulseBadge', icon:'🔵', desc:'バッジの点滅', css:'3s ease-in-out infinite' },
+  { name:'floatLeaf',  icon:'🌿', desc:'葉っぱの浮遊', css:'6s ease-in-out infinite' },
+  { name:'particleDrift',icon:'🫧', desc:'背景パーティクル', css:'8〜22s linear infinite' },
+  { name:'confettiFall',icon:'🎊', desc:'コンフェッティ落下', css:'1.2〜2.5s linear forwards' },
+  { name:'toast',      icon:'📢', desc:'トースト出現', css:'0.4s cubic-bezier(0.34,1.56,0.64,1)' },
+  { name:'countUp',    icon:'🔢', desc:'数字カウントアップ', css:'700ms easeOutQuart（JS）' },
+  { name:'donut',      icon:'🍩', desc:'ドーナツグラフ描画', css:'1s cubic-bezier(0.22,0.61,0.36,1)' },
+  { name:'spring',     icon:'🌀', desc:'ボタンのスプリング', css:'0.25s cubic-bezier(0.34,1.56,0.64,1)' },
+];
+const PRINCIPLES = [
+  { n:1,  title:'グリーン系シャドウで空気感',   icon:'🌿', body:'影に rgba(74,140,111,…) を使い、黒い影特有の「重さ」を排除。浮いているのに軽やか。' },
+  { n:2,  title:'スプリングイージングで生き物感', icon:'🌀', body:'cubic-bezier(0.34,1.56,0.64,1) のovershoot（行き過ぎて戻る）で機械的でない動きを演出。' },
+  { n:3,  title:'数字はLight（300）で圧迫感を減らす', icon:'🔢', body:'Roboto weight:300 の細い数字は、数字が苦手なユーザーへの心理的障壁を下げる。' },
+  { n:4,  title:'入力フォーカスで清潔感を演出', icon:'✏️', body:'フォーカス時に背景を白にすることで「今ここを編集中」が直感的にわかる。光輪（focus ring）がフォーカスを優しく示す。' },
+  { n:5,  title:'初期状態に空白を作らない',     icon:'🌱', body:'入力前からガイドメッセージ＋絵文字を表示。「何をすればいいか」を即座に伝え、離脱を防ぐ。' },
+  { n:6,  title:'3入力モードは同一値を共有',    icon:'🔗', body:'テキスト・スライダー・クイックボタンはすべて currentRawValue を参照。どこから操作しても同期する。' },
+  { n:7,  title:'プレースホルダーを「薄く・小さく」', icon:'👻', body:'color:#b8d4cc（薄）＋ font-size:18px（入力値22pxより小）で、入力済みかどうかを瞬時に判別できる。' },
+  { n:8,  title:'フィードバックをレイヤーで積む', icon:'🎚️', body:'1つの操作に対して、視覚（アニメーション）＋インタラクション（カード浮き上がり）＋通知（トースト）を重ね、触感を豊かにする。' },
+  { n:9,  title:'絵文字を文脈の手がかりに使う', icon:'😊', body:'絵文字は装飾でなく「感情・文脈の伝達媒体」。バッジ✨・ラベル💴・結果📊・注釈📋で情報の種類を素早く識別させる。' },
+  { n:10, title:'clamp() でレスポンシブな文字',  icon:'📱', body:'font-size: clamp(22px, 5vw, 32px) を使い、デバイス幅に応じて自然に拡縮。メディアクエリの記述量を削減。' },
+];
+const EMOJIS = [
+  { em:'✨', use:'バッジ・特別感' }, { em:'💴', use:'金額ラベル' },
+  { em:'📊', use:'計算結果' },      { em:'📋', use:'法的・注釈' },
+  { em:'🌿', use:'初期状態・テーマ' }, { em:'🎉', use:'成功トースト' },
+  { em:'🗓', use:'年度切り替え' },  { em:'📉', use:'変化トースト' },
+  { em:'👆', use:'インタラクション説明' }, { em:'🔢', use:'数字・計算' },
+];
+const EASINGS = [
+  { name:'easeOutQuart',  fn:'cubic-bezier(0.22,0.61,0.36,1)', use:'数字・バー・ページロード' },
+  { name:'spring',        fn:'cubic-bezier(0.34,1.56,0.64,1)', use:'ボタン・タブ・トースト' },
+  { name:'ease-in-out',   fn:'ease-in-out',                    use:'葉っぱ・バッジパルス' },
+  { name:'linear',        fn:'linear',                         use:'シマー・パーティクル' },
+];
+
+/* ════════════════════════
+   MOBILE FIRST DATA
+════════════════════════ */
+const BREAKPOINTS = [
+  { label:'Mobile S', range:'〜 374px', token:'xs',  color:'#e8f5f1', desc:'小型スマホ（SE等）。最小単位として必ず検証する。' },
+  { label:'Mobile M', range:'375〜 479px', token:'sm', color:'#d4ede3', desc:'標準スマホ（iPhone 14等）。★ 設計の起点。' },
+  { label:'Tablet',   range:'480〜 767px', token:'md', color:'#a8d5ba', desc:'大型スマホ・タブレット縦。カード幅が広がり始める。' },
+  { label:'PC / Wide',range:'768px 〜',   token:'lg', color:'#4a8c6f', desc:'PCブラウザ。コンテナ幅を max-width:560px で制限。' },
+];
+
+const TOUCH_TARGETS = [
+  { name:'クイックボタン', w:80,  h:44, ok:true,  note:'padding:11px 20px で44px確保' },
+  { name:'スライダーつまみ', w:44, h:44, ok:true, note:'width/height:24px でも当たり判定は44px' },
+  { name:'テキスト入力欄', w:240, h:56, ok:true,  note:'padding:18px で縦56px相当' },
+  { name:'年度切り替えボタン', w:120, h:44, ok:true, note:'padding:10px で44px確保' },
+  { name:'コピーボタン（NG例）', w:48, h:28, ok:false, note:'28px < 44px — タップしにくい ❌' },
+];
+
+const FLUID_TYPES = [
+  { name:'見出し h1',     clamp:'clamp(20px, 5vw, 32px)',  sp:20, pc:32 },
+  { name:'メイン数値',    clamp:'clamp(22px, 6vw, 30px)',  sp:22, pc:30 },
+  { name:'入力フィールド',clamp:'clamp(16px, 5vw, 22px)',  sp:16, pc:22 },
+  { name:'ラベル',        clamp:'clamp(12px, 3vw, 13px)',  sp:12, pc:13 },
+  { name:'補足文',        clamp:'clamp(11px, 2.5vw, 11px)',sp:11, pc:11 },
+];
+
+const MOBILE_CHECKLIST = [
+  { cat:'設計',     items:[
+    { ok:true,  text:'ベーススタイルをモバイル幅（375px）で書き、min-width で上書きする' },
+    { ok:true,  text:'font-size は clamp() で流動的に設定する' },
+    { ok:true,  text:'タッチターゲットを最小 44×44px に設定する' },
+    { ok:true,  text:'input には inputmode="numeric" を設定（テンキー表示）' },
+    { ok:true,  text:'input の font-size は 16px 以上にする（iOS 自動ズーム防止）' },
+  ]},
+  { cat:'レイアウト', items:[
+    { ok:true,  text:'max-width を使い、PC でコンテンツが横に広がりすぎない' },
+    { ok:true,  text:'overflow-x: hidden でボディの横スクロールを防ぐ' },
+    { ok:true,  text:'ドーナツグラフなど横並び要素は、モバイルで縦積みに切り替える' },
+    { ok:false, text:'fixed 要素が Safe Area（ノッチ/ホームバー）と被っていないか確認する' },
+  ]},
+  { cat:'タップ体験', items:[
+    { ok:true,  text:'-webkit-tap-highlight-color: transparent でタップ色を消す' },
+    { ok:true,  text:'ホバーエフェクト（translateY）はモバイルでも適度に動作する' },
+    { ok:true,  text:'スプリングアニメーションは @media (prefers-reduced-motion) に配慮する' },
+    { ok:false, text:'スライダーのつまみは実機でドラッグしやすいか確認する' },
+  ]},
+  { cat:'パフォーマンス', items:[
+    { ok:true,  text:'Google Fonts は preconnect ヒントで先読みする' },
+    { ok:true,  text:'CSS アニメーションは transform / opacity のみ使い Reflow を避ける' },
+    { ok:true,  text:'パーティクルは requestAnimationFrame ではなく純 CSS animation を使う' },
+    { ok:false, text:'Lighthouse モバイルスコアを定期チェックする（目標 90+）' },
+  ]},
+];
+
+/* ════════════════════════
+   RENDER MOBILE
+════════════════════════ */
+function renderMobileSection() {
+  renderBreakpoints();
+  renderTouchTargets();
+  renderFluidType();
+  renderLayoutCompare();
+  renderMobileChecklist();
+}
+
+function renderBreakpoints() {
+  const el = document.getElementById('breakpoint-demo');
+  if (!el) return;
+  el.innerHTML = BREAKPOINTS.map(b => `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div style="width:${b.label==='Mobile S'?40:b.label==='Mobile M'?56:b.label==='Tablet'?80:120}px;
+                  height:32px;background:${b.color};border-radius:6px;flex-shrink:0;
+                  border:${b.token==='sm'?'2px solid #4a8c6f':'1.5px solid #d4ede3'};
+                  display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:9px;color:${b.token==='sm'||b.token==='lg'?'#fff':'#44504c'};font-family:'Roboto Mono',monospace;font-weight:500;">${b.token}</span>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+          <span style="font-size:12px;font-weight:700;color:var(--text-main)">${b.label}</span>
+          <span style="font-size:11px;font-family:'Roboto Mono',monospace;color:var(--accent-deep);background:var(--mint-pale);padding:1px 7px;border-radius:4px;border:1px solid var(--mint-light);">${b.range}</span>
+          ${b.token==='sm'?'<span style="font-size:10px;background:#4a8c6f;color:#fff;padding:1px 8px;border-radius:4px;">★ 設計起点</span>':''}
+        </div>
+        <div style="font-size:11px;color:var(--sub-text);line-height:1.5;">${b.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTouchTargets() {
+  const el = document.getElementById('touch-target-demo');
+  if (!el) return;
+  el.innerHTML = `<div style="margin-bottom:12px;font-size:11px;color:var(--sub-text);">
+    <span style="display:inline-block;width:10px;height:10px;background:#4a8c6f;border-radius:50%;margin-right:4px;"></span>✅ 44px以上 &nbsp;&nbsp;
+    <span style="display:inline-block;width:10px;height:10px;background:#e07a7a;border-radius:50%;margin-right:4px;"></span>❌ 44px未満
+  </div>` +
+  TOUCH_TARGETS.map(t => `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;padding:10px 14px;background:${t.ok?'var(--mint-pale)':'#fff5f5'};border-radius:10px;border:1px solid ${t.ok?'var(--mint-light)':'#f0c0c0'};">
+      <div style="width:${Math.min(t.w,80)}px;height:${t.h}px;
+                  background:${t.ok?'linear-gradient(135deg,var(--accent),var(--accent-deep))':'#e0a0a0'};
+                  border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:9px;color:#fff;font-family:'Roboto Mono',monospace;">${t.w}×${t.h}</span>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-main);margin-bottom:3px;">${t.name}</div>
+        <div style="font-size:11px;color:var(--sub-text);">${t.note}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderFluidType() {
+  const el = document.getElementById('fluid-type-demo');
+  if (!el) return;
+  el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--placeholder);margin-bottom:8px;padding:0 2px;">
+    <span>要素</span><span>スマホ</span><span>PC</span>
+  </div>` +
+  FLUID_TYPES.map(t => `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--sys-border);">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-main)">${t.name}</div>
+        <div style="font-size:10px;font-family:'Roboto Mono',monospace;color:var(--accent-deep);margin-top:2px;">${t.clamp}</div>
+      </div>
+      <div style="font-family:'Roboto',sans-serif;font-size:${t.sp}px;font-weight:300;color:var(--text-main);line-height:1;">${t.sp}px</div>
+      <div style="font-family:'Roboto',sans-serif;font-size:${Math.min(t.pc,26)}px;font-weight:300;color:var(--accent-deep);line-height:1;">${t.pc}px</div>
+    </div>`).join('');
+}
+
+let currentLayoutView = 'mobile';
+function setLayoutView(view) {
+  currentLayoutView = view;
+  renderLayoutPreview();
+  document.getElementById('btn-mobile-view').style.background = view==='mobile' ? 'var(--accent-deep)' : '';
+  document.getElementById('btn-mobile-view').style.color      = view==='mobile' ? '#fff' : '';
+  document.getElementById('btn-mobile-view').style.borderColor= view==='mobile' ? 'var(--accent-deep)' : '';
+  document.getElementById('btn-pc-view').style.background     = view==='pc'     ? 'var(--accent-deep)' : '';
+  document.getElementById('btn-pc-view').style.color          = view==='pc'     ? '#fff' : '';
+  document.getElementById('btn-pc-view').style.borderColor    = view==='pc'     ? 'var(--accent-deep)' : '';
+}
+
+function renderLayoutCompare() {
+  setLayoutView('mobile');
+}
+
+function renderLayoutPreview() {
+  const el = document.getElementById('layout-preview');
+  if (!el) return;
+  const isMobile = currentLayoutView === 'mobile';
+
+  el.innerHTML = `
+    <div style="
+      width:${isMobile?'320px':'100%'};
+      margin:0 auto;
+      background:var(--base-bg);
+      border-radius:${isMobile?'20px':'8px'};
+      padding:${isMobile?'20px 16px':'28px 24px'};
+      border:2px solid var(--mint-light);
+      transition:all 0.4s cubic-bezier(0.22,0.61,0.36,1);
+      background-image:radial-gradient(circle at 15% 15%,rgba(168,213,186,0.2) 0%,transparent 50%);
+    ">
+      <!-- badge -->
+      <div style="text-align:center;margin-bottom:12px;">
+        <span style="background:var(--accent);color:#fff;font-size:10px;padding:3px 12px;border-radius:16px;letter-spacing:0.1em;">✨ 給与所得控除</span>
+      </div>
+      <!-- title -->
+      <div style="text-align:center;font-size:${isMobile?'18px':'24px'};font-weight:700;color:var(--text-main);margin-bottom:16px;letter-spacing:0.06em;">
+        かんたん計算
+      </div>
+      <!-- card -->
+      <div style="background:#fff;border-radius:${isMobile?'16px':'20px'};padding:${isMobile?'16px':'24px'};box-shadow:0 4px 20px var(--shadow);position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-deep));"></div>
+        <!-- segment -->
+        <div style="display:flex;gap:4px;background:var(--mint-pale);padding:4px;border-radius:10px;margin-bottom:12px;">
+          <div style="flex:1;text-align:center;padding:6px;font-size:10px;color:var(--sub-text);">令和6年分</div>
+          <div style="flex:1;text-align:center;padding:6px;font-size:10px;background:#fff;border-radius:7px;color:var(--accent-deep);font-weight:600;box-shadow:0 1px 4px var(--shadow);">令和7年分</div>
+        </div>
+        <!-- input -->
+        <div style="background:var(--mint-pale);border:2px solid var(--mint-light);border-radius:12px;padding:12px 16px;margin-bottom:12px;font-family:'Roboto',sans-serif;font-size:${isMobile?'16px':'18px'};color:var(--text-main);">
+          5,000,000
+        </div>
+        <!-- result cards -->
+        <div style="background:var(--mint-pale);border-radius:10px;padding:10px 12px;border:1px solid var(--mint-light);margin-bottom:8px;">
+          <div style="font-size:10px;color:var(--sub-text);margin-bottom:3px;">給与所得控除額</div>
+          <div style="font-family:'Roboto',sans-serif;font-size:${isMobile?'20px':'24px'};font-weight:300;color:var(--text-main);">1,440,000 <span style="font-size:11px;">円</span></div>
+        </div>
+        <div style="background:linear-gradient(135deg,#f0faf6,#e8f5f1);border-radius:10px;padding:10px 12px;border:1px solid var(--accent);">
+          <div style="font-size:10px;color:var(--sub-text);margin-bottom:3px;">控除後の所得</div>
+          <div style="font-family:'Roboto',sans-serif;font-size:${isMobile?'20px':'24px'};font-weight:400;color:var(--accent-deep);">3,560,000 <span style="font-size:11px;">円</span></div>
+        </div>
+        <!-- donut -->
+        <div style="display:flex;${isMobile?'flex-direction:column;':'flex-direction:row;'}align-items:center;gap:12px;margin-top:12px;padding:10px;background:var(--mint-pale);border-radius:10px;border:1px solid var(--mint-light);">
+          <svg width="60" height="60" viewBox="0 0 60 60" style="flex-shrink:0;">
+            <circle cx="30" cy="30" r="22" fill="none" stroke="#d4ede3" stroke-width="10"/>
+            <circle cx="30" cy="30" r="22" fill="none" stroke="#a8d5ba" stroke-width="10" stroke-dasharray="55 138.2" stroke-linecap="round" transform="rotate(-90 30 30)"/>
+            <circle cx="30" cy="30" r="22" fill="none" stroke="#4a8c6f" stroke-width="10" stroke-dasharray="83 138.2" stroke-linecap="round" transform="rotate(-90 30 30)" stroke-dashoffset="-55"/>
+          </svg>
+          <div style="font-size:10px;line-height:1.8;color:var(--sub-text);">
+            <div>🟢 控除後の所得: 3,560,000円</div>
+            <div>🟩 給与所得控除: 1,440,000円</div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:var(--placeholder);margin-top:10px;letter-spacing:0.06em;">${isMobile?'📱 モバイルレイアウト (320px)':'🖥 PCレイアウト（max-width: 560px）'}</div>
+    </div>`;
+}
+
+function renderMobileChecklist() {
+  const el = document.getElementById('mobile-checklist');
+  if (!el) return;
+  el.innerHTML = MOBILE_CHECKLIST.map(cat => `
+    <div style="margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;color:var(--placeholder);text-transform:uppercase;margin-bottom:8px;">${cat.cat}</div>
+      ${cat.items.map(item => `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--sys-border);">
+          <span style="font-size:14px;flex-shrink:0;margin-top:1px;">${item.ok ? '✅' : '🔲'}</span>
+          <span style="font-size:12px;color:${item.ok?'var(--text-main)':'var(--sub-text)'};line-height:1.6;">${item.text}</span>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+/* ════════════════════════
+   RENDER
+════════════════════════ */
+function renderColors() {
+  const grid = document.getElementById('color-grid');
+  COLORS.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'color-swatch';
+    div.innerHTML = `<div class="swatch-color" style="background:${c.hex}"></div>
+      <div class="swatch-info">
+        <div class="swatch-role">${c.role}</div>
+        <div class="swatch-code">${c.hex}</div>
+        <div class="swatch-var">${c.var}</div>
+      </div>`;
+    div.title = 'クリックでコピー';
+    div.onclick = () => copyColor(c.hex);
+    grid.appendChild(div);
+  });
+
+  const agrid = document.getElementById('aux-color-grid');
+  AUX_COLORS.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'color-swatch';
+    const displayHex = c.hex.startsWith('rgba') ? c.hex : c.hex;
+    const bgColor = c.hex.startsWith('rgba') ? 'rgba(74,140,111,0.12)' : c.hex;
+    div.innerHTML = `<div class="swatch-color" style="background:${bgColor}"></div>
+      <div class="swatch-info">
+        <div class="swatch-role">${c.role}</div>
+        <div class="swatch-code" style="font-size:10px;">${c.hex}</div>
+        <div class="swatch-var">${c.desc}</div>
+      </div>`;
+    if (!c.hex.startsWith('rgba')) div.onclick = () => copyColor(c.hex);
+    agrid.appendChild(div);
+  });
+}
+
+function renderTypography() {
+  const tbody = document.getElementById('type-table-body');
+  TYPE_SCALE.forEach(t => {
+    const fontDisplay = t.font === 'Roboto' ? `<span style="font-family:'Roboto',sans-serif">${t.font}</span>` : t.font;
+    const fontStyle = t.font === 'Roboto' ? "font-family:'Roboto',sans-serif;" : (t.font === 'Roboto Mono' ? "font-family:'Roboto Mono',monospace;" : '');
+    tbody.innerHTML += `<tr>
+      <td><span class="tag-pill">${t.el}</span></td>
+      <td><span style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--accent-deep)">${t.size}</span></td>
+      <td><span style="font-family:'Roboto Mono',monospace;font-size:12px;">${t.wt}</span></td>
+      <td>${fontDisplay}</td>
+      <td><span class="type-preview" style="${fontStyle}font-size:${t.psize}px;font-weight:${t.font==='ヒラギノ'?'400':'300'}">${t.sample}</span></td>
+    </tr>`;
+  });
+}
+
+function renderSpacing() {
+  const demo = document.getElementById('spacing-demo');
+  demo.innerHTML = '<div class="demo-label">SPACING SCALE</div>';
+  SPACINGS.forEach(s => {
+    demo.innerHTML += `<div class="spacing-row">
+      <div class="spacing-box" style="width:${s.px*2}px;height:${Math.max(s.px,8)}px;opacity:${0.4+s.px/80}"></div>
+      <span class="spacing-label">${s.name}</span>
+      <span class="spacing-val">${s.px}px</span>
+    </div>`;
+  });
+}
+
+function renderRadius() {
+  const grid = document.getElementById('radius-grid');
+  RADII.forEach(r => {
+    grid.innerHTML += `<div class="radius-box" style="border-radius:${r.val}">
+      <span>${r.val}</span>
+      <span class="rx-label">${r.name}</span>
+    </div>`;
+  });
+}
+
+function renderShadows() {
+  const grid = document.getElementById('shadow-grid');
+  SHADOWS.forEach(s => {
+    grid.innerHTML += `<div class="shadow-card" style="box-shadow:${s.css}">
+      <div class="sc-name">${s.name}</div>
+      <div>${s.desc}</div>
+    </div>`;
+  });
+}
+
+function renderGradients() {
+  const demo = document.getElementById('gradient-demo');
+  demo.innerHTML = '<div class="demo-label">GRADIENT SYSTEM</div>';
+  GRADIENTS.forEach(g => {
+    const isShimmer = g.name === 'シマーバー';
+    const extraStyle = isShimmer
+      ? 'background-size:200%;animation:shimmerBar 3s linear infinite;'
+      : '';
+    demo.innerHTML += `<div style="margin-bottom:12px;">
+      <div style="background:${g.css};height:${g.h}px;border-radius:${g.br}px;margin-bottom:6px;${extraStyle}"></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span style="font-size:12px;font-weight:600;color:var(--text-main)">${g.name}</span>
+        <span style="font-size:11px;color:var(--sub-text)">${g.desc}</span>
+      </div>
+    </div>`;
+  });
+}
+
+function renderEasings() {
+  const demo = document.getElementById('easing-demo');
+  EASINGS.forEach((e, i) => {
+    demo.innerHTML += `<div class="easing-row">
+      <div class="easing-name">${e.name}</div>
+      <div class="easing-track" onclick="animateEasing(${i})" title="クリックしてアニメーション">
+        <div class="easing-ball" id="easing-ball-${i}"></div>
+      </div>
+      <div class="easing-label">${e.fn}<br><span style="color:var(--sub-text);font-size:10px;">${e.use}</span></div>
+    </div>`;
+  });
+}
+
+function renderAnimGrid() {
+  const grid = document.getElementById('anim-grid');
+  ANIMATIONS.forEach(a => {
+    grid.innerHTML += `<div class="anim-tile" onclick="playAnim('${a.name}')">
+      <div class="anim-tile-icon" id="anim-icon-${a.name}">${a.icon}</div>
+      <div class="anim-tile-name">${a.name}</div>
+      <div class="anim-tile-desc">${a.desc}<br><span style="font-family:'Roboto Mono',monospace;font-size:10px;color:var(--accent-deep)">${a.css}</span></div>
+    </div>`;
+  });
+}
+
+function renderPrinciples() {
+  const wrap = document.getElementById('principles-list');
+  PRINCIPLES.forEach(p => {
+    wrap.innerHTML += `<div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--sys-border);">
+      <div style="width:40px;height:40px;border-radius:12px;background:var(--mint-pale);border:1px solid var(--mint-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${p.icon}</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:4px;">${p.n}. ${p.title}</div>
+        <div style="font-size:12px;color:var(--sub-text);line-height:1.8;">${p.body}</div>
+      </div>
+    </div>`;
+  });
+}
+
+function renderEmoji() {
+  const grid = document.getElementById('emoji-grid');
+  EMOJIS.forEach(e => {
+    grid.innerHTML += `<div class="emoji-chip">
+      <span class="ec-em">${e.em}</span>
+      <span>${e.use}</span>
+    </div>`;
+  });
+}
+
+function renderQuickBtns() {
+  const wrap = document.getElementById('quick-btns-demo');
+  [300,400,500,600,800,1000].forEach(n => {
+    const btn = document.createElement('button');
+    btn.className = 'ds-btn-secondary';
+    btn.style.cssText = 'font-size:12px;padding:7px 16px;border-radius:20px;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);';
+    btn.textContent = n + '万';
+    btn.onclick = function() {
+      wrap.querySelectorAll('button').forEach(b => {
+        b.style.background = ''; b.style.color = 'var(--sub-text)';
+        b.style.borderColor = 'var(--mint-light)'; b.style.boxShadow = '';
+      });
+      this.style.background = 'var(--accent-deep)';
+      this.style.color = '#fff';
+      this.style.borderColor = 'var(--accent-deep)';
+      this.style.boxShadow = '0 2px 12px rgba(74,140,111,0.35)';
+      document.getElementById('demo-input').value = (n*10000).toLocaleString('ja-JP');
+      document.getElementById('demo-slider').value = n * 10000;
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+/* ════════════════════════
+   INTERACTIONS
+════════════════════════ */
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'fintech' && window._dsRedrawChart) {
+    requestAnimationFrame(() => requestAnimationFrame(window._dsRedrawChart));
+  }
+}
+
+function copyColor(hex) {
+  navigator.clipboard.writeText(hex).then(() => {
+    const f = document.getElementById('copied-flash');
+    f.textContent = '✓ ' + hex + ' をコピーしました';
+    f.classList.add('show');
+    setTimeout(() => f.classList.remove('show'), 2000);
+  });
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function toggleSeg(btn) {
+  btn.closest('.ds-segment').querySelectorAll('.ds-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+let toastTimer;
+function demoToast(msg) {
+  const t = document.getElementById('ds-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function demoConfetti() {
+  const wrap = document.getElementById('ds-confetti');
+  const colors = ['#a8d5ba','#4a8c6f','#d4ede3','#e8f5f1','#7fc49e','#2d7a5a'];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement('div');
+    c.className = 'ds-confetti-piece';
+    c.style.cssText = `left:${10+Math.random()*80}%;top:-10px;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.2+Math.random()*1.3}s;animation-delay:${Math.random()*.5}s;`;
+    wrap.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
+  }
+  demoToast('🎉 コンフェッティ発火！');
+}
+
+let rafId;
+function demoCounter() {
+  const el = document.getElementById('counter-display');
+  const targets = [1292000, 3668000, 5000000, 440000, 1950000];
+  const to = targets[Math.floor(Math.random() * targets.length)];
+  const from = parseInt(el.textContent.replace(/,/g,'')) || 0;
+  if (rafId) cancelAnimationFrame(rafId);
+  const t0 = performance.now();
+  function step(now) {
+    const p = Math.min((now-t0)/700,1);
+    const e = 1-Math.pow(1-p,4);
+    el.textContent = Math.round(from+(to-from)*e).toLocaleString('ja-JP');
+    if (p<1) rafId = requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function animateEasing(i) {
+  const ball = document.getElementById('easing-ball-' + i);
+  const fns = EASINGS.map(e => e.fn);
+  ball.style.transition = 'none';
+  ball.style.transform = 'translateY(-50%) translateX(4px)';
+  setTimeout(() => {
+    ball.style.transition = `transform 0.8s ${fns[i]}`;
+    const trackW = ball.parentElement.offsetWidth - 40;
+    ball.style.transform = `translateY(-50%) translateX(${trackW}px)`;
+    setTimeout(() => {
+      ball.style.transition = `transform 0.8s ${fns[i]}`;
+      ball.style.transform = 'translateY(-50%) translateX(4px)';
+    }, 1000);
+  }, 20);
+}
+
+function playAnim(name) {
+  const el = document.getElementById('anim-icon-' + name);
+  if (name === 'confettiFall') { demoConfetti(); return; }
+  if (name === 'countUp') { showSection('animation'); demoCounter(); return; }
+  if (name === 'toast') { demoToast('📢 トーストアニメーション！'); return; }
+  el.style.animation = 'none';
+  el.offsetHeight;
+  const anims = {
+    fadeInDown: 'fadeInDown 0.6s cubic-bezier(0.22,0.61,0.36,1) both',
+    fadeInUp:   'fadeInUp 0.6s cubic-bezier(0.22,0.61,0.36,1) both',
+    shimmerBar: 'pulseBadge 1s ease-in-out 3',
+    barShimmer: 'barShimmer 0.8s ease-in-out 2',
+    pulseBadge: 'pulseBadge 0.5s ease-in-out 4',
+    floatLeaf:  'floatLeaf 2s ease-in-out 2',
+    particleDrift:'fadeInDown 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+    spring:     'fadeInUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both',
+    donut:      'pulseBadge 0.5s ease-in-out 2',
+  };
+  el.style.animation = anims[name] || 'pulseBadge 0.5s ease-in-out 2';
+}
+
+function syncDemo(el) {
+  const raw = el.value.replace(/[^0-9]/g,'');
+  const num = parseInt(raw)||0;
+  const pos=el.selectionStart, oldLen=el.value.length;
+  el.value = num ? num.toLocaleString('ja-JP') : '';
+  const diff=el.value.length-oldLen;
+  try{el.setSelectionRange(pos+diff,pos+diff);}catch(e){}
+  document.getElementById('demo-slider').value = Math.min(num,15000000);
+}
+function syncDemoSlider(el) {
+  const num = parseInt(el.value)||0;
+  document.getElementById('demo-input').value = num ? num.toLocaleString('ja-JP') : '';
+}
+
+/* ════════════════════════
+   ① InputStepper デモ
+════════════════════════ */
+function dsSyncStepper(numEl) {
+  const sl = document.getElementById('ds-stepper-sl');
+  const v = parseFloat(numEl.value);
+  if (!isNaN(v)) {
+    sl.value = Math.min(Math.max(v, 0), 30);
+    dsUpdateStepperBg(sl);
+  }
+}
+function dsSyncSlider(sl) {
+  const num = document.getElementById('ds-stepper-num');
+  num.value = parseFloat(sl.value).toFixed(1);
+  dsUpdateStepperBg(sl);
+}
+function dsUpdateStepperBg(sl) {
+  const pct = ((parseFloat(sl.value) - parseFloat(sl.min)) / (parseFloat(sl.max) - parseFloat(sl.min))) * 100;
+  sl.style.setProperty('--pct', pct + '%');
+}
+function dsStepperChange(delta) {
+  const sl  = document.getElementById('ds-stepper-sl');
+  const num = document.getElementById('ds-stepper-num');
+  const next = Math.min(Math.max(parseFloat((parseFloat(sl.value) + delta).toFixed(10)), 0), 30);
+  sl.value  = next;
+  num.value = next.toFixed(1);
+  dsUpdateStepperBg(sl);
+}
+(function initStepper() {
+  const sl = document.getElementById('ds-stepper-sl');
+  if (sl) dsUpdateStepperBg(sl);
+})();
+
+/* ════════════════════════
+   ③ SelectUnderline デモ（生年月日）
+════════════════════════ */
+(function initDobDemo() {
+  const yEl = document.getElementById('ds-dob-year');
+  const mEl = document.getElementById('ds-dob-month');
+  if (!yEl || !mEl) return;
+  const now = new Date();
+  const cy = now.getFullYear(), cm = now.getMonth() + 1;
+  for (let y = cy - 18; y >= cy - 65; y--) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y; yEl.appendChild(o);
+  }
+  yEl.value = cy - 36;
+  for (let m = 1; m <= 12; m++) {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m; mEl.appendChild(o);
+  }
+  mEl.value = cm;
+  function update() {
+    const by = parseInt(yEl.value), bm = parseInt(mEl.value);
+    let ageM = (cy - by) * 12 + (cm - bm);
+    if (ageM < 0) ageM = 0;
+    const age = Math.floor(ageM / 12), mon = ageM % 12;
+    const el = document.getElementById('ds-dob-age');
+    if (el) el.textContent = `（現在 ${age}歳${mon > 0 ? mon + 'ヶ月' : ''}）`;
+  }
+  yEl.addEventListener('change', update);
+  mEl.addEventListener('change', update);
+  update();
+})();
+
+/* ════════════════════════
+   ⑤ SimulationChart デモ
+════════════════════════ */
+(function initSimChart() {
+  const NISA_MAX = 18_000_000;
+  let dsChartBars = [], dsHovIdx = -1;
+
+  function fmtM(n) {
+    if (n >= 100_000_000) {
+      const ok = Math.floor(n / 100_000_000);
+      const mn = Math.round((n % 100_000_000) / 10_000);
+      return mn === 0 ? ok + '億円' : ok + '億' + mn.toLocaleString('ja-JP') + '万円';
+    }
+    return Math.round(n / 10_000).toLocaleString('ja-JP') + '万円';
+  }
+  function fmtAxis(n) {
+    if (n >= 100_000_000) return (n / 100_000_000).toFixed(1).replace(/\.0$/, '') + '億';
+    return Math.round(n / 10_000).toLocaleString('ja-JP') + '万';
+  }
+  function rRect(ctx, x, y, w, h, r) {
+    if (h <= 0 || w <= 0) return;
+    if (typeof r === 'number') r = [r, r, r, r];
+    ctx.beginPath();
+    ctx.moveTo(x + r[0], y);
+    ctx.lineTo(x + w - r[1], y); ctx.quadraticCurveTo(x + w, y, x + w, y + r[1]);
+    ctx.lineTo(x + w, y + h - r[2]); ctx.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
+    ctx.lineTo(x + r[3], y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r[3]);
+    ctx.lineTo(x, y + r[0]); ctx.quadraticCurveTo(x, y, x + r[0], y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  function buildData() {
+    const monthly = 5 * 10_000, annualR = 0.05, startAge = 36;
+    const mr = annualR / 12;
+    let balance = 0, principal = 0, contributed = 0;
+    const data = [];
+    for (let m = 1; m <= 29 * 12; m++) {
+      balance *= (1 + mr);
+      if (contributed < NISA_MAX && monthly > 0) {
+        const add = Math.min(monthly, NISA_MAX - contributed);
+        balance += add; principal += add; contributed += add;
+      }
+      if (m % 12 === 0) {
+        data.push({
+          year: m / 12,
+          age: startAge + m / 12,
+          principal,
+          gain: balance - principal,
+          total: balance,
+          nisaLeft: Math.max(0, NISA_MAX - contributed),
+        });
+      }
+    }
+    return data;
+  }
+
+  function renderDsChart(data) {
+    const canvas = document.getElementById('ds-chart');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const isMobile = window.innerWidth < 560;
+    const containerW = canvas.parentElement.clientWidth;
+    const n = data.length;
+    const PAD = { t: 14, r: isMobile ? 6 : 14, b: isMobile ? 34 : 42, l: isMobile ? 6 : 64 };
+    const MOBILE_MAX = 25;
+    let cW;
+    if (isMobile && n > MOBILE_MAX) {
+      const slotW = (containerW - PAD.l - PAD.r) / MOBILE_MAX;
+      cW = Math.ceil(PAD.l + PAD.r + slotW * n);
+    } else {
+      cW = containerW;
+    }
+    const plotW = cW - PAD.l - PAD.r;
+    const BAR  = Math.max(3, plotW / n - Math.max(1, Math.min(4, plotW / n * 0.28)));
+    const GAP  = Math.max(1, plotW / n - BAR);
+    const H    = isMobile ? 220 : 300;
+    const pH   = H - PAD.t - PAD.b;
+
+    canvas.width  = cW * dpr; canvas.height = H * dpr;
+    canvas.style.width = cW + 'px'; canvas.style.height = H + 'px';
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cW, H);
+
+    const maxVal = Math.max(...data.map(d => d.total), 1);
+
+    for (let i = 0; i <= 4; i++) {
+      const y = PAD.t + pH - pH * i / 4;
+      ctx.strokeStyle = '#deeee8'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(cW - PAD.r, y); ctx.stroke();
+      if (!isMobile) {
+        ctx.fillStyle = '#7a9a8e';
+        ctx.font = '500 10px Roboto, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(fmtAxis(maxVal * i / 4), PAD.l - 6, y + 3.5);
+      }
+    }
+
+    const labelStep = isMobile ? 10 : 5;
+    dsChartBars = data.map((d, i) => {
+      const x      = PAD.l + i * (BAR + GAP);
+      const baseY  = PAD.t + pH;
+      const totalH = (d.total / maxVal) * pH;
+      const prinH  = (d.principal / maxVal) * pH;
+      const gainH  = totalH - prinH;
+      const isHov  = i === dsHovIdx;
+
+      if (isHov) {
+        ctx.fillStyle = 'rgba(74,140,111,0.09)';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x - 3, PAD.t, BAR + 6, pH, 5);
+        else ctx.rect(x - 3, PAD.t, BAR + 6, pH);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = isHov ? '#7ec9a0' : '#a8d5ba';
+      rRect(ctx, x, baseY - prinH, BAR, prinH, [0, 0, 4, 4]);
+      if (gainH > 0.5) {
+        ctx.fillStyle = isHov ? '#3a7a5f' : '#4a8c6f';
+        rRect(ctx, x, baseY - totalH, BAR, gainH, [4, 4, 0, 0]);
+      }
+
+      if (d.year === 1 || d.year % labelStep === 0) {
+        ctx.fillStyle = '#7a9a8e';
+        ctx.font = isMobile ? '500 8.5px Roboto, sans-serif' : '500 9.5px Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(d.age + '歳', x + BAR / 2, H - PAD.b + 13);
+        ctx.strokeStyle = '#d4ede3'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x + BAR / 2, baseY); ctx.lineTo(x + BAR / 2, baseY + 4); ctx.stroke();
+      }
+
+      return { ...d, _x: x, _w: BAR };
+    });
+  }
+
+  const tip = document.getElementById('ds-chart-tooltip');
+  function onDsPointer(e) {
+    const canvas = document.getElementById('ds-chart');
+    if (!canvas || !tip) return;
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    const lx = (cx - rect.left) * (parseFloat(canvas.style.width) / rect.width);
+    const idx = dsChartBars.findIndex(b => lx >= b._x - 3 && lx <= b._x + b._w + 3);
+    if (idx < 0) {
+      if (dsHovIdx !== -1) { dsHovIdx = -1; renderDsChart(dsChartBars); }
+      tip.classList.remove('show'); return;
+    }
+    if (dsHovIdx !== idx) { dsHovIdx = idx; renderDsChart(dsChartBars); }
+    const d = dsChartBars[idx];
+    tip.innerHTML = `
+      <div class="tt-year">${d.year}年後（${d.age}歳）</div>
+      <div class="tt-total">合計：${fmtM(d.total)}</div>
+      <div class="tt-sep"></div>
+      <div class="tt-row"><div class="tt-dot" style="background:#a8d5ba"></div>元本：${fmtM(d.principal)}</div>
+      <div class="tt-row"><div class="tt-dot" style="background:#4a8c6f"></div>運用収益：${fmtM(d.gain)}</div>
+      <div class="tt-sep"></div>
+      <div class="tt-row"><div class="tt-dot" style="background:#d4ede3"></div>新NISA残枠：${fmtM(d.nisaLeft)}</div>`;
+    const TW = 210, TH = 175;
+    let tx = cx + 16, ty = cy - 20;
+    if (tx + TW > window.innerWidth) tx = cx - TW - 16;
+    if (tx < 4) tx = 4;
+    if (ty + TH > window.innerHeight) ty = cy - TH - 10;
+    if (ty < 4) ty = 4;
+    tip.style.left = tx + 'px'; tip.style.top = ty + 'px';
+    tip.classList.add('show');
+  }
+  function hideDsTip() {
+    if (dsHovIdx !== -1) { dsHovIdx = -1; renderDsChart(dsChartBars); }
+    if (tip) tip.classList.remove('show');
+  }
+
+  const chartData = buildData();
+  let _eventsAttached = false;
+
+  function initChart() {
+    const cvs = document.getElementById('ds-chart');
+    if (!cvs) return;
+    renderDsChart(chartData);
+    if (!_eventsAttached) {
+      cvs.addEventListener('mousemove', onDsPointer);
+      cvs.addEventListener('mouseleave', hideDsTip);
+      cvs.addEventListener('touchstart', e => { onDsPointer(e); }, { passive: true });
+      cvs.addEventListener('touchmove', hideDsTip, { passive: true });
+      _eventsAttached = true;
+    }
+  }
+
+  window._dsRedrawChart = initChart;
+  window.addEventListener('resize', () => { if (dsChartBars.length) renderDsChart(dsChartBars); });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChart);
+  } else {
+    initChart();
+  }
+})();
+
+/* ════════════════════════
+   INIT
+════════════════════════ */
+renderColors();
+renderTypography();
+renderSpacing();
+renderRadius();
+renderShadows();
+renderGradients();
+renderEasings();
+renderAnimGrid();
+renderMobileSection();
+renderPrinciples();
+renderEmoji();
+renderQuickBtns();
+</script>
+</body>
+</html>

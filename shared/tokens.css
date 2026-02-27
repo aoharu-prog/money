@@ -1,0 +1,35 @@
+/* ══════════════════════════════════════════
+   DESIGN TOKENS — Mint Design System
+   このファイルは base-design-system.html の
+   :root {} から抽出したCSS変数定義のみを含む
+══════════════════════════════════════════ */
+:root {
+  /* ── ブランドカラー ── */
+  --base-bg:     #e8f5f1;   /* ベース背景（淡いミント）*/
+  --accent:      #a8d5ba;   /* アクセント（若葉ミント）*/
+  --accent-deep: #4a8c6f;   /* アクセント深（深みミント）*/
+
+  /* ── テキスト ── */
+  --text-main:   #44504c;   /* メイン文字（チャコールグレー）*/
+  --text-sub:    #ccd6d1;   /* サブ文字（極薄グレー）*/
+  --sub-text:    #7a9a8e;   /* セカンダリテキスト */
+  --placeholder: #b8d4cc;   /* プレースホルダー */
+  --label-color: #5a7a70;   /* ラベル */
+
+  /* ── 面・背景 ── */
+  --card-bg:     #ffffff;   /* カード背景（純白）*/
+  --mint-light:  #d4ede3;   /* ボーダー・バー背景 */
+  --mint-pale:   #f0faf5;   /* 入力・ホバー背景 */
+
+  /* ── エフェクト ── */
+  --shadow:      rgba(74, 140, 111, 0.12);  /* グリーン系シャドウ */
+
+  /* ── セマンティック ── */
+  --warn-color:  #e07a3a;   /* 警告・注意（オレンジ）*/
+
+  /* ── システムUI専用（デザインシステム閲覧画面用）── */
+  --sys-sidebar: #f8fcfa;
+  --sys-border:  #e2f0e9;
+  --sys-code-bg: #1e2d28;
+  --sys-code-fg: #a8d5ba;
+}
