@@ -313,7 +313,6 @@ html { scroll-behavior: smooth; }
   display: flex; align-items: flex-start; gap: 8px;
   padding: 10px 14px;
   background: rgba(224,122,58,0.08);
-  border-left: 3px solid var(--warn-color);
   border-radius: 10px;
   font-size: 12px; color: var(--warn-color);
   line-height: 1.7; letter-spacing: 0.04em;
@@ -389,9 +388,10 @@ html { scroll-behavior: smooth; }
 .ds-chip-scroll {
   display: flex; gap: 6px; flex-wrap: nowrap;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; margin-left: auto;
-  flex: 1 1 0; min-width: 0; padding: 4px;
+  scrollbar-width: none; min-width: 0; padding: 4px;
 }
+/* ds-val-row 内では残スペースを埋めて右端に寄せる */
+.ds-val-row .ds-chip-scroll { flex: 1 1 0; margin-left: auto; }
 .ds-chip-scroll::-webkit-scrollbar { display: none; }
 .ds-chip {
   padding: 5px 14px;
