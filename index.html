@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Money Tools — Mint Design</title>
+<link rel="stylesheet" href="./shared/components.css">
+<style>
+:root { --card-px: 20px; }
+@media (min-width: 600px) { :root { --card-px: 32px; } }
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
+  background: var(--base-bg);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(168,213,186,0.18) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(74,140,111,0.07) 0%, transparent 45%);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 32px 16px 64px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) { body { padding: 48px 24px 80px; } }
+
+/* ── Header ── */
+header {
+  text-align: center;
+  margin-bottom: clamp(32px, 6vw, 52px);
+}
+.logo-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--mint-pale); border: 1px solid var(--mint-light);
+  color: var(--accent-deep); font-size: 11px; font-family: 'Roboto Mono', monospace;
+  padding: 3px 14px; border-radius: 20px; margin-bottom: 16px;
+  font-weight: 500; letter-spacing: 0.08em;
+}
+header h1 {
+  font-size: clamp(1.6rem, 5.5vw, 2.4rem);
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.03em;
+  margin-bottom: 10px;
+}
+header p {
+  font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.7;
+}
+
+/* ── グリッド ── */
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 560px) { .tool-grid { grid-template-columns: 1fr 1fr; gap: 18px; } }
+
+/* ── ツールカード ── */
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid rgba(168,213,186,0.5);
+  border-radius: 20px;
+  padding: 28px var(--card-px) 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.22s cubic-bezier(0.22,0.61,0.36,1),
+              box-shadow 0.22s ease,
+              border-color 0.2s ease;
+  animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+.tool-card:nth-child(1) { animation-delay: 0.04s; }
+.tool-card:nth-child(2) { animation-delay: 0.10s; }
+.tool-card:nth-child(3) { animation-delay: 0.16s; }
+.tool-card:nth-child(4) { animation-delay: 0.22s; }
+.tool-card:nth-child(5) { animation-delay: 0.28s; }
+.tool-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(74,140,111,0.16);
+  border-color: var(--accent);
+}
+.tool-card:active { transform: translateY(-1px); }
+
+.card-icon {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-size: clamp(1rem, 3vw, 1.15rem);
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.card-desc {
+  font-size: clamp(0.72rem, 2.2vw, 0.82rem);
+  color: var(--sub-text);
+  line-height: 1.7;
+  flex: 1;
+}
+.card-arrow {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 18px;
+  font-size: clamp(0.68rem, 2vw, 0.75rem);
+  font-weight: 600;
+  color: var(--accent-deep);
+  letter-spacing: 0.06em;
+}
+.card-arrow::after {
+  content: '→';
+  transition: transform 0.2s ease;
+}
+.tool-card:hover .card-arrow::after { transform: translateX(4px); }
+
+/* ── セクション区切り ── */
+.section-label {
+  font-size: clamp(0.62rem, 1.8vw, 0.7rem);
+  font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--placeholder);
+  margin: clamp(28px, 5vw, 40px) 0 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--sys-border);
+}
+
+/* ── 単ファイルリスト ── */
+.file-list {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.file-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
+  background: #fff;
+  border: 1px solid rgba(168,213,186,0.5);
+  border-radius: 14px;
+  text-decoration: none; color: inherit;
+  font-size: clamp(0.78rem, 2.3vw, 0.88rem);
+  font-weight: 500;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.file-link:hover {
+  background: var(--mint-pale);
+  border-color: var(--mint-light);
+}
+.file-link-icon { font-size: 1.1rem; flex-shrink: 0; }
+.file-link-text { flex: 1; }
+.file-link-sub  { font-size: clamp(0.62rem, 1.8vw, 0.7rem); color: var(--sub-text); font-weight: 400; margin-top: 2px; }
+.file-link-arr  { color: var(--accent-deep); font-size: 0.8rem; flex-shrink: 0; }
+
+/* ── Footer ── */
+footer {
+  margin-top: clamp(40px, 7vw, 60px);
+  text-align: center;
+  font-size: clamp(0.6rem, 1.8vw, 0.68rem);
+  color: var(--placeholder);
+  letter-spacing: 0.06em;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-badge">🌿 Mint Design — Money Tools</div>
+  <h1>マネーツール</h1>
+  <p>資産形成・税金・老後資金をシミュレーションするツール集</p>
+</header>
+
+<!-- ── シミュレーター ── -->
+<div class="section-label">Simulators</div>
+<div class="tool-grid">
+
+  <a class="tool-card" href="./nisa-simulator/index.html">
+    <div class="card-icon">📈</div>
+    <div class="card-title">新NISA積立シミュレーター</div>
+    <div class="card-desc">新NISA総枠1,800万円を考慮した長期積立運用シミュレーション。複数の入力から最終資産額・運用益を試算します。</div>
+    <div class="card-arrow">シミュレーターを開く</div>
+  </a>
+
+  <a class="tool-card" href="./ideco-simulator/index.html">
+    <div class="card-icon">🏦</div>
+    <div class="card-title">iDeCoシミュレーター</div>
+    <div class="card-desc">職業・課税所得に応じた節税効果と老後資産ブースト額を試算。受取方法（一時金/年金）ごとの税引後額も計算します。</div>
+    <div class="card-arrow">シミュレーターを開く</div>
+  </a>
+
+  <a class="tool-card" href="./retirement-simulator/index.html">
+    <div class="card-icon">🏖️</div>
+    <div class="card-title">老後資金シミュレーター</div>
+    <div class="card-desc">退職後の資産取り崩しシミュレーション。生活費・年金収入・運用利率をもとに資産の推移を試算します。</div>
+    <div class="card-arrow">シミュレーターを開く</div>
+  </a>
+
+  <a class="tool-card" href="./kyuyo-shotoku-keisan/index.html">
+    <div class="card-icon">💼</div>
+    <div class="card-title">給与所得計算ツール</div>
+    <div class="card-desc">給与収入から給与所得控除・課税所得・所得税・住民税などの概算額を計算します。</div>
+    <div class="card-arrow">ツールを開く</div>
+  </a>
+
+  <a class="tool-card" href="./Salary Impact Calculator/index.html">
+    <div class="card-icon">🧮</div>
+    <div class="card-title">派遣社員 年収・手取りシミュレーター</div>
+    <div class="card-desc">時給・勤務時間をもとに年収・月収・手取りを試算。社会保険料・所得税・住民税も含めた実質収入をシミュレーションします。</div>
+    <div class="card-arrow">シミュレーターを開く</div>
+  </a>
+
+</div>
+
+<!-- ── その他のファイル ── -->
+<div class="section-label">Design &amp; Reference</div>
+<div class="file-list">
+
+  <a class="file-link" href="./shared/catalog.html">
+    <span class="file-link-icon">🎨</span>
+    <div class="file-link-text">
+      <div>デザインシステム カタログ</div>
+      <div class="file-link-sub">Mint Design System — コンポーネント・トークン・関数の一覧</div>
+    </div>
+    <span class="file-link-arr">→</span>
+  </a>
+
+  <a class="file-link" href="./base-design-system.html">
+    <span class="file-link-icon">📐</span>
+    <div class="file-link-text">
+      <div>ベースデザインシステム</div>
+      <div class="file-link-sub">デザイン原則・コンポーネント定義ドキュメント</div>
+    </div>
+    <span class="file-link-arr">→</span>
+  </a>
+
+</div>
+
+<footer>
+  Mint Design System &nbsp;·&nbsp; Money Tools &nbsp;·&nbsp; © 2025 AOKI DESIGN WORKS
+</footer>
+
+</body>
+</html>

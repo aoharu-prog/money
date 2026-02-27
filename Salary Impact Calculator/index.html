@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>派遣社員 年収・手取りシミュレーター</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════════ */
+:root {
+  --base-bg:     #e8f5f1;
+  --accent:      #a8d5ba;
+  --accent-deep: #4a8c6f;
+  --text-main:   #44504c;
+  --text-sub:    #ccd6d1;
+  --card-bg:     #ffffff;
+  --mint-light:  #d4ede3;
+  --mint-pale:   #f0faf5;
+  --shadow:      rgba(74,140,111,0.12);
+  --sub-text:    #7a9a8e;
+  --placeholder: #b8d4cc;
+
+  --color-nenkin:   #4a7fd4;
+  --color-health:   #7aa8e8;
+  --color-employ:   #aac8f4;
+  --color-income:   #e07a3a;
+  --color-resident: #f0c060;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
+  background: var(--base-bg);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 20px 16px calc(48px + env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+@media (min-width: 480px) {
+  body { padding: 36px 24px 64px; }
+}
+@media (min-width: 768px) {
+  body { max-width: 680px; margin: 0 auto; padding: 48px 32px 80px; }
+}
+
+/* ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ */
+.app-header {
+  text-align: center;
+  margin-bottom: 28px;
+  animation: fadeInDown 0.7s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+.app-header h1 {
+  font-size: clamp(20px, 5vw, 28px);
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+.app-header p {
+  font-size: 13px;
+  color: var(--sub-text);
+  line-height: 1.75;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* ══════════════════════════════════════════
+   BADGE
+══════════════════════════════════════════ */
+.ds-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 12px rgba(168,213,186,0.5);
+  animation: pulseBadge 3s ease-in-out infinite;
+}
+@keyframes pulseBadge {
+  0%,100% { box-shadow: 0 2px 12px rgba(168,213,186,0.5); }
+  50%     { box-shadow: 0 4px 22px rgba(74,140,111,0.45); }
+}
+
+/* ══════════════════════════════════════════
+   CARD
+══════════════════════════════════════════ */
+.card {
+  background: var(--card-bg);
+  border-radius: 28px;
+  padding: 28px 20px;
+  box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.7s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+@media (min-width: 480px) {
+  .card { padding: 36px 32px; margin-bottom: 20px; }
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
+  background-size: 200%;
+  animation: shimmerBar 3s linear infinite;
+  border-radius: 28px 28px 0 0;
+}
+@keyframes shimmerBar {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--placeholder);
+  margin-bottom: 20px;
+}
+
+/* ══════════════════════════════════════════
+   INPUT ROW
+══════════════════════════════════════════ */
+.irow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--mint-light);
+}
+@media (min-width: 560px) {
+  .irow { grid-template-columns: 180px 1fr; align-items: start; gap: 16px; }
+}
+.irow:last-child { border-bottom: none; }
+.irow-label { display: flex; flex-direction: column; gap: 4px; padding-top: 2px; }
+.irow-label .lname {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+.irow-label .ldesc {
+  font-size: 11px;
+  color: var(--sub-text);
+  line-height: 1.5;
+}
+.irow-right { display: flex; flex-direction: column; gap: 12px; }
+
+/* ══════════════════════════════════════════
+   NUMBER INPUT
+══════════════════════════════════════════ */
+.val-row { display: flex; align-items: center; gap: 8px; }
+.num-edit {
+  font-size: clamp(15px, 4vw, 17px);
+  font-weight: 300;
+  font-family: 'Roboto', sans-serif;
+  color: var(--text-main);
+  border: 2px solid var(--mint-light);
+  border-radius: 12px;
+  background: var(--mint-pale);
+  outline: none;
+  width: 88px;
+  padding: 7px 10px;
+  -moz-appearance: textfield;
+  transition: all 0.3s ease;
+  letter-spacing: 0.03em;
+}
+.num-edit:focus {
+  border-color: var(--accent);
+  background: var(--card-bg);
+  box-shadow: 0 0 0 4px rgba(168,213,186,0.25);
+}
+.num-edit::-webkit-outer-spin-button,
+.num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
+.num-edit.narrow   { width: 72px; }
+.num-edit.narrower { width: 58px; }
+.val-unit {
+  font-size: 12px;
+  color: var(--sub-text);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   SELECT
+══════════════════════════════════════════ */
+.select-input {
+  font-size: clamp(14px, 3.5vw, 16px);
+  font-weight: 300;
+  font-family: 'Roboto', sans-serif;
+  color: var(--text-main);
+  border: 2px solid var(--mint-light);
+  border-radius: 12px;
+  background: var(--mint-pale);
+  outline: none;
+  cursor: pointer;
+  padding: 7px 10px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: all 0.3s ease;
+}
+.select-input:focus {
+  border-color: var(--accent);
+  background: var(--card-bg);
+  box-shadow: 0 0 0 4px rgba(168,213,186,0.25);
+}
+
+/* ══════════════════════════════════════════
+   QUICK BUTTONS
+══════════════════════════════════════════ */
+.quick-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.quick-btn {
+  background: transparent;
+  color: var(--sub-text);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 20px;
+  padding: 6px 12px;
+  min-height: 30px;
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.quick-btn:hover {
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+  background: var(--mint-pale);
+  transform: scale(1.04);
+}
+.quick-btn:active { transform: scale(0.96); }
+.quick-btn.active {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(74,140,111,0.35);
+}
+
+/* ══════════════════════════════════════════
+   SEGMENT CONTROL（期間切り替え）
+══════════════════════════════════════════ */
+.ds-segment {
+  display: flex;
+  gap: 6px;
+  background: var(--mint-pale);
+  padding: 5px;
+  border-radius: 14px;
+  width: fit-content;
+  margin-bottom: 24px;
+}
+.ds-seg-btn {
+  padding: 9px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  color: var(--sub-text);
+  background: transparent;
+  letter-spacing: 0.04em;
+  -webkit-tap-highlight-color: transparent;
+}
+.ds-seg-btn.active {
+  background: var(--card-bg);
+  color: var(--accent-deep);
+  box-shadow: 0 2px 10px var(--shadow);
+  transform: scale(1.02);
+}
+.ds-seg-btn:hover:not(.active) { background: rgba(168,213,186,0.2); }
+
+/* ══════════════════════════════════════════
+   RESULT CARDS（サマリー）
+══════════════════════════════════════════ */
+.summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+@media (min-width: 480px) { .summary { grid-template-columns: repeat(3, 1fr); } }
+
+.ds-result {
+  background: var(--mint-pale);
+  border-radius: 16px;
+  padding: 16px 14px;
+  border: 1.5px solid var(--mint-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+}
+.ds-result:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow);
+}
+.ds-result.highlight {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-result-label {
+  font-size: 11px;
+  color: var(--sub-text);
+  margin-bottom: 8px;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+}
+.ds-result-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(22px, 6vw, 28px);
+  font-weight: 300;
+  color: var(--text-main);
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+}
+.ds-result-value.em { color: var(--accent-deep); font-weight: 400; }
+.ds-result-unit {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--sub-text);
+  font-weight: 400;
+}
+
+/* ══════════════════════════════════════════
+   DEDUCTION BAR
+══════════════════════════════════════════ */
+.bar-section { margin-bottom: 24px; }
+.bar-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--placeholder);
+  margin-bottom: 12px;
+}
+.stacked-bar {
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  display: flex;
+  width: 100%;
+  margin-bottom: 20px;
+  background: var(--mint-light);
+}
+.bar-seg {
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.22,0.61,0.36,1);
+}
+.bar-seg-takehome { background: linear-gradient(90deg, var(--accent), var(--accent-deep)); }
+.bar-seg-nenkin   { background: var(--color-nenkin); }
+.bar-seg-health   { background: var(--color-health); }
+.bar-seg-employ   { background: var(--color-employ); }
+.bar-seg-income   { background: var(--color-income); }
+.bar-seg-resident { background: var(--color-resident); }
+
+/* ══════════════════════════════════════════
+   LEGEND
+══════════════════════════════════════════ */
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 20px;
+}
+@media (min-width: 560px) { .legend-grid { grid-template-columns: repeat(3, 1fr); } }
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.legend-label { color: var(--sub-text); flex: 1; }
+.legend-amount { font-family: 'Roboto', sans-serif; font-weight: 500; color: var(--text-main); white-space: nowrap; font-size: 11px; }
+
+/* ══════════════════════════════════════════
+   DETAIL TABLE
+══════════════════════════════════════════ */
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.info-table th {
+  text-align: left;
+  padding: 8px 14px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--placeholder);
+  border-bottom: 1px solid var(--mint-light);
+  font-weight: 600;
+}
+.info-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--mint-light);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+.info-table tr:hover td { background: var(--mint-pale); }
+.info-table tr:last-child td { border-bottom: none; }
+.info-table .td-right { text-align: right; }
+.info-table .td-num {
+  text-align: right;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  color: var(--text-main);
+  font-size: 14px;
+}
+.info-table .td-muted { text-align: right; font-size: 11px; color: var(--sub-text); }
+.info-table .tr-total td { background: var(--mint-pale); font-weight: 700; }
+.info-table .tr-takehome td {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  font-weight: 700;
+  color: var(--accent-deep);
+  font-size: 14px;
+}
+
+/* ══════════════════════════════════════════
+   DIVIDER
+══════════════════════════════════════════ */
+.ds-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mint-light), transparent);
+  margin: 20px 0;
+}
+
+/* ══════════════════════════════════════════
+   NOTE BOX（注釈・免責）
+══════════════════════════════════════════ */
+.note-box {
+  background: rgba(168,213,186,0.1);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 11px;
+  color: var(--sub-text);
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  margin-top: 16px;
+}
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+.card:nth-child(2) { animation-delay: 0.05s; }
+.card:nth-child(3) { animation-delay: 0.10s; }
+.card:nth-child(4) { animation-delay: 0.15s; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--mint-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="app-header">
+  <div class="ds-badge">💼 Simulator</div>
+  <h1>派遣社員 年収・手取り<br>シミュレーター</h1>
+  <p>条件をタップするだけで、月収・年収・手取りと各種控除額を自動計算します。</p>
+</div>
+
+<!-- ===== INPUT CARD ===== -->
+<div class="card">
+  <div class="card-label">📝 基本条件を入力</div>
+
+  <!-- 時給 -->
+  <div class="irow">
+    <div class="irow-label">
+      <span class="lname">時給</span>
+      <span class="ldesc">ボタンで選択、または直接入力</span>
+    </div>
+    <div class="irow-right">
+      <div class="val-row">
+        <input class="num-edit" type="number" id="hourlyWageInput" value="1500" min="900" max="9999" step="1"
+          oninput="onDirectInput(event,'hourlyWage','qbHourlyWage')">
+        <span class="val-unit">円 / 時</span>
+      </div>
+      <div class="quick-btn-group" id="qbHourlyWage">
+        <button class="quick-btn" data-val="1400" onclick="setVal('hourlyWage',1400,'qbHourlyWage',this)">1,400円</button>
+        <button class="quick-btn active" data-val="1500" onclick="setVal('hourlyWage',1500,'qbHourlyWage',this)">1,500円</button>
+        <button class="quick-btn" data-val="1600" onclick="setVal('hourlyWage',1600,'qbHourlyWage',this)">1,600円</button>
+        <button class="quick-btn" data-val="1700" onclick="setVal('hourlyWage',1700,'qbHourlyWage',this)">1,700円</button>
+        <button class="quick-btn" data-val="1800" onclick="setVal('hourlyWage',1800,'qbHourlyWage',this)">1,800円</button>
+        <button class="quick-btn" data-val="1900" onclick="setVal('hourlyWage',1900,'qbHourlyWage',this)">1,900円</button>
+        <button class="quick-btn" data-val="2000" onclick="setVal('hourlyWage',2000,'qbHourlyWage',this)">2,000円</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1日の労働時間 -->
+  <div class="irow">
+    <div class="irow-label">
+      <span class="lname">1日の労働時間</span>
+      <span class="ldesc">休憩除く実労働時間</span>
+    </div>
+    <div class="irow-right">
+      <div class="val-row">
+        <input class="num-edit narrow" type="number" id="hoursPerDayInput" value="8" min="1" max="24" step="0.5"
+          oninput="onDirectInput(event,'hoursPerDay','qbHoursPerDay')">
+        <span class="val-unit">時間 / 日</span>
+      </div>
+      <div class="quick-btn-group" id="qbHoursPerDay">
+        <button class="quick-btn active" data-val="8"   onclick="setVal('hoursPerDay',8,'qbHoursPerDay',this)">8時間</button>
+        <button class="quick-btn" data-val="7.5" onclick="setVal('hoursPerDay',7.5,'qbHoursPerDay',this)">7.5時間</button>
+        <button class="quick-btn" data-val="7"   onclick="setVal('hoursPerDay',7,'qbHoursPerDay',this)">7時間</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 月の勤務日数 -->
+  <div class="irow">
+    <div class="irow-label">
+      <span class="lname">月の勤務日数</span>
+      <span class="ldesc">週あたりの日数×4で計算、または直接入力</span>
+    </div>
+    <div class="irow-right">
+      <div class="val-row">
+        <input class="num-edit narrow" type="number" id="daysPerMonthInput" value="20" min="1" max="31" step="1"
+          oninput="onDirectInput(event,'daysPerMonth','qbDaysPerMonth')">
+        <span class="val-unit">日 / 月</span>
+      </div>
+      <div class="quick-btn-group" id="qbDaysPerMonth">
+        <button class="quick-btn active" data-val="20" onclick="setVal('daysPerMonth',20,'qbDaysPerMonth',this)">週5日（20日）</button>
+        <button class="quick-btn" data-val="16" onclick="setVal('daysPerMonth',16,'qbDaysPerMonth',this)">週4日（16日）</button>
+        <button class="quick-btn" data-val="12" onclick="setVal('daysPerMonth',12,'qbDaysPerMonth',this)">週3日（12日）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 居住地 -->
+  <div class="irow">
+    <div class="irow-label">
+      <span class="lname">居住地</span>
+      <span class="ldesc">住民税率に影響</span>
+    </div>
+    <div class="irow-right">
+      <select class="select-input" id="prefecture" onchange="calculate()">
+        <option value="tokyo">東京都</option>
+        <option value="osaka">大阪府</option>
+        <option value="aichi">愛知県</option>
+        <option value="other">その他</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 扶養家族 -->
+  <div class="irow">
+    <div class="irow-label">
+      <span class="lname">扶養家族数</span>
+      <span class="ldesc">配偶者・子など（所得控除に影響）</span>
+    </div>
+    <div class="irow-right">
+      <div class="val-row">
+        <input class="num-edit narrower" type="number" id="dependentsInput" value="0" min="0" max="10" step="1"
+          oninput="onDirectInput(event,'dependents','qbDependents')">
+        <span class="val-unit">人</span>
+      </div>
+      <div class="quick-btn-group" id="qbDependents">
+        <button class="quick-btn active" data-val="0" onclick="setVal('dependents',0,'qbDependents',this)">0人</button>
+        <button class="quick-btn" data-val="1" onclick="setVal('dependents',1,'qbDependents',this)">1人</button>
+        <button class="quick-btn" data-val="2" onclick="setVal('dependents',2,'qbDependents',this)">2人</button>
+        <button class="quick-btn" data-val="3" onclick="setVal('dependents',3,'qbDependents',this)">3人</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESULT CARD ===== -->
+<div class="card">
+  <div class="card-label">💰 計算結果</div>
+
+  <div class="ds-segment">
+    <button class="ds-seg-btn active" id="btnMonthly" onclick="setPeriod('monthly')">月額</button>
+    <button class="ds-seg-btn" id="btnYearly" onclick="setPeriod('yearly')">年間</button>
+  </div>
+
+  <div class="summary">
+    <div class="ds-result">
+      <div class="ds-result-label">総支給額</div>
+      <div class="ds-result-value">
+        <span id="grossAmount">—</span>
+        <span class="ds-result-unit" id="grossUnit">—</span>
+      </div>
+    </div>
+    <div class="ds-result">
+      <div class="ds-result-label">控除合計</div>
+      <div class="ds-result-value">
+        <span id="totalDeduction">—</span>
+        <span class="ds-result-unit" id="deductUnit">—</span>
+      </div>
+    </div>
+    <div class="ds-result highlight">
+      <div class="ds-result-label">手取り</div>
+      <div class="ds-result-value em">
+        <span id="takeHome">—</span>
+        <span class="ds-result-unit" id="takeHomeUnit">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 構成バー -->
+  <div class="bar-section">
+    <div class="bar-title">収入の内訳</div>
+    <div class="stacked-bar" id="stackedBar">
+      <div class="bar-seg bar-seg-takehome" id="barTakeHome" style="width:70%"></div>
+      <div class="bar-seg bar-seg-nenkin"   id="barNenkin"   style="width:9%"></div>
+      <div class="bar-seg bar-seg-health"   id="barHealth"   style="width:5%"></div>
+      <div class="bar-seg bar-seg-employ"   id="barEmploy"   style="width:1%"></div>
+      <div class="bar-seg bar-seg-income"   id="barIncome"   style="width:8%"></div>
+      <div class="bar-seg bar-seg-resident" id="barResident" style="width:7%"></div>
+    </div>
+    <div class="legend-grid">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--accent-deep)"></div>
+        <span class="legend-label">手取り</span>
+        <span class="legend-amount" id="lgTakeHome">—</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--color-nenkin)"></div>
+        <span class="legend-label">厚生年金</span>
+        <span class="legend-amount" id="lgNenkin">—</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--color-health)"></div>
+        <span class="legend-label">健康保険</span>
+        <span class="legend-amount" id="lgHealth">—</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--color-employ)"></div>
+        <span class="legend-label">雇用保険</span>
+        <span class="legend-amount" id="lgEmploy">—</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--color-income)"></div>
+        <span class="legend-label">所得税</span>
+        <span class="legend-amount" id="lgIncome">—</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--color-resident)"></div>
+        <span class="legend-label">住民税</span>
+        <span class="legend-amount" id="lgResident">—</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DETAIL CARD ===== -->
+<div class="card">
+  <div class="card-label">📊 控除の詳細内訳</div>
+  <table class="info-table">
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th class="td-right">率</th>
+        <th class="td-right">月額</th>
+        <th class="td-right">年間</th>
+      </tr>
+    </thead>
+    <tbody id="deductTableBody"></tbody>
+  </table>
+
+  <div class="note-box">
+    <p>📋 社会保険料（厚生年金・健康保険）は標準報酬月額に基づく概算。実際の額は保険者・加入組合により異なります。</p>
+    <p>所得税は給与所得控除後の課税所得に基づく概算（復興特別所得税2.1%含む）。年末調整で確定します。</p>
+    <p>住民税は前年所得課税のため、初年度は発生しない場合があります。均等割 5,000円/年 含む。</p>
+    <p>週20時間未満の場合は社会保険（健保・年金）の対象外となる場合があります。</p>
+    <p>本計算はあくまで概算です。正確な金額は勤務先・税理士にご確認ください。</p>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let period = 'monthly';
+const state = {
+  hourlyWage:   1500,
+  hoursPerDay:  8,
+  daysPerMonth: 20,
+  dependents:   0,
+};
+
+// ===== HELPERS =====
+function fmtParts(n) {
+  if (n >= 10000) return { num: (n / 10000).toFixed(1).replace(/\.0$/, ''), unit: '万円' };
+  return { num: n.toLocaleString(), unit: '円' };
+}
+function fmtFull(n) { return n.toLocaleString(); }
+
+function syncBtnGroup(groupId, val) {
+  document.querySelectorAll('#' + groupId + ' .quick-btn').forEach(btn => {
+    btn.classList.toggle('active', parseFloat(btn.dataset.val) === val);
+  });
+}
+function setVal(key, val, groupId, btn) {
+  state[key] = val;
+  const inputEl = document.getElementById(key + 'Input');
+  if (inputEl) inputEl.value = val;
+  syncBtnGroup(groupId, val);
+  calculate();
+}
+function onDirectInput(e, key, groupId) {
+  const val = parseFloat(e.target.value);
+  if (isNaN(val)) return;
+  state[key] = val;
+  syncBtnGroup(groupId, val);
+  calculate();
+}
+
+// ===== TAX CALCULATION =====
+function calcSocialInsurance(monthlyGross) {
+  const nenkin = Math.round(monthlyGross * 0.0915);
+  const health = Math.round(monthlyGross * 0.05);
+  const employ = Math.round(monthlyGross * 0.006);
+  return { nenkin, health, employ };
+}
+function calcIncomeTax(yearlyTaxableIncome) {
+  const brackets = [
+    { limit: 1_950_000,  rate: 0.05,  deduct: 0 },
+    { limit: 3_300_000,  rate: 0.10,  deduct: 97_500 },
+    { limit: 6_950_000,  rate: 0.20,  deduct: 427_500 },
+    { limit: 9_000_000,  rate: 0.23,  deduct: 636_000 },
+    { limit: 18_000_000, rate: 0.33,  deduct: 1_536_000 },
+    { limit: 40_000_000, rate: 0.40,  deduct: 2_796_000 },
+    { limit: Infinity,   rate: 0.45,  deduct: 4_796_000 },
+  ];
+  if (yearlyTaxableIncome <= 0) return 0;
+  for (const b of brackets) {
+    if (yearlyTaxableIncome <= b.limit) {
+      return Math.max(0, Math.round((yearlyTaxableIncome * b.rate - b.deduct) * 1.021));
+    }
+  }
+  return 0;
+}
+function calcResidentTax(yearlyTaxableIncome) {
+  if (yearlyTaxableIncome <= 0) return 5000;
+  return Math.round(yearlyTaxableIncome * 0.10) + 5000;
+}
+function getEmploymentIncomeDeduction(yearlyGross) {
+  if (yearlyGross <= 1_625_000) return 550_000;
+  if (yearlyGross <= 1_800_000) return Math.round(yearlyGross * 0.4 - 100_000);
+  if (yearlyGross <= 3_600_000) return Math.round(yearlyGross * 0.3 + 80_000);
+  if (yearlyGross <= 6_600_000) return Math.round(yearlyGross * 0.2 + 440_000);
+  if (yearlyGross <= 8_500_000) return Math.round(yearlyGross * 0.1 + 1_100_000);
+  return 1_950_000;
+}
+
+// ===== ANIMATE NUMBER =====
+function animateNum(numEl, unitEl, from, to) {
+  const t0 = performance.now();
+  function step(now) {
+    const p = Math.min((now - t0) / 600, 1);
+    const ease = 1 - Math.pow(1 - p, 4);
+    const v = Math.round(from + (to - from) * ease);
+    const parts = fmtParts(v);
+    numEl.textContent = parts.num;
+    if (unitEl) unitEl.textContent = parts.unit;
+    if (p < 1) requestAnimationFrame(step);
+    else {
+      const final = fmtParts(to);
+      numEl.textContent = final.num;
+      if (unitEl) unitEl.textContent = final.unit;
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ===== MAIN CALCULATE =====
+const prevVals = { g: 0, d: 0, th: 0 };
+
+function calculate() {
+  const { hourlyWage, hoursPerDay, daysPerMonth, dependents } = state;
+
+  const monthlyGross = Math.round(hourlyWage * hoursPerDay * daysPerMonth);
+  const yearlyGross  = monthlyGross * 12;
+
+  const { nenkin, health, employ } = calcSocialInsurance(monthlyGross);
+  const yearlyNenkin = nenkin * 12;
+  const yearlyHealth = health * 12;
+  const yearlyEmploy = employ * 12;
+  const yearlySocial = yearlyNenkin + yearlyHealth + yearlyEmploy;
+
+  const employDeduction    = getEmploymentIncomeDeduction(yearlyGross);
+  const basicDeduction     = 480_000;
+  const dependentDeduction = dependents * 380_000;
+  const taxableBase        = yearlyGross - employDeduction - yearlySocial;
+  const taxableIncome      = Math.max(0, taxableBase - basicDeduction - dependentDeduction);
+
+  const yearlyIncomeTax   = calcIncomeTax(taxableIncome);
+  const yearlyResidentTax = calcResidentTax(taxableIncome);
+  const monthlyIncomeTax   = Math.round(yearlyIncomeTax / 12);
+  const monthlyResidentTax = Math.round(yearlyResidentTax / 12);
+
+  const monthlyDeduction = nenkin + health + employ + monthlyIncomeTax + monthlyResidentTax;
+  const yearlyDeduction  = yearlySocial + yearlyIncomeTax + yearlyResidentTax;
+  const monthlyTakeHome  = monthlyGross - monthlyDeduction;
+  const yearlyTakeHome   = yearlyGross - yearlyDeduction;
+
+  const g  = period === 'yearly' ? yearlyGross     : monthlyGross;
+  const d  = period === 'yearly' ? yearlyDeduction : monthlyDeduction;
+  const th = period === 'yearly' ? yearlyTakeHome  : monthlyTakeHome;
+
+  animateNum(document.getElementById('grossAmount'),    document.getElementById('grossUnit'),     prevVals.g,  g);
+  animateNum(document.getElementById('totalDeduction'), document.getElementById('deductUnit'),    prevVals.d,  d);
+  animateNum(document.getElementById('takeHome'),       document.getElementById('takeHomeUnit'),  prevVals.th, th);
+  prevVals.g = g; prevVals.d = d; prevVals.th = th;
+
+  // バー
+  const total = monthlyGross;
+  const pTH = total > 0 ? (monthlyTakeHome   / total * 100).toFixed(1) : 0;
+  const pN  = total > 0 ? (nenkin             / total * 100).toFixed(1) : 0;
+  const pH  = total > 0 ? (health             / total * 100).toFixed(1) : 0;
+  const pE  = total > 0 ? (employ             / total * 100).toFixed(1) : 0;
+  const pI  = total > 0 ? (monthlyIncomeTax   / total * 100).toFixed(1) : 0;
+  const pR  = total > 0 ? (monthlyResidentTax / total * 100).toFixed(1) : 0;
+  document.getElementById('barTakeHome').style.width = pTH + '%';
+  document.getElementById('barNenkin').style.width   = pN  + '%';
+  document.getElementById('barHealth').style.width   = pH  + '%';
+  document.getElementById('barEmploy').style.width   = pE  + '%';
+  document.getElementById('barIncome').style.width   = pI  + '%';
+  document.getElementById('barResident').style.width = pR  + '%';
+
+  // レジェンド
+  const lm = period === 'yearly' ? 12 : 1;
+  document.getElementById('lgTakeHome').textContent = fmtFull(monthlyTakeHome * lm) + '円';
+  document.getElementById('lgNenkin').textContent   = fmtFull(nenkin * lm) + '円';
+  document.getElementById('lgHealth').textContent   = fmtFull(health * lm) + '円';
+  document.getElementById('lgEmploy').textContent   = fmtFull(employ * lm) + '円';
+  document.getElementById('lgIncome').textContent   = fmtFull(monthlyIncomeTax * lm) + '円';
+  document.getElementById('lgResident').textContent = fmtFull(monthlyResidentTax * lm) + '円';
+
+  // 詳細テーブル
+  const rows = [
+    { name: '厚生年金保険料', color: 'var(--color-nenkin)',   desc: '労働者負担 9.15%',   rate: '9.15%', monthly: nenkin,             yearly: yearlyNenkin },
+    { name: '健康保険料',     color: 'var(--color-health)',   desc: '協会けんぽ概算 5%',  rate: '5.00%', monthly: health,             yearly: yearlyHealth },
+    { name: '雇用保険料',     color: 'var(--color-employ)',   desc: '労働者負担 0.6%',    rate: '0.60%', monthly: employ,             yearly: yearlyEmploy },
+    { name: '所得税',         color: 'var(--color-income)',   desc: '復興特別税含む概算',  rate: '—',    monthly: monthlyIncomeTax,   yearly: yearlyIncomeTax },
+    { name: '住民税',         color: 'var(--color-resident)', desc: '均等割5,000円含む',   rate: '10%',  monthly: monthlyResidentTax, yearly: yearlyResidentTax },
+  ];
+
+  const tbody = document.getElementById('deductTableBody');
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:10px;height:10px;border-radius:3px;background:${r.color};flex-shrink:0;display:inline-block"></span>
+          <div>
+            <div style="font-weight:700;font-size:13px">${r.name}</div>
+            <div style="font-size:10px;color:var(--sub-text);margin-top:1px">${r.desc}</div>
+          </div>
+        </div>
+      </td>
+      <td class="td-muted">${r.rate}</td>
+      <td class="td-num">${fmtFull(r.monthly)}<span style="font-size:11px;color:var(--sub-text);margin-left:2px">円</span></td>
+      <td class="td-num">${fmtFull(r.yearly)}<span style="font-size:11px;color:var(--sub-text);margin-left:2px">円</span></td>
+    </tr>
+  `).join('') + `
+    <tr class="tr-total">
+      <td colspan="2"><strong>控除合計</strong></td>
+      <td class="td-num">${fmtFull(monthlyDeduction)}<span style="font-size:11px;color:var(--sub-text);margin-left:2px">円</span></td>
+      <td class="td-num">${fmtFull(yearlyDeduction)}<span style="font-size:11px;color:var(--sub-text);margin-left:2px">円</span></td>
+    </tr>
+    <tr class="tr-takehome">
+      <td colspan="2"><strong>✅ 手取り</strong></td>
+      <td class="td-num">${fmtFull(monthlyTakeHome)}<span style="font-size:11px;margin-left:2px">円</span></td>
+      <td class="td-num">${fmtFull(yearlyTakeHome)}<span style="font-size:11px;margin-left:2px">円</span></td>
+    </tr>
+  `;
+}
+
+function setPeriod(p) {
+  period = p;
+  document.getElementById('btnMonthly').classList.toggle('active', p === 'monthly');
+  document.getElementById('btnYearly').classList.toggle('active', p === 'yearly');
+  prevVals.g = 0; prevVals.d = 0; prevVals.th = 0;
+  calculate();
+}
+
+document.addEventListener('DOMContentLoaded', () => { calculate(); });
+</script>
+</body>
+</html>
