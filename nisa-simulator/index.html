@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/components.css">
 <style>
 /* ══════════════════════════════════════════
    DESIGN TOKENS — Mint Design System
@@ -93,27 +94,15 @@ header p {
 }
 
 /* ══════════════════════════════════════════
-   CARD (ds-card)
+   ds-card — NISA固有オーバーライド
+   （共通スタイルは shared/components.css）
 ══════════════════════════════════════════ */
-.card {
-  background: var(--card-bg);
-  border-radius: 28px;
+.ds-card {
   padding: 24px var(--card-px) 28px;
-  box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
   margin-bottom: 16px;
-  position: relative;
-  overflow: hidden;
 }
-.card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
-  background-size: 200%;
-  animation: shimmerBar 3s linear infinite;
-  border-radius: 28px 28px 0 0;
-}
-@keyframes shimmerBar { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 @media (min-width: 600px) {
-  .card { padding: 32px var(--card-px); margin-bottom: 20px; }
+  .ds-card { padding: 32px var(--card-px); margin-bottom: 20px; }
 }
 
 .card-label {
@@ -164,59 +153,15 @@ header p {
 
 .irow-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 
-/* value row */
-.val-row { display: flex; align-items: center; gap: 8px; }
+/* ds-val-row / ds-num-edit / ds-val-unit — NISA固有オーバーライド */
+.ds-val-row { align-items: center; margin-bottom: 0; }
+.ds-num-edit { font-size: clamp(1.6rem, 6vw, 2.1rem); width: 82px; letter-spacing: 0.02em; font-weight: 500; }
+.ds-val-unit { font-size: clamp(0.85rem, 2.5vw, 1rem); }
 
-.num-edit {
-  font-size: clamp(1.6rem, 6vw, 2.1rem);
-  font-weight: 300;
-  color: var(--text-main);
-  font-family: 'Roboto', sans-serif;
-  border: none;
-  border-bottom: 2px solid var(--mint-light);
-  outline: none;
-  background: transparent;
-  width: 82px;
-  -moz-appearance: textfield;
-  padding: 0 4px 4px;
-  transition: border-color .25s ease;
-  line-height: 1.1;
-  letter-spacing: 0.02em;
-}
-.num-edit:focus { border-bottom-color: var(--accent-deep); }
-.num-edit::-webkit-outer-spin-button,
-.num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-.val-unit {
-  font-size: clamp(0.85rem, 2.5vw, 1rem);
-  color: var(--sub-text);
-  font-weight: 500;
-}
-
-/* DOB select */
+/* ds-select-underline / ds-select-unit — NISA固有オーバーライド */
 .dob-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.dob-row select {
-  font-size: clamp(1.5rem, 6vw, 2rem);
-  font-weight: 300;
-  color: var(--text-main);
-  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
-  border: none;
-  border-bottom: 2px solid var(--mint-light);
-  background: transparent;
-  outline: none;
-  cursor: pointer;
-  padding: 0 4px 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  transition: border-color .25s ease;
-  line-height: 1.1;
-}
-.dob-row select:focus { border-bottom-color: var(--accent-deep); }
-.dob-unit {
-  font-size: clamp(0.85rem, 2.5vw, 1rem);
-  color: var(--sub-text);
-  font-weight: 500;
-}
+.ds-select-underline { font-size: clamp(1.5rem, 6vw, 2rem); font-weight: 500; }
+.ds-select-unit { font-size: clamp(0.85rem, 2.5vw, 1rem); }
 .age-display {
   font-size: clamp(0.75rem, 2.3vw, 0.88rem);
   color: var(--label-color);
@@ -247,65 +192,11 @@ header p {
   width: 100%;
 }
 
-.pm-btn {
+/* ds-pm-btn — NISA固有オーバーライド（レスポンシブサイズ） */
+.ds-pm-btn {
   width: clamp(30px, 8vw, 34px);
   height: clamp(30px, 8vw, 34px);
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
-  color: #fff;
-  border: none;
-  cursor: pointer;
   font-size: clamp(1.1rem, 3.5vw, 1.3rem);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  line-height: 1;
-  box-shadow: 0 2px 10px rgba(74,140,111,0.35);
-  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-  user-select: none;
-}
-.pm-btn:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(74,140,111,0.45); }
-.pm-btn:active { transform: scale(0.92); }
-
-.range-wrap { flex: 1; min-width: 0; }
-
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: var(--slider-track);
-  background: linear-gradient(
-    to right,
-    var(--accent-deep) 0%, var(--accent-deep) var(--pct, 0%),
-    var(--mint-light) var(--pct, 0%), var(--mint-light) 100%
-  );
-  border-radius: 99px;
-  outline: none;
-  cursor: pointer;
-  display: block;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: var(--thumb-size);
-  height: var(--thumb-size);
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(74,140,111,0.4);
-  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-  cursor: grab;
-}
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.25); }
-input[type="range"]::-moz-range-thumb {
-  width: var(--thumb-size);
-  height: var(--thumb-size);
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(74,140,111,0.4);
-  cursor: grab;
 }
 
 /* ── Divider (ds-divider) ── */
@@ -385,67 +276,9 @@ input[type="range"]::-moz-range-thumb {
   .summary { grid-template-columns: repeat(3, 1fr); gap: 14px; }
 }
 @media (max-width: 479px) {
-  .sitem:last-child { grid-column: 1 / -1; }
+  .summary .ds-stat-card:last-child { grid-column: 1 / -1; }
 }
 
-.sitem {
-  background: var(--mint-pale);
-  border-radius: 16px;
-  padding: clamp(14px, 3vw, 20px) clamp(10px, 2vw, 16px) clamp(12px, 2.5vw, 18px);
-  text-align: center;
-  border: 1.5px solid var(--mint-light);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.sitem:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--shadow);
-}
-.sitem.highlight {
-  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
-  border-color: var(--accent);
-  box-shadow: 0 4px 20px rgba(74,140,111,0.1);
-}
-.sitem .sl {
-  font-size: clamp(0.72rem, 2.2vw, 0.85rem);
-  color: var(--sub-text);
-  font-weight: 600;
-  margin-bottom: clamp(6px, 1.8vw, 10px);
-  line-height: 1.4;
-  letter-spacing: 0.04em;
-}
-.sitem .sv { font-family: 'Roboto', sans-serif; line-height: 1.1; }
-.sv-num {
-  font-size: clamp(1.4rem, 5vw, 2rem);
-  font-weight: 300;
-  color: var(--accent-deep);
-}
-.sv-man {
-  font-size: clamp(0.85rem, 2.8vw, 1.1rem);
-  font-weight: 400;
-  color: var(--accent-deep);
-  margin-left: 3px;
-}
-
-.nisa-done-num {
-  font-size: clamp(1.4rem, 5vw, 2rem);
-  font-weight: 300;
-  color: var(--accent-deep);
-  font-family: 'Roboto', sans-serif;
-}
-.nisa-done-unit {
-  font-size: clamp(0.75rem, 2.5vw, 0.95rem);
-  font-weight: 400;
-  color: var(--accent-deep);
-  margin-left: 1px; margin-right: 2px;
-  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
-  vertical-align: middle;
-}
-.nisa-done-detail {
-  font-size: clamp(0.72rem, 2.3vw, 0.88rem);
-  color: var(--sub-text);
-  font-weight: 500;
-  margin-top: 8px;
-}
 
 /* ══════════════════════════════════════════
    CHART
@@ -593,9 +426,9 @@ canvas { display: block; cursor: default; }
    ANIMATIONS
 ══════════════════════════════════════════ */
 @keyframes secFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-.card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
-.card:nth-child(2) { animation-delay: 0.08s; }
-.card:nth-child(3) { animation-delay: 0.14s; }
+.ds-card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
+.ds-card:nth-child(2) { animation-delay: 0.08s; }
+.ds-card:nth-child(3) { animation-delay: 0.14s; }
 </style>
 </head>
 <body>
@@ -607,7 +440,7 @@ canvas { display: block; cursor: default; }
 </header>
 
 <!-- ── 入力カード ── -->
-<div class="card">
+<div class="ds-card">
   <div class="card-label">入力条件</div>
   <div class="input-rows">
 
@@ -619,8 +452,8 @@ canvas { display: block; cursor: default; }
       </div>
       <div class="irow-right">
         <div class="dob-row">
-          <select id="dobYear"></select><span class="dob-unit">年</span>
-          <select id="dobMonth"></select><span class="dob-unit">月</span>
+          <select id="dobYear" class="ds-select-underline"></select><span class="ds-select-unit">年</span>
+          <select id="dobMonth" class="ds-select-underline"></select><span class="ds-select-unit">月</span>
           <span class="age-display" id="ageDisplay"></span>
         </div>
       </div>
@@ -634,9 +467,9 @@ canvas { display: block; cursor: default; }
         <span class="lname">毎月の積立額</span>
       </div>
       <div class="irow-right">
-        <div class="val-row">
-          <input class="num-edit" type="number" id="inMonthly" min="0" max="30" step="0.1" value="5">
-          <span class="val-unit">万円</span>
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inMonthly" min="0" max="30" step="0.1" value="5">
+          <span class="ds-val-unit">万円</span>
           <div class="preset-chips">
             <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="3">3万円</button>
             <button class="preset-chip" data-target="inMonthly" data-sl="slMonthly" data-value="5">5万円</button>
@@ -646,9 +479,9 @@ canvas { display: block; cursor: default; }
           </div>
         </div>
         <div class="slider-row">
-          <button class="pm-btn" data-target="slMonthly" data-step="-0.1">－</button>
-          <div class="range-wrap"><input type="range" id="slMonthly" min="0" max="30" step="0.1" value="5"></div>
-          <button class="pm-btn" data-target="slMonthly" data-step="0.1">＋</button>
+          <button class="ds-pm-btn" data-target="slMonthly" data-step="-0.1">－</button>
+          <input type="range" class="ds-stepper-range" id="slMonthly" min="0" max="30" step="0.1" value="5">
+          <button class="ds-pm-btn" data-target="slMonthly" data-step="0.1">＋</button>
         </div>
       </div>
     </div>
@@ -661,9 +494,9 @@ canvas { display: block; cursor: default; }
         <span class="lname">想定利回り（年率）</span>
       </div>
       <div class="irow-right">
-        <div class="val-row">
-          <input class="num-edit" type="number" id="inRate" min="0" max="10" step="0.1" value="5">
-          <span class="val-unit">%</span>
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inRate" min="0" max="10" step="0.1" value="5">
+          <span class="ds-val-unit">%</span>
           <div class="preset-chips">
             <button class="preset-chip" data-target="inRate" data-sl="slRate" data-value="3">3%</button>
             <button class="preset-chip" data-target="inRate" data-sl="slRate" data-value="5">5%</button>
@@ -671,9 +504,9 @@ canvas { display: block; cursor: default; }
           </div>
         </div>
         <div class="slider-row">
-          <button class="pm-btn" data-target="slRate" data-step="-0.1">－</button>
-          <div class="range-wrap"><input type="range" id="slRate" min="0" max="10" step="0.1" value="5"></div>
-          <button class="pm-btn" data-target="slRate" data-step="0.1">＋</button>
+          <button class="ds-pm-btn" data-target="slRate" data-step="-0.1">－</button>
+          <input type="range" class="ds-stepper-range" id="slRate" min="0" max="10" step="0.1" value="5">
+          <button class="ds-pm-btn" data-target="slRate" data-step="0.1">＋</button>
         </div>
       </div>
     </div>
@@ -695,14 +528,14 @@ canvas { display: block; cursor: default; }
           <span class="ldesc">これまでに新NISAへ投資した合計額</span>
         </div>
         <div class="irow-right">
-          <div class="val-row">
-            <input class="num-edit" type="number" id="inContrib" min="0" max="1800" step="1" value="0">
-            <span class="val-unit">万円</span>
+          <div class="ds-val-row">
+            <input class="ds-num-edit" type="number" id="inContrib" min="0" max="1800" step="1" value="0">
+            <span class="ds-val-unit">万円</span>
           </div>
           <div class="slider-row">
-            <button class="pm-btn" data-target="slContrib" data-step="-1">－</button>
-            <div class="range-wrap"><input type="range" id="slContrib" min="0" max="1800" step="1" value="0"></div>
-            <button class="pm-btn" data-target="slContrib" data-step="1">＋</button>
+            <button class="ds-pm-btn" data-target="slContrib" data-step="-1">－</button>
+            <input type="range" class="ds-stepper-range" id="slContrib" min="0" max="1800" step="1" value="0">
+            <button class="ds-pm-btn" data-target="slContrib" data-step="1">＋</button>
           </div>
         </div>
       </div>
@@ -714,14 +547,14 @@ canvas { display: block; cursor: default; }
           <span class="ldesc">現在の新NISAの時価評価額</span>
         </div>
         <div class="irow-right">
-          <div class="val-row">
-            <input class="num-edit" type="number" id="inEval" min="0" max="9999" step="1" value="0">
-            <span class="val-unit">万円</span>
+          <div class="ds-val-row">
+            <input class="ds-num-edit" type="number" id="inEval" min="0" max="9999" step="1" value="0">
+            <span class="ds-val-unit">万円</span>
           </div>
           <div class="slider-row">
-            <button class="pm-btn" data-target="slEval" data-step="-10">－</button>
-            <div class="range-wrap"><input type="range" id="slEval" min="0" max="9999" step="1" value="0"></div>
-            <button class="pm-btn" data-target="slEval" data-step="10">＋</button>
+            <button class="ds-pm-btn" data-target="slEval" data-step="-10">－</button>
+            <input type="range" class="ds-stepper-range" id="slEval" min="0" max="9999" step="1" value="0">
+            <button class="ds-pm-btn" data-target="slEval" data-step="10">＋</button>
           </div>
           <div id="evalWarn" class="eval-warn">⚠ 評価額が投資累計額を下回っています（含み損の状態）</div>
         </div>
@@ -733,7 +566,7 @@ canvas { display: block; cursor: default; }
 </div>
 
 <!-- ── 結果カード ── -->
-<div class="card" id="resultCard">
+<div class="ds-card" id="resultCard">
   <div class="card-label">シミュレーション結果</div>
   <div class="summary" id="summary"></div>
   <div class="legend">
@@ -866,7 +699,7 @@ linkInputs('inRate',    'slRate',    0,   10, 0.1);
 
 const numMap = { slContrib:'inContrib', slEval:'inEval', slMonthly:'inMonthly', slRate:'inRate' };
 
-document.querySelectorAll('.pm-btn').forEach(btn => {
+document.querySelectorAll('.ds-pm-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const sl   = document.getElementById(btn.dataset.target);
     const step = parseFloat(btn.dataset.step);
@@ -954,7 +787,7 @@ function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBal
 
   function svHtml(n, key) {
     const { num, unit } = fmtYenParts(n);
-    return `<span class="sv-num" data-key="${key}">${num}</span><span class="sv-man" data-key="${key}-unit">${unit}</span>`;
+    return `<span class="ds-stat-num" data-key="${key}">${num}</span><span class="ds-stat-unit" data-key="${key}-unit">${unit}</span>`;
   }
 
   let nisaCell;
@@ -962,38 +795,38 @@ function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBal
     const { simYear, simMonth, age: fAge, ageMon: fAgeM } = nisaFullInfo;
     nisaCell = `
       <div>
-        <span class="nisa-done-num">${simYear}</span><span class="nisa-done-unit">年</span><span class="nisa-done-num">${simMonth}</span><span class="nisa-done-unit">ヶ月目</span>
+        <span class="ds-stat-detail-num">${simYear}</span><span class="ds-stat-detail-unit">年</span><span class="ds-stat-detail-num">${simMonth}</span><span class="ds-stat-detail-unit">ヶ月目</span>
       </div>
-      <div class="nisa-done-detail">${fAge}歳${fAgeM}ヶ月</div>
+      <div class="ds-stat-detail">${fAge}歳${fAgeM}ヶ月</div>
     `;
   } else {
     const futureContrib = Math.min(monthly * monthsLeft, Math.max(0, NISA_MAX - contrib));
     const totalIn = contrib + futureContrib;
     const { num, unit } = fmtYenParts(totalIn);
     nisaCell = `
-      <div><span class="nisa-done-num" style="font-size:1.5rem">未到達</span></div>
-      <div class="nisa-done-detail">入金合計 <span style="color:var(--accent-deep);font-weight:600">${num}${unit}</span></div>
+      <div><span class="ds-stat-detail-num" style="font-size:1.5rem">未到達</span></div>
+      <div class="ds-stat-detail">入金合計 <span style="color:var(--accent-deep);font-weight:600">${num}${unit}</span></div>
     `;
   }
 
   document.getElementById('summary').innerHTML = `
-    <div class="sitem highlight">
-      <div class="sl">65歳時の資産</div>
-      <div class="sv">${svHtml(finalBalance, 'total')}</div>
+    <div class="ds-stat-card highlight">
+      <div class="ds-stat-label">65歳時の資産</div>
+      <div class="ds-stat-value">${svHtml(finalBalance, 'total')}</div>
     </div>
-    <div class="sitem">
-      <div class="sl">うち運用収益</div>
-      <div class="sv">${svHtml(finalBalance - finalPrincipal, 'gain')}</div>
+    <div class="ds-stat-card">
+      <div class="ds-stat-label">うち運用収益</div>
+      <div class="ds-stat-value">${svHtml(finalBalance - finalPrincipal, 'gain')}</div>
     </div>
-    <div class="sitem">
-      <div class="sl">新NISA枠使い切り</div>
-      <div class="sv">${nisaCell}</div>
+    <div class="ds-stat-card">
+      <div class="ds-stat-label">新NISA枠使い切り</div>
+      <div class="ds-stat-value">${nisaCell}</div>
     </div>
   `;
 
   [['total', finalBalance], ['gain', finalBalance - finalPrincipal]].forEach(([key, val]) => {
-    const numEl = document.querySelector(`.sv-num[data-key="${key}"]`);
-    const manEl = document.querySelector(`.sv-man[data-key="${key}-unit"]`);
+    const numEl = document.querySelector(`.ds-stat-num[data-key="${key}"]`);
+    const manEl = document.querySelector(`.ds-stat-unit[data-key="${key}-unit"]`);
     if (numEl) animateCountUp(numEl, manEl, val);
   });
 }

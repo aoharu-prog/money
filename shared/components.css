@@ -335,13 +335,13 @@ html { scroll-behavior: smooth; }
 .ds-stat-value { font-family: 'Roboto', sans-serif; line-height: 1.1; }
 .ds-stat-num {
   font-size: clamp(1.4rem, 5vw, 2rem);
-  font-weight: 300; color: var(--accent-deep);
+  font-weight: 500; color: var(--accent-deep);
 }
 .ds-stat-unit { font-size: clamp(0.85rem, 2.8vw, 1.1rem); font-weight: 400; color: var(--accent-deep); margin-left: 3px; }
 .ds-stat-detail { font-size: clamp(0.72rem, 2.3vw, 0.88rem); color: var(--sub-text); font-weight: 500; margin-top: 8px; }
 .ds-stat-detail-num {
   font-family: 'Roboto', sans-serif; font-size: clamp(1.4rem, 5vw, 2rem);
-  font-weight: 300; color: var(--accent-deep);
+  font-weight: 500; color: var(--accent-deep);
 }
 .ds-stat-detail-unit {
   font-size: clamp(0.75rem, 2.5vw, 0.95rem); font-weight: 400;
