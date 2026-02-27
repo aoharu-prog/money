@@ -1,0 +1,30 @@
+## プロジェクト概要
+個人利用の金融シミュレーターツール集。
+すべてのツールは MONEY/ 配下のフォルダに配置する。
+
+## フォルダ構成ルール
+- 共通ファイルは shared/ に置く
+- 各ツールは専用フォルダを作り index.html を配置する
+- 例: nisa-simulator/index.html, ideco-simulator/index.html
+
+## 新規ツール作成時のルール
+- ../shared/tokens.css と ../shared/components.css を <link> で参照する
+- ../shared/base.js を <script> で参照する
+- Google Fontsの <link> タグは書かない（components.cssに含まれているため）
+- デザイントークンの変数（--color-* 等）を積極的に使う
+- そのツール固有のスタイルのみ <style> タグに書く
+
+## デザインシステムの更新ルール
+- shared/components.css を変更・追加するときは
+  shared/catalog.html も必ず同時に更新する
+- 新しいコンポーネント追加 → catalog.html にデモを追加
+- 既存コンポーネント変更 → catalog.html の該当デモも修正
+- コンポーネント削除 → catalog.html の該当デモも削除
+
+## CSSクラス命名ルール
+- 共通コンポーネントは ds- プレフィックスをつける
+- ツール固有のクラスには ds- をつけない
+
+## 変更時の注意
+- 複数ファイルを変更するときは、変更前に影響範囲を提示してからGOをもらう
+- 見た目が変わる可能性がある変更は事前に警告する
