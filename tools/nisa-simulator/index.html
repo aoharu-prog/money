@@ -220,6 +220,10 @@ header p {
 /* モバイル時も2段：上段65歳時、下段は運用収益+NISA枠の2カラム（last-childの全幅を解除） */
 .summary .ds-hero-result .ds-stat-num,
 .summary .ds-hero-result .ds-stat-unit { color: inherit; }
+/* 65歳時の資産の数値フォントサイズを月間手取り（salary-calculator）と同じに */
+.summary .ds-hero-result .hero-amount .ds-stat-num {
+  font-size: clamp(2.2rem, 7vw, 3rem);
+}
 .ds-stat-prefix { font-weight: 500; color: var(--accent-deep); margin-right: 2px; }
 
 
