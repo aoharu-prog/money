@@ -394,7 +394,7 @@ html { scroll-behavior: smooth; }
 }
 .ds-stepper-pill-line {
   width: 1.5px;
-  height: 10px;
+  height: 4px;
   background: var(--mint-light);
   flex-shrink: 0;
 }
