@@ -16,6 +16,48 @@ html { scroll-behavior: smooth; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
 /* ══════════════════════════════════════════
+   site-header
+   共通ヘッダー（header.js で挿入・トップへ戻るリンク）
+   上に隙間なく・白背景・スクロール時固定
+══════════════════════════════════════════ */
+body.has-site-header {
+  padding-top: 92px;
+}
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: var(--card-bg);
+  padding: 18px clamp(16px, 4vw, 24px);
+  box-shadow: 0 1px 4px var(--shadow);
+  border-bottom: 1px solid var(--mint-light);
+}
+.site-header-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 600;
+  color: var(--accent-deep, var(--accent));
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s ease;
+}
+.site-header-link:hover {
+  color: var(--accent);
+}
+.site-header-icon {
+  font-size: 1em;
+  opacity: 0.85;
+}
+
+/* ══════════════════════════════════════════
    KEYFRAMES
 ══════════════════════════════════════════ */
 @keyframes shimmerBar    { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
