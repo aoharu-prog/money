@@ -48,7 +48,33 @@ body.has-site-header {
   color: var(--accent, #a8d5ba);
 }
 
-/* ページタイトル（上部タイトル）の余白 */
+/* ══════════════════════════════════════════
+   ページタイトルエリア
+   .app-scope 直下の h1 + p に統一スタイルを適用
+══════════════════════════════════════════ */
+
+/* h1 本体 */
+.app-scope > h1,
+.app-scope > .page-header > h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin-top: clamp(20px, 4vw, 36px);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+/* h1 直後のサブタイトル p */
+.app-scope > h1 + p,
+.app-scope > .page-header > h1 + p {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.65;
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+
+/* 後方互換：既存セレクタも残す */
 #site-header + h1,
 body > h1:first-of-type,
 .wrapper > h1:first-of-type {
@@ -58,6 +84,47 @@ body > h1:first-of-type,
 body > h1:first-of-type + p,
 .wrapper > h1:first-of-type + p {
   margin-bottom: clamp(20px, 4vw, 32px);
+}
+
+/* ══════════════════════════════════════════
+   app-scope — ページ基本レイアウト
+   すべてのアプリの <main class="app-scope"> に適用
+══════════════════════════════════════════ */
+.app-scope {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 40px) clamp(16px, 4vw, 40px) 80px;
+}
+
+/* ══════════════════════════════════════════
+   2カラムページレイアウト
+   PC: 入力(左固定幅) + 結果(右可変)
+   SP: 縦1カラム
+══════════════════════════════════════════ */
+.ds-page-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 800px) {
+  .ds-page-cols {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .ds-input-col {
+    position: sticky;
+    top: 72px; /* site-header(52px) + 余白20px */
+  }
+}
+
+.ds-result-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0; /* grid内でのはみ出し防止 */
 }
 
 /* ══════════════════════════════════════════
@@ -191,6 +258,7 @@ body > h1:first-of-type + p,
   color: var(--text-main); display: flex; align-items: baseline; gap: 4px;
 }
 .ds-result-unit { font-family: 'Hiragino Kaku Gothic ProN', sans-serif; font-size: 13px; color: var(--sub-text); font-weight: 400; }
+.ds-result-sub { font-size: 11px; color: var(--sub-text); margin-top: 6px; line-height: 1.4; }
 
 /* ══════════════════════════════════════════
    ds-progress
@@ -371,6 +439,29 @@ body > h1:first-of-type + p,
    数値入力 + スライダー + ±ボタン セット
 ══════════════════════════════════════════ */
 .ds-val-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.ds-val-row .ds-input-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  background: transparent;
+  padding: 4px 0 6px;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s ease;
+  -moz-appearance: textfield;
+}
+.ds-val-row .ds-input-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-val-row .ds-input-underline::-webkit-outer-spin-button,
+.ds-val-row .ds-input-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .ds-num-edit {
   font-size: clamp(1.5rem, 5.5vw, 2rem); font-weight: 500;
   color: var(--text-main); font-family: 'Roboto', sans-serif;
@@ -382,6 +473,35 @@ body > h1:first-of-type + p,
 .ds-num-edit::-webkit-outer-spin-button,
 .ds-num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
 .ds-val-unit { font-size: 0.95rem; color: var(--sub-text); font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   ds-input-num-underline
+   数値入力（アンダーラインのみ・単位付き）
+   ds-val-row 内で使用: <input class="ds-input-num-underline"> + <span class="ds-val-unit">万円</span>
+══════════════════════════════════════════ */
+.ds-input-num-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.5rem, 5.5vw, 2rem);
+  font-weight: 500;
+  color: var(--text-main);
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  outline: none;
+  background: transparent;
+  width: 100px;
+  padding: 0 4px 4px;
+  transition: border-color 0.25s ease;
+  line-height: 1.1;
+  -moz-appearance: textfield;
+}
+.ds-input-num-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-input-num-underline::-webkit-outer-spin-button,
+.ds-input-num-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
 .ds-input-stepper { display: flex; align-items: center; gap: 10px; width: 100%; }
 .ds-pm-btn {

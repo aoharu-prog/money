@@ -129,23 +129,6 @@ body {
 .fn-input:focus { border-color: var(--accent); }
 .fn-label { font-size: 12px; color: var(--sub-text); white-space: nowrap; }
 
-/* ── グループ見出し（ページ内セパレーター） ── */
-.cat-group-heading {
-  display: flex; align-items: center; gap: 14px;
-  margin: 0 0 40px;
-  padding-bottom: 12px;
-}
-.cat-group-heading-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--accent-deep);
-  background: rgba(168,213,186,0.18); border: 1px solid var(--mint-light);
-  padding: 4px 12px; border-radius: 8px;
-  white-space: nowrap;
-}
-.cat-group-heading-line {
-  flex: 1; height: 1px; background: var(--sys-border);
-}
-
 /* ── レスポンシブ（モバイル） ── */
 @media (max-width: 860px) {
   body { grid-template-columns: 1fr; }
@@ -180,36 +163,32 @@ body {
   <a class="cat-nav-link" href="#colors">カラーパレット</a>
   <a class="cat-nav-link" href="#typography">タイポグラフィ</a>
 
-  <div class="cat-nav-group">入力</div>
-  <a class="cat-nav-link" href="#input">ds-input</a>
-  <a class="cat-nav-link" href="#input-num-underline">ds-input-num-underline</a>
-  <a class="cat-nav-link" href="#stepper">ds-input-stepper</a>
-  <a class="cat-nav-link" href="#select">ds-select-underline</a>
-  <a class="cat-nav-link" href="#chips">ds-chip-scroll</a>
-  <a class="cat-nav-link" href="#segment">ds-segment</a>
-
-  <div class="cat-nav-group">結果表示</div>
-  <a class="cat-nav-link" href="#result">ds-result</a>
-  <a class="cat-nav-link" href="#summary-grid">ds-summary-grid</a>
-  <a class="cat-nav-link" href="#hero-result">ds-hero-result</a>
-  <a class="cat-nav-link" href="#progress">ds-progress</a>
-
-  <div class="cat-nav-group">データ可視化</div>
-  <a class="cat-nav-link" href="#donut-summary">ds-donut-summary</a>
-  <a class="cat-nav-link" href="#breakdown-accordion">ds-breakdown-accordion</a>
-  <a class="cat-nav-link" href="#resident-savings">ds-resident-savings</a>
-
-  <div class="cat-nav-group">注釈・フィードバック</div>
-  <a class="cat-nav-link" href="#annotations">note-box / warning-inline</a>
-  <a class="cat-nav-link" href="#divider">ds-divider</a>
+  <div class="cat-nav-group">コンポーネント</div>
   <a class="cat-nav-link" href="#badge">ds-badge</a>
   <a class="cat-nav-link" href="#card">ds-card</a>
+  <a class="cat-nav-link" href="#input">ds-input</a>
   <a class="cat-nav-link" href="#buttons">ボタン</a>
+  <a class="cat-nav-link" href="#segment">ds-segment</a>
+  <a class="cat-nav-link" href="#result">ds-result</a>
+  <a class="cat-nav-link" href="#progress">ds-progress</a>
+  <a class="cat-nav-link" href="#divider">ds-divider</a>
+  <a class="cat-nav-link" href="#form-row">ds-form-row</a>
+  <a class="cat-nav-link" href="#boxes">note-box</a>
+  <a class="cat-nav-link" href="#stepper">ds-input-stepper</a>
+  <a class="cat-nav-link" href="#warning">ds-warning-inline</a>
+  <a class="cat-nav-link" href="#select">ds-select-underline</a>
+  <a class="cat-nav-link" href="#summary-grid">ds-summary-grid</a>
+  <a class="cat-nav-link" href="#chips">ds-chip-scroll</a>
   <a class="cat-nav-link" href="#back-to-index">back-to-index</a>
+  <a class="cat-nav-link" href="#hero-result">ds-hero-result</a>
+  <a class="cat-nav-link" href="#breakdown-accordion">ds-breakdown-accordion</a>
+  <a class="cat-nav-link" href="#donut-summary">ds-donut-summary</a>
+  <a class="cat-nav-link" href="#resident-savings">ds-resident-savings</a>
 
-  <div class="cat-nav-group">ユーティリティ</div>
+  <div class="cat-nav-group">base.js</div>
   <a class="cat-nav-link" href="#fmt">数値フォーマット</a>
   <a class="cat-nav-link" href="#animate">animateNum</a>
+  <a class="cat-nav-link" href="#stepper">スライダー連動</a>
   <a class="cat-nav-link" href="#toast-demo">showToast</a>
   <a class="cat-nav-link" href="#confetti-demo">fireConfetti</a>
 </nav>
@@ -219,16 +198,9 @@ body {
      MAIN
 ════════════════════════ -->
 <main class="cat-main">
-
-  <!-- ════════════════════════════════
-       GROUP: 基礎
-  ════════════════════════════════ -->
-  <div class="cat-group-heading" id="group-base">
-    <span class="cat-group-heading-label">基礎</span>
-    <div class="cat-group-heading-line"></div>
-  </div>
-
-  <!-- カラーパレット -->
+  <!-- ══════════════════════
+       1. カラーパレット
+  ══════════════════════ -->
   <section class="cat-section" id="colors">
     <div class="cat-section-header">
       <h2 class="cat-section-title">カラーパレット</h2>
@@ -297,7 +269,10 @@ body {
     </div>
   </section>
 
-  <!-- タイポグラフィ -->
+
+  <!-- ══════════════════════
+       2. タイポグラフィ
+  ══════════════════════ -->
   <section class="cat-section" id="typography">
     <div class="cat-section-header">
       <h2 class="cat-section-title">タイポグラフィ</h2>
@@ -345,21 +320,53 @@ body {
   </section>
 
 
-  <!-- ════════════════════════════════
-       GROUP: 入力
-  ════════════════════════════════ -->
-  <div class="cat-group-heading" id="group-input">
-    <span class="cat-group-heading-label">入力</span>
-    <div class="cat-group-heading-line"></div>
-  </div>
+  <!-- ══════════════════════
+       3. ds-badge
+  ══════════════════════ -->
+  <section class="cat-section" id="badge">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-badge</h2>
+      <span class="cat-section-tag">.ds-badge</span>
+    </div>
+    <p class="cat-desc">ステータス・ラベル表示用インラインバッジ。pulse アニメーション付き。</p>
+    <div class="preview center" style="gap:16px;">
+      <span class="ds-badge">NEW</span>
+      <span class="ds-badge">UPDATED</span>
+      <span class="ds-badge">🌿 Mint DS</span>
+      <span class="ds-badge">v2.0</span>
+    </div>
+  </section>
 
-  <!-- ds-input -->
+
+  <!-- ══════════════════════
+       4. ds-card
+  ══════════════════════ -->
+  <section class="cat-section" id="card">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-card</h2>
+      <span class="cat-section-tag">.ds-card</span>
+    </div>
+    <p class="cat-desc">ホワイトカード。上部にアクセントカラーのシマーバー付き。<code>overflow: hidden</code> のため子要素の角丸も適用。</p>
+    <div class="preview" style="gap:16px;">
+      <div class="ds-card" style="flex:1;min-width:180px;animation:none;">
+        <p style="font-size:13px;color:var(--sub-text);line-height:1.7;">カード内のコンテンツです。シマーバーが上部に表示されます。</p>
+      </div>
+      <div class="ds-card" style="flex:1;min-width:180px;animation:secFadeIn 0.5s both;">
+        <p style="font-size:13px;color:var(--sub-text);line-height:1.7;"><code style="font-family:'Roboto Mono',monospace;font-size:11px;color:var(--accent-deep);background:rgba(168,213,186,0.15);padding:1px 5px;border-radius:4px;">secFadeIn</code> でフェードインアニメーション付き表示。</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       5. ds-input
+  ══════════════════════ -->
   <section class="cat-section" id="input">
     <div class="cat-section-header">
       <h2 class="cat-section-title">ds-input</h2>
       <span class="cat-section-tag">.ds-input / .ds-input-wrap</span>
     </div>
-    <p class="cat-desc">フルワイドのボーダー付きテキスト入力。フォーカス時にグリーンのフォーカスリング表示。単位テキストは <code>.ds-input-unit</code> で付与。</p>
+    <p class="cat-desc">フルワイドのボーダー付きテキスト入力。フォーカス時にグリーンのフォーカスリング表示。</p>
     <div class="preview col" style="gap:16px;">
       <div class="ds-input-wrap" style="max-width:380px;">
         <input class="ds-input" type="text" placeholder="金額を入力してください">
@@ -372,143 +379,33 @@ body {
     </div>
   </section>
 
-  <!-- ds-input-num-underline -->
-  <section class="cat-section" id="input-num-underline">
+
+  <!-- ══════════════════════
+       6. ボタン
+  ══════════════════════ -->
+  <section class="cat-section" id="buttons">
     <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-input-num-underline</h2>
-      <span class="cat-section-tag">.ds-val-row / .ds-val-unit</span>
+      <h2 class="cat-section-title">ボタン</h2>
+      <span class="cat-section-tag">.ds-btn-primary / secondary / ghost</span>
     </div>
-    <p class="cat-desc">数値入力（アンダーラインのみ）。<code>ds-val-row</code> 内で <code>ds-input-num-underline</code> と <code>ds-val-unit</code> を組み合わせて使用。</p>
-    <div class="preview col" style="gap:12px;">
-      <div class="ds-val-row">
-        <input class="ds-input-num-underline" type="number" min="0" value="10" placeholder="0">
-        <span class="ds-val-unit">万円</span>
-      </div>
+    <p class="cat-desc">3種類のバリアント。ホバー時はスプリング感のあるスケールアニメーション。アクティブ時は押し込み効果。</p>
+    <div class="preview" style="align-items:center;gap:12px;">
+      <button class="ds-btn-primary">プライマリ</button>
+      <button class="ds-btn-secondary">セカンダリ</button>
+      <button class="ds-btn-ghost">ゴースト</button>
     </div>
   </section>
 
-  <!-- ds-input-stepper -->
-  <section class="cat-section" id="stepper">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-input-stepper</h2>
-      <span class="cat-section-tag">.ds-pm-btn / .ds-stepper-range / base.js</span>
-    </div>
-    <p class="cat-desc">数値入力 + スライダー + ±ボタンのセット。<code>updateSliderBg(sl)</code> でトラック塗りとシマーオーバーレイを同期。<code>linkInputs(numId, slId, min, max, step, onChange?)</code> で number input とスライダーを双方向同期。<code>.ds-stepper-wrap--no-pill</code> でピル無し版に切り替え。</p>
-    <div class="preview col" style="gap:12px;">
-      <div style="font-size:11px;color:var(--sub-text);">ピル有り（フローティングピル） <code>.ds-input-stepper</code> <code>.ds-stepper-wrap</code></div>
-      <div class="ds-val-row">
-        <input class="ds-num-edit" id="stepperNum" type="number" min="0" max="30" step="1" value="10">
-        <span class="ds-val-unit">万円</span>
-      </div>
-      <div class="ds-input-stepper">
-        <button class="ds-pm-btn" id="stepperMinus">－</button>
-        <div class="ds-stepper-wrap">
-          <div class="ds-stepper-wrap-inner">
-            <div class="ds-stepper-pill" id="stepperSl-pill">
-              <div class="ds-stepper-pill-label" id="stepperSl-pill-label">10万円</div>
-              <div class="ds-stepper-pill-line"></div>
-            </div>
-            <div class="ds-stepper-shimmer" id="stepperSl-shimmer"></div>
-            <input class="ds-stepper-range" id="stepperSl" type="range" min="0" max="30" step="1" value="10" data-unit="万円">
-          </div>
-        </div>
-        <button class="ds-pm-btn" id="stepperPlus">＋</button>
-      </div>
-      <hr class="ds-divider" style="margin:8px 0;">
-      <div style="font-size:11px;color:var(--sub-text);">ピル無し <code>.ds-input-stepper</code> <code>.ds-stepper-wrap--no-pill</code></div>
-      <div class="ds-val-row">
-        <input class="ds-num-edit" id="stepperNumNoPill" type="number" min="0" max="30" step="1" value="10">
-        <span class="ds-val-unit">万円</span>
-      </div>
-      <div class="ds-input-stepper">
-        <button class="ds-pm-btn" id="stepperMinusNoPill">－</button>
-        <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
-          <div class="ds-stepper-shimmer" id="stepperSlNoPill-shimmer"></div>
-          <input class="ds-stepper-range" id="stepperSlNoPill" type="range" min="0" max="30" step="1" value="10">
-        </div>
-        <button class="ds-pm-btn" id="stepperPlusNoPill">＋</button>
-      </div>
-      <hr class="ds-divider" style="margin:8px 0;">
-      <div style="font-size:11px;color:var(--sub-text);">ds-range（シンプルスライダー） <code>.ds-range-wrap</code> <code>.ds-range</code></div>
-      <div class="ds-range-wrap" style="max-width:400px;">
-        <div class="ds-range-fill"></div>
-        <input class="ds-range" id="simpleRange" type="range" min="0" max="100" value="40">
-      </div>
-      <hr class="ds-divider" style="margin:8px 0;">
-      <div style="font-size:11px;color:var(--sub-text);">ピル有り（±ボタン無し） <code>.ds-stepper-wrap</code></div>
-      <div class="ds-val-row">
-        <input class="ds-num-edit" id="rangePillNum" type="number" min="0" max="30" step="1" value="10">
-        <span class="ds-val-unit">万円</span>
-      </div>
-      <div class="ds-stepper-wrap" style="max-width:400px;">
-        <div class="ds-stepper-wrap-inner">
-          <div class="ds-stepper-pill" id="rangePillSl-pill">
-            <div class="ds-stepper-pill-label" id="rangePillSl-pill-label">10万円</div>
-            <div class="ds-stepper-pill-line"></div>
-          </div>
-          <div class="ds-stepper-shimmer" id="rangePillSl-shimmer"></div>
-          <input class="ds-stepper-range" id="rangePillSl" type="range" min="0" max="30" step="1" value="10" data-unit="万円">
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ds-select-underline -->
-  <section class="cat-section" id="select">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-select-underline</h2>
-      <span class="cat-section-tag">.ds-select-underline / .ds-select-unit</span>
-    </div>
-    <p class="cat-desc">アンダーラインスタイルのセレクトボックス。数値として読めるよう大きなフォントで表示。</p>
-    <div class="preview" style="align-items:baseline;gap:8px;">
-      <div class="ds-select-row">
-        <select class="ds-select-underline">
-          <option>1990</option><option>1992</option><option selected>1995</option><option>2000</option>
-        </select>
-        <span class="ds-select-unit">年</span>
-        <select class="ds-select-underline">
-          <option>1</option><option selected>6</option><option>12</option>
-        </select>
-        <span class="ds-select-unit">月</span>
-        <span style="font-size:13px;color:var(--sub-text);margin-left:4px;">（現在 29歳）</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ds-chip-scroll -->
-  <section class="cat-section" id="chips">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-chip-scroll</h2>
-      <span class="cat-section-tag">.ds-chip-scroll / .ds-chip</span>
-    </div>
-    <p class="cat-desc">横スクロール可能なプリセットチップ群。<code>initChipScroll()</code> で右端フェードマスクを初期化。<code>.active</code> で選択状態。入力値のクイック選択に使用。</p>
-    <div class="preview col" style="gap:16px;">
-      <div style="font-size:11px;color:var(--sub-text);">毎月の積立額</div>
-      <div class="ds-chip-scroll" id="chipDemo" style="max-width:320px;">
-        <button class="ds-chip active">3万円</button>
-        <button class="ds-chip">5万円</button>
-        <button class="ds-chip">10万円</button>
-        <button class="ds-chip">15万円</button>
-        <button class="ds-chip">20万円</button>
-        <button class="ds-chip">25万円</button>
-        <button class="ds-chip">30万円</button>
-      </div>
-      <div style="font-size:11px;color:var(--sub-text);">想定利回り</div>
-      <div class="ds-chip-scroll">
-        <button class="ds-chip">3%</button>
-        <button class="ds-chip active">5%</button>
-        <button class="ds-chip">7%</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ds-segment -->
+  <!-- ══════════════════════
+       7. ds-segment
+  ══════════════════════ -->
   <section class="cat-section" id="segment">
     <div class="cat-section-header">
       <h2 class="cat-section-title">ds-segment</h2>
       <span class="cat-section-tag">.ds-segment / .ds-seg-btn</span>
     </div>
-    <p class="cat-desc">タブ切り替えコントロール。<code>.active</code> クラスで選択状態。クリックで切り替え可能。表示モードの切り替えに使用（月次 / 年次 / 累計など）。</p>
+    <p class="cat-desc">タブ切り替えコントロール。<code>.active</code> クラスで選択状態。クリックで切り替え可能。</p>
     <div class="preview center">
       <div class="ds-segment" id="seg-demo">
         <button class="ds-seg-btn active">月次</button>
@@ -518,7 +415,66 @@ body {
     </div>
   </section>
 
-  <!-- ds-form-row -->
+
+  <!-- ══════════════════════
+       8. ds-result
+  ══════════════════════ -->
+  <section class="cat-section" id="result">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-result</h2>
+      <span class="cat-section-tag">.ds-result / .highlight</span>
+    </div>
+    <p class="cat-desc">KPI単体表示カード。<code>.highlight</code> でグリーン強調表示。ホバーで浮き上がり。</p>
+    <div class="preview" style="gap:12px;">
+      <div class="ds-result" style="flex:1;min-width:160px;">
+        <div class="ds-result-label">うち運用収益</div>
+        <div class="ds-result-value"><span>1,200</span><span class="ds-result-unit">万円</span></div>
+      </div>
+      <div class="ds-result highlight" style="flex:1;min-width:160px;">
+        <div class="ds-result-label">65歳時の資産</div>
+        <div class="ds-result-value"><span>2,346</span><span class="ds-result-unit">万円</span></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       9. ds-progress
+  ══════════════════════ -->
+  <section class="cat-section" id="progress">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-progress</h2>
+      <span class="cat-section-tag">.ds-progress-bg / .ds-progress-fill</span>
+    </div>
+    <p class="cat-desc">グラデーション＋シマーアニメーション付きの進捗バー。<code>width</code> で進捗率を指定。</p>
+    <div class="preview col" style="gap:18px;">
+      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">30%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:30%"></div></div></div>
+      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">65%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:65%"></div></div></div>
+      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">100%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:100%"></div></div></div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       10. ds-divider
+  ══════════════════════ -->
+  <section class="cat-section" id="divider">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-divider</h2>
+      <span class="cat-section-tag">.ds-divider</span>
+    </div>
+    <p class="cat-desc">フェードグラデーション付きの区切り線。</p>
+    <div class="preview col" style="gap:12px;">
+      <p style="font-size:13px;color:var(--sub-text);">セクション上部のコンテンツ</p>
+      <hr class="ds-divider" style="margin:0;">
+      <p style="font-size:13px;color:var(--sub-text);">セクション下部のコンテンツ</p>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       11. ds-form-row
+  ══════════════════════ -->
   <section class="cat-section" id="form-row">
     <div class="cat-section-header">
       <h2 class="cat-section-title">ds-form-row</h2>
@@ -555,40 +511,127 @@ body {
   </section>
 
 
-  <!-- ════════════════════════════════
-       GROUP: 結果表示
-  ════════════════════════════════ -->
-  <div class="cat-group-heading" id="group-result">
-    <span class="cat-group-heading-label">結果表示</span>
-    <div class="cat-group-heading-line"></div>
-  </div>
-
-  <!-- ds-result -->
-  <section class="cat-section" id="result">
+  <!-- ══════════════════════
+       12. note-box / dashed-box
+  ══════════════════════ -->
+  <section class="cat-section" id="boxes">
     <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-result</h2>
-      <span class="cat-section-tag">.ds-result / .highlight</span>
+      <h2 class="cat-section-title">note-box / dashed-box</h2>
+      <span class="cat-section-tag">.note-box / .dashed-box</span>
     </div>
-    <p class="cat-desc">KPI単体表示カード。<code>.highlight</code> でグリーン強調表示。ホバーで浮き上がり。少数の指標を横並びで示す場面に使用。</p>
-    <div class="preview" style="gap:12px;">
-      <div class="ds-result" style="flex:1;min-width:160px;">
-        <div class="ds-result-label">うち運用収益</div>
-        <div class="ds-result-value"><span>1,200</span><span class="ds-result-unit">万円</span></div>
+    <p class="cat-desc">注釈・補足情報の表示ボックス。<code>.note-box</code> はボーダーレフト付き、<code>.dashed-box</code> はモノスペース・破線枠。</p>
+    <div class="preview col" style="gap:14px;">
+      <div class="note-box">※ 新NISA総枠（1,800万円）到達後は新規積立が停止されます。投資判断はご自身の責任でお願いします。</div>
+      <div class="dashed-box">--form-label-w: 210px;<br>--card-px: 20px;</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       13. ds-input-stepper
+  ══════════════════════ -->
+  <section class="cat-section" id="stepper">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-input-stepper / スライダー連動</h2>
+      <span class="cat-section-tag">.ds-pm-btn / .ds-stepper-range / base.js</span>
+    </div>
+    <p class="cat-desc">数値入力 + スライダー + ±ボタンのセット。<code>updateSliderBg(sl)</code> でトラック塗りとシマーオーバーレイを同期。<code>linkInputs(numId, slId, min, max, step, onChange?)</code> で number input とスライダーを双方向同期。<code>.ds-stepper-wrap--no-pill</code> でピル無し版に切り替え。</p>
+    <div class="preview col" style="gap:12px;">
+      <div style="font-size:11px;color:var(--sub-text);">ピル有り（フローティングピル）</div>
+      <div class="ds-val-row">
+        <input class="ds-num-edit" id="stepperNum" type="number" min="0" max="30" step="1" value="10">
+        <span class="ds-val-unit">万円</span>
       </div>
-      <div class="ds-result highlight" style="flex:1;min-width:160px;">
-        <div class="ds-result-label">65歳時の資産</div>
-        <div class="ds-result-value"><span>2,346</span><span class="ds-result-unit">万円</span></div>
+      <div class="ds-input-stepper">
+        <button class="ds-pm-btn" id="stepperMinus">－</button>
+        <div class="ds-stepper-wrap">
+          <div class="ds-stepper-wrap-inner">
+            <div class="ds-stepper-pill" id="stepperSl-pill">
+              <div class="ds-stepper-pill-label" id="stepperSl-pill-label">10万円</div>
+              <div class="ds-stepper-pill-line"></div>
+            </div>
+            <div class="ds-stepper-shimmer" id="stepperSl-shimmer"></div>
+            <input class="ds-stepper-range" id="stepperSl" type="range" min="0" max="30" step="1" value="10" data-unit="万円">
+          </div>
+        </div>
+        <button class="ds-pm-btn" id="stepperPlus">＋</button>
+      </div>
+      <hr class="ds-divider" style="margin:8px 0;">
+      <div style="font-size:11px;color:var(--sub-text);">ピル無し（<code>.ds-stepper-wrap--no-pill</code>）</div>
+      <div class="ds-val-row">
+        <input class="ds-num-edit" id="stepperNumNoPill" type="number" min="0" max="30" step="1" value="10">
+        <span class="ds-val-unit">万円</span>
+      </div>
+      <div class="ds-input-stepper">
+        <button class="ds-pm-btn" id="stepperMinusNoPill">－</button>
+        <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+          <div class="ds-stepper-shimmer" id="stepperSlNoPill-shimmer"></div>
+          <input class="ds-stepper-range" id="stepperSlNoPill" type="range" min="0" max="30" step="1" value="10">
+        </div>
+        <button class="ds-pm-btn" id="stepperPlusNoPill">＋</button>
+      </div>
+      <hr class="ds-divider" style="margin:8px 0;">
+      <div style="font-size:11px;color:var(--sub-text);">ds-range（シンプルスライダー）</div>
+      <div class="ds-range-wrap" style="max-width:400px;">
+        <div class="ds-range-fill"></div>
+        <input class="ds-range" id="simpleRange" type="range" min="0" max="100" value="40">
       </div>
     </div>
   </section>
 
-  <!-- ds-summary-grid -->
+
+  <!-- ══════════════════════
+       14. ds-warning-inline
+  ══════════════════════ -->
+  <section class="cat-section" id="warning">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-warning-inline</h2>
+      <span class="cat-section-tag">.ds-warning-inline</span>
+    </div>
+    <p class="cat-desc">オレンジ系のインライン警告ボックス。<code>.wi-icon</code> でアイコンを配置。</p>
+    <div class="preview col">
+      <div class="ds-warning-inline">
+        <span class="wi-icon">⚠</span>
+        評価額が投資累計額を下回っています（含み損の状態）。入力値を確認してください。
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       15. ds-select-underline
+  ══════════════════════ -->
+  <section class="cat-section" id="select">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-select-underline</h2>
+      <span class="cat-section-tag">.ds-select-underline / .ds-select-unit</span>
+    </div>
+    <p class="cat-desc">アンダーラインスタイルのセレクトボックス。数値として読めるよう大きなフォントで表示。</p>
+    <div class="preview" style="align-items:baseline;gap:8px;">
+      <div class="ds-select-row">
+        <select class="ds-select-underline">
+          <option>1990</option><option>1992</option><option selected>1995</option><option>2000</option>
+        </select>
+        <span class="ds-select-unit">年</span>
+        <select class="ds-select-underline">
+          <option>1</option><option selected>6</option><option>12</option>
+        </select>
+        <span class="ds-select-unit">月</span>
+        <span style="font-size:13px;color:var(--sub-text);margin-left:4px;">（現在 29歳）</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       16. ds-summary-grid
+  ══════════════════════ -->
   <section class="cat-section" id="summary-grid">
     <div class="cat-section-header">
       <h2 class="cat-section-title">ds-summary-grid</h2>
       <span class="cat-section-tag">.ds-stat-card / .ds-stat-*</span>
     </div>
-    <p class="cat-desc">KPI・サマリーグリッドレイアウト。<code>.highlight</code> で強調。<code>ds-stat-num / unit / detail / detail-num / detail-unit</code> の5要素で構成。複数指標を整列して表示する場合は <strong>ds-result</strong> よりこちらを使用。</p>
+    <p class="cat-desc">KPI・サマリーグリッドレイアウト。<code>.highlight</code> で強調。<code>ds-stat-num / unit / detail / detail-num / detail-unit</code> の5要素で構成。</p>
     <div class="preview col">
       <div class="ds-summary-grid">
         <div class="ds-stat-card highlight">
@@ -614,13 +657,66 @@ body {
     </div>
   </section>
 
-  <!-- ds-hero-result -->
+
+  <!-- ══════════════════════
+       17. ds-chip-scroll
+  ══════════════════════ -->
+  <!-- ══════════════════════
+       18. back-to-index
+  ══════════════════════ -->
+  <section class="cat-section" id="back-to-index">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">back-to-index</h2>
+      <span class="cat-section-tag">.back-to-index</span>
+    </div>
+    <p class="cat-desc">各シミュレーター・ツールページ下部に配置する「マネーツール一覧へ戻る」ボタン。<code>href="../index.html"</code> で一覧ページへリンク。</p>
+    <div class="preview center" style="padding: 32px 28px;">
+      <div class="back-to-index">
+        <a href="../index.html">← マネーツールへ戻る</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       19. ds-chip-scroll
+  ══════════════════════ -->
+  <section class="cat-section" id="chips">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-chip-scroll</h2>
+      <span class="cat-section-tag">.ds-chip-scroll / .ds-chip</span>
+    </div>
+    <p class="cat-desc">横スクロール可能なプリセットチップ群。<code>initChipScroll()</code> で右端フェードマスクを初期化。<code>.active</code> で選択状態。</p>
+    <div class="preview col" style="gap:16px;">
+      <div style="font-size:11px;color:var(--sub-text);">毎月の積立額</div>
+      <div class="ds-chip-scroll" id="chipDemo" style="max-width:320px;">
+        <button class="ds-chip active">3万円</button>
+        <button class="ds-chip">5万円</button>
+        <button class="ds-chip">10万円</button>
+        <button class="ds-chip">15万円</button>
+        <button class="ds-chip">20万円</button>
+        <button class="ds-chip">25万円</button>
+        <button class="ds-chip">30万円</button>
+      </div>
+      <div style="font-size:11px;color:var(--sub-text);">想定利回り</div>
+      <div class="ds-chip-scroll">
+        <button class="ds-chip">3%</button>
+        <button class="ds-chip active">5%</button>
+        <button class="ds-chip">7%</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════
+       20. ds-hero-result
+  ══════════════════════ -->
   <section class="cat-section" id="hero-result">
     <div class="cat-section-header">
       <h2 class="cat-section-title">ds-hero-result</h2>
       <span class="cat-section-tag">.ds-hero-result</span>
     </div>
-    <p class="cat-desc">手取りヒーローカード。グラデーション背景（#5aaa8e → #6ec4a8）でメイン数値を強調。ページ最上部の1番目立つ結果値に使用。</p>
+    <p class="cat-desc">手取りヒーローカード。グラデーション背景（#5aaa8e → #6ec4a8）でメイン数値を強調。</p>
     <div class="ds-hero-result" style="max-width:400px;">
       <div class="hero-eyebrow">推定月間手取り</div>
       <div class="hero-amount">
@@ -630,30 +726,47 @@ body {
     </div>
   </section>
 
-  <!-- ds-progress -->
-  <section class="cat-section" id="progress">
+
+  <!-- ══════════════════════
+       21. ds-breakdown-accordion
+  ══════════════════════ -->
+  <section class="cat-section" id="breakdown-accordion">
     <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-progress</h2>
-      <span class="cat-section-tag">.ds-progress-bg / .ds-progress-fill</span>
+      <h2 class="cat-section-title">ds-breakdown-accordion</h2>
+      <span class="cat-section-tag">.ds-breakdown-block / .ds-accordion-trigger</span>
     </div>
-    <p class="cat-desc">グラデーション＋シマーアニメーション付きの進捗バー。<code>width</code> で進捗率を指定。NISA枠充足率などの達成度表示に使用。</p>
-    <div class="preview col" style="gap:18px;">
-      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">30%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:30%"></div></div></div>
-      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">65%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:65%"></div></div></div>
-      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">100%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:100%"></div></div></div>
+    <p class="cat-desc">社会保険料・税金の内訳をアコーディオンで表示。クリックで展開・折りたたみ。</p>
+    <div class="ds-breakdown-block" style="max-width:480px;">
+      <div class="ds-breakdown-header-row">
+        <span>月間総支給（額面）</span>
+        <span>¥ 256,000</span>
+      </div>
+      <button type="button" class="ds-accordion-trigger" aria-expanded="false"
+        onclick="var b=this.nextElementSibling;b.classList.toggle('open');this.setAttribute('aria-expanded',b.classList.contains('open'));this.querySelector('.acc-toggle-label').textContent=b.classList.contains('open')?'▲ 閉じる':'▼ 内訳を見る';">
+        <span class="acc-left">社会保険料<span class="acc-toggle-label">▼ 内訳を見る</span></span>
+        <span class="acc-right">¥ 38,079</span>
+      </button>
+      <div class="ds-accordion-body">
+        <div class="breakdown-row color-health">
+          <span class="breakdown-label">健康保険料（協会けんぽ東京）</span>
+          <span class="breakdown-value">¥ 12,558</span>
+        </div>
+        <div class="breakdown-row color-pension">
+          <span class="breakdown-label">厚生年金保険料</span>
+          <span class="breakdown-value">¥ 23,985</span>
+        </div>
+      </div>
+      <div class="ds-breakdown-takehome">
+        <span>振込額</span>
+        <span class="takehome-value">¥ 211,317</span>
+      </div>
     </div>
   </section>
 
 
-  <!-- ════════════════════════════════
-       GROUP: データ可視化
-  ════════════════════════════════ -->
-  <div class="cat-group-heading" id="group-dataviz">
-    <span class="cat-group-heading-label">データ可視化</span>
-    <div class="cat-group-heading-line"></div>
-  </div>
-
-  <!-- ds-donut-summary -->
+  <!-- ══════════════════════
+       22. ds-donut-summary
+  ══════════════════════ -->
   <section class="cat-section" id="donut-summary">
     <div class="cat-section-header">
       <h2 class="cat-section-title">ds-donut-summary</h2>
@@ -690,47 +803,17 @@ body {
     </div>
   </section>
 
-  <!-- ds-breakdown-accordion -->
-  <section class="cat-section" id="breakdown-accordion">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-breakdown-accordion</h2>
-      <span class="cat-section-tag">.ds-breakdown-block / .ds-accordion-trigger</span>
-    </div>
-    <p class="cat-desc">社会保険料・税金の内訳をアコーディオンで表示。クリックで展開・折りたたみ。</p>
-    <div class="ds-breakdown-block" style="max-width:480px;">
-      <div class="ds-breakdown-header-row">
-        <span>月間総支給（額面）</span>
-        <span>¥ 256,000</span>
-      </div>
-      <button type="button" class="ds-accordion-trigger" aria-expanded="false"
-        onclick="var b=this.nextElementSibling;b.classList.toggle('open');this.setAttribute('aria-expanded',b.classList.contains('open'));this.querySelector('.acc-toggle-label').textContent=b.classList.contains('open')?'▲ 閉じる':'▼ 内訳を見る';">
-        <span class="acc-left">社会保険料<span class="acc-toggle-label">▼ 内訳を見る</span></span>
-        <span class="acc-right">¥ 38,079</span>
-      </button>
-      <div class="ds-accordion-body">
-        <div class="breakdown-row color-health">
-          <span class="breakdown-label">健康保険料（協会けんぽ東京）</span>
-          <span class="breakdown-value">¥ 12,558</span>
-        </div>
-        <div class="breakdown-row color-pension">
-          <span class="breakdown-label">厚生年金保険料</span>
-          <span class="breakdown-value">¥ 23,985</span>
-        </div>
-      </div>
-      <div class="ds-breakdown-takehome">
-        <span>振込額</span>
-        <span class="takehome-value">¥ 211,317</span>
-      </div>
-    </div>
-  </section>
 
-  <!-- ds-resident-savings -->
+  <!-- ══════════════════════
+       ds-resident-savings — 住民税取り置きブロック
+  ══════════════════════ -->
   <section class="cat-section" id="resident-savings">
     <div class="cat-section-header">
       <h2 class="cat-section-title">ds-resident-savings</h2>
       <span class="cat-section-tag">.ds-resident-savings</span>
     </div>
     <p class="cat-desc">住民税を計算から外すON時、振込額直下に表示。月額・年間・手取り比率バーを表示。</p>
+
     <div class="ds-resident-savings visible" style="max-width:440px;">
       <div class="drs-header">
         <span class="drs-header-icon">🍃</span>
@@ -769,120 +852,11 @@ body {
   </section>
 
 
-  <!-- ════════════════════════════════
-       GROUP: 注釈・フィードバック
-  ════════════════════════════════ -->
-  <div class="cat-group-heading" id="group-annotation">
-    <span class="cat-group-heading-label">注釈・フィードバック</span>
-    <div class="cat-group-heading-line"></div>
-  </div>
+  <!-- ════════════════════════
+       base.js 関数デモ
+  ════════════════════════ -->
 
-  <!-- note-box / warning-inline — 統合 -->
-  <section class="cat-section" id="annotations">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">注釈・警告ボックス</h2>
-      <span class="cat-section-tag">.note-box / .dashed-box / .ds-warning-inline</span>
-    </div>
-    <p class="cat-desc">補足情報・警告のインライン表示コンポーネント群。<code>.note-box</code> は補足・免責（ボーダーレフト付き）、<code>.dashed-box</code> はコード・変数の表示（破線枠・等幅フォント）、<code>.ds-warning-inline</code> は計算上の注意事項（オレンジ系）。</p>
-    <div class="preview col" style="gap:14px;">
-      <div style="font-size:11px;color:var(--sub-text);">.note-box — 補足・免責</div>
-      <div class="note-box">※ 新NISA総枠（1,800万円）到達後は新規積立が停止されます。投資判断はご自身の責任でお願いします。</div>
-
-      <div style="font-size:11px;color:var(--sub-text);">.dashed-box — コード・変数表示</div>
-      <div class="dashed-box">--form-label-w: 210px;<br>--card-px: 20px;</div>
-
-      <div style="font-size:11px;color:var(--sub-text);">.ds-warning-inline — 警告・注意</div>
-      <div class="ds-warning-inline">
-        <span class="wi-icon">⚠</span>
-        評価額が投資累計額を下回っています（含み損の状態）。入力値を確認してください。
-      </div>
-    </div>
-  </section>
-
-  <!-- ds-divider -->
-  <section class="cat-section" id="divider">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-divider</h2>
-      <span class="cat-section-tag">.ds-divider</span>
-    </div>
-    <p class="cat-desc">フェードグラデーション付きの区切り線。</p>
-    <div class="preview col" style="gap:12px;">
-      <p style="font-size:13px;color:var(--sub-text);">セクション上部のコンテンツ</p>
-      <hr class="ds-divider" style="margin:0;">
-      <p style="font-size:13px;color:var(--sub-text);">セクション下部のコンテンツ</p>
-    </div>
-  </section>
-
-  <!-- ds-badge -->
-  <section class="cat-section" id="badge">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-badge</h2>
-      <span class="cat-section-tag">.ds-badge</span>
-    </div>
-    <p class="cat-desc">ステータス・ラベル表示用インラインバッジ。pulse アニメーション付き。</p>
-    <div class="preview center" style="gap:16px;">
-      <span class="ds-badge">NEW</span>
-      <span class="ds-badge">UPDATED</span>
-      <span class="ds-badge">🌿 Mint DS</span>
-      <span class="ds-badge">v2.0</span>
-    </div>
-  </section>
-
-  <!-- ds-card -->
-  <section class="cat-section" id="card">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">ds-card</h2>
-      <span class="cat-section-tag">.ds-card</span>
-    </div>
-    <p class="cat-desc">ホワイトカード。上部にアクセントカラーのシマーバー付き。<code>overflow: hidden</code> のため子要素の角丸も適用。</p>
-    <div class="preview" style="gap:16px;">
-      <div class="ds-card" style="flex:1;min-width:180px;animation:none;">
-        <p style="font-size:13px;color:var(--sub-text);line-height:1.7;">カード内のコンテンツです。シマーバーが上部に表示されます。</p>
-      </div>
-      <div class="ds-card" style="flex:1;min-width:180px;animation:secFadeIn 0.5s both;">
-        <p style="font-size:13px;color:var(--sub-text);line-height:1.7;"><code style="font-family:'Roboto Mono',monospace;font-size:11px;color:var(--accent-deep);background:rgba(168,213,186,0.15);padding:1px 5px;border-radius:4px;">secFadeIn</code> でフェードインアニメーション付き表示。</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ボタン -->
-  <section class="cat-section" id="buttons">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">ボタン</h2>
-      <span class="cat-section-tag">.ds-btn-primary / secondary / ghost</span>
-    </div>
-    <p class="cat-desc">3種類のバリアント。ホバー時はスプリング感のあるスケールアニメーション。アクティブ時は押し込み効果。</p>
-    <div class="preview" style="align-items:center;gap:12px;">
-      <button class="ds-btn-primary">プライマリ</button>
-      <button class="ds-btn-secondary">セカンダリ</button>
-      <button class="ds-btn-ghost">ゴースト</button>
-    </div>
-  </section>
-
-  <!-- back-to-index -->
-  <section class="cat-section" id="back-to-index">
-    <div class="cat-section-header">
-      <h2 class="cat-section-title">back-to-index</h2>
-      <span class="cat-section-tag">.back-to-index</span>
-    </div>
-    <p class="cat-desc">各シミュレーター・ツールページ下部に配置する「マネーツール一覧へ戻る」ボタン。<code>href="../index.html"</code> で一覧ページへリンク。</p>
-    <div class="preview center" style="padding: 32px 28px;">
-      <div class="back-to-index">
-        <a href="../index.html">← マネーツールへ戻る</a>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ════════════════════════════════
-       GROUP: ユーティリティ
-  ════════════════════════════════ -->
-  <div class="cat-group-heading" id="group-util">
-    <span class="cat-group-heading-label">ユーティリティ / JS関数</span>
-    <div class="cat-group-heading-line"></div>
-  </div>
-
-  <!-- 数値フォーマット + clamp -->
+  <!-- 数値フォーマット -->
   <section class="cat-section" id="fmt">
     <div class="cat-section-header">
       <h2 class="cat-section-title">数値フォーマット</h2>
@@ -922,6 +896,7 @@ body {
     </div>
   </section>
 
+
   <!-- animateNum -->
   <section class="cat-section" id="animate">
     <div class="cat-section-header">
@@ -951,6 +926,7 @@ body {
     </div>
   </section>
 
+
   <!-- showToast -->
   <section class="cat-section" id="toast-demo">
     <div class="cat-section-header">
@@ -968,6 +944,7 @@ body {
       </div>
     </div>
   </section>
+
 
   <!-- fireConfetti -->
   <section class="cat-section" id="confetti-demo">
@@ -1044,9 +1021,6 @@ if (simpleRange) {
   updateSliderBg(simpleRange);
   simpleRange.addEventListener('input', () => updateSliderBg(simpleRange));
 }
-
-// ── ピル有り（±ボタン無し）デモ ──
-linkInputs('rangePillNum', 'rangePillSl', 0, 30, 1);
 
 // ── チップスクロール初期化 ──
 initChipScroll();

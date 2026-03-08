@@ -20,18 +20,18 @@
       color: var(--text-main);
       min-height: 100vh;
       padding: 20px 16px 48px;
-      max-width: 1120px;
+      max-width: 1280px;
       margin: 0 auto;
     }
     @media (min-width: 640px) { body { padding: 36px 24px 60px; } }
 
     /* --- layout --- */
     .app-scope .wrap{
-      max-width:1120px;
+      max-width:1280px;
       margin:0 auto;
       padding: 10px 18px 28px;
       display:grid;
-      grid-template-columns: 1.05fr 1.55fr;
+      grid-template-columns: 1fr 2.2fr;
       gap:16px;
     }
     @media (max-width: 980px){
@@ -148,28 +148,13 @@
     }
     .app-scope button:hover{ filter: brightness(1.06); }
 
-    /* --- KPI cards --- */
-    .app-scope .kpis{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
+    /* --- ds-result row（KPIカード） --- */
+    .app-scope .ds-result-row{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
     }
-    @media (max-width: 980px){
-      .app-scope .kpis{grid-template-columns:1fr 1fr}
-    }
-    @media (max-width: 520px){
-      .app-scope .kpis{grid-template-columns:1fr}
-    }
-    .app-scope .kpi{
-      background: var(--mint-pale);
-      border: 1px solid var(--sys-border);
-      border-radius: 14px;
-      padding: 14px;
-      min-height: 78px;
-    }
-    .app-scope .kpi .t{font-size:12px; color:var(--sub-text)}
-    .app-scope .kpi .v{font-size:18px; margin-top:6px}
-    .app-scope .kpi .s{font-size:12px; color:var(--sub-text); margin-top:6px}
+    .app-scope .ds-result-row .ds-result{ margin-bottom: 0; }
 
     /* --- canvas / chart --- */
     .app-scope .canvasWrap{
@@ -269,20 +254,21 @@
     }
     @media (min-width: 600px) { .app-scope .footer { padding: 16px 22px; } }
 
-    /* --- page header --- */
+    /* --- page header（salary-calculator 準拠の余白） --- */
     .app-scope .page-header{
-      padding: 0 0 24px;
-      margin-bottom: 4px;
+      margin-top: clamp(20px, 4vw, 32px);
+      padding: 0 0 clamp(20px, 4vw, 32px);
+      margin-bottom: 0;
     }
     .app-scope .page-header h1{
-      margin: 0;
+      margin: 0 0 12px;
       font-weight: 700;
       letter-spacing: 0.02em;
       font-size: clamp(1.25rem, 2.5vw, 1.75rem);
       color: var(--text-main);
     }
     .app-scope .sub{
-      margin-top: 8px;
+      margin-top: 0;
       color: var(--sub-text);
       line-height: 1.65;
       font-size: clamp(0.875rem, 2vw, 0.95rem);
@@ -440,21 +426,21 @@
         <div class="pill" id="verPill">v1 (年次/単純モデル)</div>
       </div>
       <div class="bd">
-        <div class="kpis">
-          <div class="kpi">
-            <div class="t">終了時残高（名目）</div>
-            <div class="v" id="kpiEndNom">-</div>
-            <div class="s" id="kpiEndNomSub">-</div>
+        <div class="ds-result-row">
+          <div class="ds-result" style="flex:1;min-width:min(200px,100%);">
+            <div class="ds-result-label">終了時残高（名目）</div>
+            <div class="ds-result-value" id="kpiEndNom">-</div>
+            <div class="ds-result-sub" id="kpiEndNomSub">-</div>
           </div>
-          <div class="kpi">
-            <div class="t">終了時残高（実質）</div>
-            <div class="v" id="kpiEndReal">-</div>
-            <div class="s" id="kpiEndRealSub">-</div>
+          <div class="ds-result" style="flex:1;min-width:min(200px,100%);">
+            <div class="ds-result-label">終了時残高（実質）</div>
+            <div class="ds-result-value" id="kpiEndReal">-</div>
+            <div class="ds-result-sub" id="kpiEndRealSub">-</div>
           </div>
-          <div class="kpi">
-            <div class="t">枯渇年齢（もし枯渇したら）</div>
-            <div class="v" id="kpiDeplete">-</div>
-            <div class="s" id="kpiDepleteSub">-</div>
+          <div class="ds-result highlight" style="flex:1;min-width:min(200px,100%);">
+            <div class="ds-result-label">枯渇年齢（もし枯渇したら）</div>
+            <div class="ds-result-value" id="kpiDeplete">-</div>
+            <div class="ds-result-sub" id="kpiDepleteSub">-</div>
           </div>
         </div>
 
