@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>副業税金取り置きシミュレーター — Money Tools</title>
+  <link rel="stylesheet" href="../../shared/tokens.css">
+  <link rel="stylesheet" href="../../shared/components.css">
+  <style>
+    body { background: var(--base-bg); color: var(--text-main); }
+
+    /* ── 共通設定 ── */
+    .app-scope .section-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: var(--sub-text);
+      margin-bottom: 10px; text-transform: uppercase;
+    }
+    .app-scope .reserve-rate-input { width: 48px; max-width: 52px; }
+
+    /* ── 案件カード ── */
+    .app-scope .project-cards { display: flex; flex-direction: column; gap: 16px; }
+    .app-scope .project-card {
+      padding: 18px 20px; background: var(--mint-pale); border-radius: 16px;
+      border: 1px solid var(--mint-light); position: relative;
+    }
+    .app-scope .project-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; font-size: 12px; font-weight: 600; color: var(--accent-deep);
+    }
+    .app-scope .project-card-remove {
+      padding: 4px 10px; font-size: 11px; border: none; background: transparent;
+      color: var(--sub-text); cursor: pointer; border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .app-scope .project-card-remove:hover { background: rgba(224,122,58,0.15); color: var(--warn-color); }
+    .app-scope .project-form-row { margin-bottom: 14px; }
+    .app-scope .project-form-row:last-child { margin-bottom: 0; }
+    .app-scope .project-form-row label {
+      display: block; font-size: 11px; font-weight: 500; color: var(--sub-text);
+      margin-bottom: 6px; letter-spacing: 0.05em;
+    }
+    .app-scope .project-templates { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .app-scope .project-template {
+      padding: 5px 12px; font-size: 11px; border: 1px solid var(--mint-light);
+      border-radius: 14px; background: transparent; color: var(--sub-text);
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .app-scope .project-template:hover { border-color: var(--accent); color: var(--accent-deep); }
+
+    /* ── 案件追加ボタン ── */
+    .app-scope .add-project-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px; margin-top: 12px;
+      border: 2px dashed var(--mint-light); border-radius: 16px;
+      background: transparent; color: var(--sub-text); font-size: 13px;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .app-scope .add-project-btn:hover { border-color: var(--accent); color: var(--accent-deep); background: var(--mint-pale); }
+
+    .app-scope .summary-tier { display: flex; flex-direction: column; gap: 14px; }
+    .app-scope .summary-tier-upper { display: flex; flex-direction: column; gap: 10px; }
+    .app-scope .summary-tier-lower .ds-result-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .app-scope .summary-tier-lower .ds-result { flex: 1; min-width: min(140px, 100%); }
+
+    /* ── ドーナツ（chart-donut.js + ds-donut-summary） ── */
+    .app-scope .donut-wrap.ds-donut-summary { margin: 20px 0; }
+
+    /* ── 年間予測 ── */
+    .app-scope .yearly-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--mint-light); }
+    .app-scope .yearly-title { font-size: 12px; font-weight: 600; color: var(--accent-deep); margin-bottom: 14px; letter-spacing: 0.08em; }
+
+    /* ── CSVボタン ── */
+    .app-scope .csv-btn { margin-top: 20px; width: 100%; }
+    .app-scope .divider { height: 1px; background: var(--mint-light); margin: 20px 0; }
+
+    @media (max-width: 520px) {
+      .app-scope .donut-wrap.ds-donut-summary { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-scope">
+    <header class="ds-page-title">
+      <h1>副業税金取り置きシミュレーター</h1>
+      <p>フリーランス・副業の売上から税金として取り置く金額を管理。複数案件に対応し、月合計と年間予測を可視化します。</p>
+    </header>
+
+    <div class="ds-page-cols">
+      <!-- 左: 条件設定 -->
+      <div class="ds-input-col">
+        <div class="ds-card">
+          <div class="ds-card-label">条件設定</div>
+
+          <!-- ① 共通設定 -->
+          <div class="section-label">共通設定</div>
+          <div class="ds-form-row" style="margin-bottom:0;">
+            <div class="ds-form-row-label"><span class="lname">税金取り置き率（%）</span></div>
+            <div class="ds-form-row-right">
+              <div class="ds-val-row">
+                <input type="number" class="ds-input-underline reserve-rate-input" id="globalReserveRate" min="0" max="100" step="0.5" value="25">
+                <span class="ds-val-unit">%</span>
+                <div class="ds-chip-scroll" id="rateChipScroll">
+                  <button type="button" class="ds-chip" data-rate="20">20%</button>
+                  <button type="button" class="ds-chip active" data-rate="25">25%</button>
+                  <button type="button" class="ds-chip" data-rate="30">30%</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- ② 案件入力 -->
+          <div class="section-label">案件入力</div>
+          <div class="project-cards" id="projectCards"></div>
+          <button type="button" class="add-project-btn" id="addProjectBtn">＋ 案件追加</button>
+        </div>
+      </div>
+
+      <!-- 右: シミュレーション結果 -->
+      <div class="ds-result-col">
+        <div class="ds-card">
+          <div class="ds-card-label">シミュレーション結果</div>
+
+          <!-- ③ 月合計サマリー（2段：上段=高優先、下段=低優先） -->
+          <div class="section-label">月合計サマリー</div>
+          <div class="summary-tier">
+            <div class="summary-tier-upper">
+              <div class="ds-hero-result">
+                <div class="hero-eyebrow">取り置き税金</div>
+                <div class="hero-amount">
+                  <span id="totalReserveTax">0</span>
+                  <span class="hero-amount-unit">円</span>
+                </div>
+              </div>
+              <div class="ds-result highlight">
+                <div class="ds-result-label">手元残り</div>
+                <div class="ds-result-value">
+                  <span id="totalRemain">0</span>
+                  <span class="ds-result-unit">円</span>
+                </div>
+              </div>
+            </div>
+            <div class="summary-tier-lower">
+              <div class="ds-result-row">
+                <div class="ds-result">
+                  <div class="ds-result-label">売上合計</div>
+                  <div class="ds-result-value">
+                    <span id="totalGross">0</span>
+                    <span class="ds-result-unit">円</span>
+                  </div>
+                </div>
+                <div class="ds-result">
+                  <div class="ds-result-label">入金合計</div>
+                  <div class="ds-result-value">
+                    <span id="totalDeposit">0</span>
+                    <span class="ds-result-unit">円</span>
+                  </div>
+                </div>
+                <div class="ds-result">
+                  <div class="ds-result-label">源泉徴収合計</div>
+                  <div class="ds-result-value">
+                    <span id="totalWithholding">0</span>
+                    <span class="ds-result-unit">円</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ④ ドーナツグラフ（chart-donut.js） -->
+          <div class="donut-wrap ds-donut-summary" id="donutWrap"></div>
+
+          <!-- ⑤ 年間予測 -->
+          <div class="yearly-section">
+            <div class="yearly-title">年間予測（月合計×12）</div>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <span class="label">年間売上</span>
+                <span class="value" id="yearGross">0円</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">年間源泉徴収</span>
+                <span class="value" id="yearWithholding">0円</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">年間取り置き税金</span>
+                <span class="value" id="yearReserve">0円</span>
+              </div>
+              <div class="summary-item highlight">
+                <span class="label">年間手元残り</span>
+                <span class="value" id="yearRemain">0円</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑥ CSVエクスポート -->
+          <button type="button" class="ds-btn-primary csv-btn" id="csvBtn">CSV出力</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-footer" style="margin-top:24px;font-size:11px;color:var(--sub-text);line-height:1.8;">
+      本ツールは概算です。実際の税額は税理士・国税庁へご確認ください。
+    </div>
+  </main>
+
+  <div id="ds-toast" class="ds-toast"></div>
+  <script src="../../shared/base.js"></script>
+  <script src="../../shared/chart-donut.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    const TEMPLATES = {
+      withHolding: { gross: 100000, hasWithholding: true, withholdingRate: 10.21, reserveRate: 25 },
+      noWithHolding: { gross: 100000, hasWithholding: false, withholdingRate: 0, reserveRate: 25 }
+    };
+
+    let projectId = 0;
+    let prevTotals = { gross: 0, deposit: 0, withholding: 0, reserveTax: 0, remain: 0 };
+
+    function createProjectCard(data = { gross: 0, hasWithholding: false, withholdingRate: 10.21, reserveRate: 25 }) {
+      const id = ++projectId;
+      const card = document.createElement('div');
+      card.className = 'project-card';
+      card.dataset.id = id;
+      card.innerHTML = `
+        <div class="project-card-header">
+          <span>案件 ${id}</span>
+          <button type="button" class="project-card-remove" data-id="${id}">削除</button>
+        </div>
+        <div class="project-form-row">
+          <label>売上（円）</label>
+          <div class="ds-val-row">
+            <input type="text" class="ds-input-underline project-gross" inputmode="numeric" data-comma="int" placeholder="0" value="${(data.gross || 0).toLocaleString('ja-JP')}">
+            <span class="ds-val-unit">円</span>
+          </div>
+        </div>
+        <div class="project-form-row">
+          <label>源泉徴収</label>
+          <div class="ds-segment project-withholding-seg">
+            <button type="button" class="ds-seg-btn ${data.hasWithholding ? '' : 'active'}" data-val="no">なし</button>
+            <button type="button" class="ds-seg-btn ${data.hasWithholding ? 'active' : ''}" data-val="yes">あり</button>
+          </div>
+        </div>
+        <div class="project-form-row project-withholding-rate-row" style="${data.hasWithholding ? '' : 'display:none;'}">
+          <label>源泉徴収率（%）</label>
+          <div class="ds-val-row">
+            <input type="number" class="ds-input-underline project-withholding-rate" min="0" max="100" step="0.01" value="${data.withholdingRate || 10.21}" style="width:80px;">
+            <span class="ds-val-unit">%</span>
+          </div>
+        </div>
+        <div class="project-templates">
+          <button type="button" class="project-template" data-tpl="withHolding">源泉あり案件</button>
+          <button type="button" class="project-template" data-tpl="noWithHolding">源泉なし案件</button>
+        </div>
+      `;
+      return card;
+    }
+
+    function parseCommaInt(str) {
+      if (typeof str !== 'string') return parseInt(str) || 0;
+      return parseInt(str.replace(/,/g, '')) || 0;
+    }
+
+    function getGlobalReserveRate() {
+      return parseFloat(document.getElementById('globalReserveRate').value) || 25;
+    }
+
+    function collectProjects() {
+      const cards = document.querySelectorAll('.project-card');
+      const globalRate = getGlobalReserveRate();
+      return Array.from(cards).map(card => {
+        const gross = parseCommaInt(card.querySelector('.project-gross').value);
+        const hasWithholding = card.querySelector('.project-withholding-seg .ds-seg-btn[data-val="yes"]').classList.contains('active');
+        const withholdingRate = parseFloat(card.querySelector('.project-withholding-rate').value) || 0;
+        return { gross, hasWithholding, withholdingRate: hasWithholding ? withholdingRate : 0, reserveRate: globalRate };
+      });
+    }
+
+    function calcProject(p) {
+      const gross = p.gross;
+      const withholding = gross * (p.withholdingRate / 100);
+      const deposit = gross - withholding;
+      const taxTarget = gross * (p.reserveRate / 100);
+      let reserveTax = taxTarget - withholding;
+      if (reserveTax < 0) reserveTax = 0;
+      const remain = deposit - reserveTax;
+      return { gross, withholding, deposit, reserveTax, remain };
+    }
+
+    function calculate() {
+      const projects = collectProjects();
+      let totalGross = 0, totalDeposit = 0, totalWithholding = 0, totalReserveTax = 0, totalRemain = 0;
+      projects.forEach(p => {
+        const r = calcProject(p);
+        totalGross += r.gross;
+        totalDeposit += r.deposit;
+        totalWithholding += r.withholding;
+        totalReserveTax += r.reserveTax;
+        totalRemain += r.remain;
+      });
+
+      const fmtNum = n => (n || 0).toLocaleString('ja-JP');
+      const fmtYen = n => (n || 0).toLocaleString('ja-JP') + '円';
+      const ids = ['totalGross', 'totalDeposit', 'totalWithholding', 'totalReserveTax', 'totalRemain'];
+      const vals = [totalGross, totalDeposit, totalWithholding, totalReserveTax, totalRemain];
+      const prevs = [prevTotals.gross, prevTotals.deposit, prevTotals.withholding, prevTotals.reserveTax, prevTotals.remain];
+      ids.forEach((id, i) => {
+        animateNum(document.getElementById(id), prevs[i], vals[i], 700, fmtNum);
+      });
+
+      const yearIds = ['yearGross', 'yearWithholding', 'yearReserve', 'yearRemain'];
+      const yearVals = [totalGross * 12, totalWithholding * 12, totalReserveTax * 12, totalRemain * 12];
+      const yearPrevs = [prevs[0] * 12, prevs[2] * 12, prevs[3] * 12, prevs[4] * 12];
+      yearIds.forEach((id, i) => {
+        animateNum(document.getElementById(id), yearPrevs[i], yearVals[i], 700, fmtYen);
+      });
+
+      prevTotals = { gross: totalGross, deposit: totalDeposit, withholding: totalWithholding, reserveTax: totalReserveTax, remain: totalRemain };
+
+      if (typeof renderDonutChart === 'function') {
+        const donutSegs = [
+          { value: totalWithholding, label: '源泉徴収', hint: 'other' },
+          { value: totalReserveTax, label: '取り置き税金', hint: 'tax' },
+          { value: totalRemain, label: '手元残り', hint: 'takehome' }
+        ];
+        const donutTotal = donutSegs.reduce((s, x) => s + (x.value || 0), 0) || 1;
+        const donutLargest = donutSegs.reduce((a, b) => (a.value || 0) > (b.value || 0) ? a : b);
+        const donutPct = Math.round(((donutLargest.value || 0) / donutTotal) * 100);
+        renderDonutChart(document.getElementById('donutWrap'), donutSegs, {
+          title: '売上の内訳',
+          showPct: true,
+          format: (n) => (n || 0).toLocaleString('ja-JP') + '円',
+          centerLabel: { value: donutPct + '%', sub: donutLargest.label }
+        });
+      }
+    }
+
+    function init() {
+      const cardsEl = document.getElementById('projectCards');
+      cardsEl.innerHTML = '';
+      cardsEl.appendChild(createProjectCard({ gross: 100000, hasWithholding: true, withholdingRate: 10.21, reserveRate: 25 }));
+
+      cardsEl.addEventListener('input', (e) => {
+        if (e.target.classList.contains('project-gross')) {
+          const el = e.target;
+          const raw = el.value.replace(/[^0-9]/g, '');
+          const num = parseInt(raw) || 0;
+          el.value = num ? num.toLocaleString('ja-JP') : '';
+          calculate();
+        }
+      });
+
+      document.getElementById('addProjectBtn').addEventListener('click', () => {
+        const globalRate = getGlobalReserveRate();
+        cardsEl.appendChild(createProjectCard({ gross: 0, hasWithholding: false, withholdingRate: 10.21, reserveRate: globalRate }));
+        bindProjectCard(cardsEl.lastElementChild);
+        calculate();
+      });
+
+      document.querySelectorAll('#rateChipScroll .ds-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#rateChipScroll .ds-chip').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const rate = parseFloat(btn.dataset.rate);
+          document.getElementById('globalReserveRate').value = rate;
+          calculate();
+        });
+      });
+
+      document.getElementById('globalReserveRate').addEventListener('input', () => {
+        const v = parseFloat(document.getElementById('globalReserveRate').value);
+        document.querySelectorAll('#rateChipScroll .ds-chip').forEach(b => {
+          b.classList.toggle('active', Math.abs(parseFloat(b.dataset.rate) - v) < 0.1);
+        });
+        calculate();
+      });
+
+      if (typeof initChipScroll === 'function') initChipScroll('.ds-chip-scroll');
+
+      document.getElementById('csvBtn').addEventListener('click', () => {
+        const projects = collectProjects();
+        const rows = [['売上', '源泉徴収率', '取り置き率']];
+        projects.forEach(p => {
+          rows.push([
+            p.gross,
+            p.hasWithholding ? p.withholdingRate : 0,
+            p.reserveRate
+          ]);
+        });
+        const csv = rows.map(r => r.join(',')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'tax_reserve.csv';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        if (typeof showToast === 'function') showToast('CSVをダウンロードしました', 2000);
+      });
+
+      function bindProjectCard(card) {
+        card.querySelector('.project-card-remove').addEventListener('click', () => {
+          if (document.querySelectorAll('.project-card').length <= 1) return;
+          card.remove();
+          calculate();
+        });
+        card.querySelector('.project-withholding-seg').addEventListener('click', (e) => {
+          const btn = e.target.closest('.ds-seg-btn');
+          if (!btn) return;
+          card.querySelectorAll('.ds-seg-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const hasWithholding = btn.dataset.val === 'yes';
+          card.querySelector('.project-withholding-rate-row').style.display = hasWithholding ? '' : 'none';
+          if (!hasWithholding) card.querySelector('.project-withholding-rate').value = 0;
+          calculate();
+        });
+        card.querySelectorAll('.project-withholding-rate').forEach(inp => {
+          inp.addEventListener('input', calculate);
+        });
+        card.querySelectorAll('.project-template').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const tpl = TEMPLATES[btn.dataset.tpl];
+            card.querySelector('.project-gross').value = tpl.gross.toLocaleString('ja-JP');
+            card.querySelector('.project-withholding-seg .ds-seg-btn[data-val="yes"]').classList.toggle('active', tpl.hasWithholding);
+            card.querySelector('.project-withholding-seg .ds-seg-btn[data-val="no"]').classList.toggle('active', !tpl.hasWithholding);
+            card.querySelector('.project-withholding-rate-row').style.display = tpl.hasWithholding ? '' : 'none';
+            card.querySelector('.project-withholding-rate').value = tpl.withholdingRate;
+            calculate();
+          });
+        });
+      }
+
+      document.querySelectorAll('.project-card').forEach(bindProjectCard);
+      calculate();
+    }
+
+    window.addEventListener('load', init);
+  })();
+  </script>
+</body>
+</html>

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>給与・手取り計算シミュレーター</title>
 <link rel="stylesheet" href="../../shared/components.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 /* ══════════════════════════════════════════
    給与シミュレーター固有スタイル
@@ -437,33 +436,8 @@ body {
     </div>
   </div>
 
-    <!-- ④ ドーナツグラフ＋内訳 -->
-    <div class="ds-donut-summary">
-      <div class="donut-canvas-wrap">
-        <canvas id="resultChart"></canvas>
-      </div>
-      <div class="donut-legend">
-        <div class="donut-legend-label">給与の内訳</div>
-        <div class="ds-donut-legend-row">
-          <div class="ds-donut-legend-dot" style="background:#a8d5ba;"></div>
-          <span class="ds-donut-legend-name">手取り</span>
-          <span class="ds-donut-legend-val" id="legendTakeHome">¥ 0</span>
-          <span class="ds-donut-legend-pct" id="legendTakeHomePct"></span>
-        </div>
-        <div class="ds-donut-legend-row">
-          <div class="ds-donut-legend-dot" style="background:#4a7fd4;"></div>
-          <span class="ds-donut-legend-name">社会保険料</span>
-          <span class="ds-donut-legend-val" id="legendSocial">¥ 0</span>
-          <span class="ds-donut-legend-pct" id="legendSocialPct"></span>
-        </div>
-        <div class="ds-donut-legend-row">
-          <div class="ds-donut-legend-dot" style="background:#e07a3a;"></div>
-          <span class="ds-donut-legend-name">税金</span>
-          <span class="ds-donut-legend-val" id="legendTax">¥ 0</span>
-          <span class="ds-donut-legend-pct" id="legendTaxPct"></span>
-        </div>
-      </div>
-    </div>
+    <!-- ④ ドーナツグラフ＋内訳（chart-donut.js で描画） -->
+    <div class="ds-donut-summary" id="donutChart"></div>
 
     <!-- 注釈 -->
     <div class="chart-note" style="margin-top:12px; text-align:left;">
@@ -485,6 +459,7 @@ body {
 
 </main>
 <script src="../../shared/base.js"></script>
+<script src="../../shared/chart-donut.js"></script>
 <script>
 /* ══════════════════════════════════════════
    給与・手取りシミュレーター
@@ -492,7 +467,6 @@ body {
 
 let ageCategory   = 'under40';
 let currentPeriod = 'monthly'; // 'monthly' | 'annual'
-let chart         = null;
 const _prev       = {};
 const _prevBd     = {}; // 内訳ブロックの前回表示値（animateNum用）
 
@@ -648,42 +622,21 @@ function calculate() {
   document.getElementById('bdResidenceTaxRow').style.display =
     (excludeRes && shouldDed) ? 'none' : '';
 
-  /* ── ドーナツグラフ凡例（月次表示） ── */
-  const fmt = v => '¥\u00a0' + Math.round(v).toLocaleString('ja-JP');
-  const pct = (v) => gross > 0 ? Math.round(v / gross * 100) + '%' : '0%';
-  document.getElementById('legendTakeHome').textContent    = fmt(takeHome);
-  document.getElementById('legendTakeHomePct').textContent = pct(takeHome);
-  document.getElementById('legendSocial').textContent     = fmt(socialTotal);
-  document.getElementById('legendSocialPct').textContent   = pct(socialTotal);
-  document.getElementById('legendTax').textContent         = fmt(taxDisplayTotal);
-  document.getElementById('legendTaxPct').textContent      = pct(taxDisplayTotal);
-
-  updateChart(takeHome, socialTotal, taxDisplayTotal);
-}
-
-function updateChart(takeHome, socialTotal, taxTotal) {
-  const ctx  = document.getElementById('resultChart').getContext('2d');
-  const data = {
-    labels: ['手取り', '社会保険料', '税金'],
-    datasets: [{
-      data: [takeHome || 1, socialTotal, taxTotal],
-      backgroundColor:      ['#a8d5ba', '#4a7fd4', '#e07a3a'],
-      hoverBackgroundColor: ['#7ec9a0', '#3a6fc4', '#c86428'],
-      borderWidth: 0, hoverOffset: 8,
-    }]
-  };
-  if (chart) {
-    chart.data = data; chart.update('none');
-  } else {
-    chart = new Chart(ctx, {
-      type: 'doughnut', data,
-      options: {
-        maintainAspectRatio: true, cutout: '68%',
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: c => ` ${c.label}: ¥${Math.round(c.raw).toLocaleString('ja-JP')}` } }
-        }
-      }
+  /* ── ドーナツグラフ（chart-donut.js） ── */
+  if (typeof renderDonutChart === 'function') {
+    const donutSegs = [
+      { value: takeHome || 1, label: '手取り', hint: 'takehome' },
+      { value: socialTotal, label: '社会保険料', hint: 'other' },
+      { value: taxDisplayTotal, label: '税金', hint: 'tax' }
+    ];
+    const donutTotal = donutSegs.reduce((s, x) => s + (x.value || 0), 0) || 1;
+    const donutLargest = donutSegs.reduce((a, b) => (a.value || 0) > (b.value || 0) ? a : b);
+    const donutPct = Math.round(((donutLargest.value || 0) / donutTotal) * 100);
+    renderDonutChart(document.getElementById('donutChart'), donutSegs, {
+      title: '給与の内訳',
+      showPct: true,
+      format: (n) => '¥ ' + (n || 0).toLocaleString('ja-JP'),
+      centerLabel: { value: donutPct + '%', sub: donutLargest.label }
     });
   }
 }

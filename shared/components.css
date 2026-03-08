@@ -145,6 +145,10 @@ body > h1:first-of-type + p,
     animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
     animation-delay: 0.1s;
   }
+  /* ds-input-col は 340px 幅のため、フォームを縦並びに（はみ出し防止） */
+  .ds-input-col .ds-form-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ds-result-col {
@@ -478,6 +482,8 @@ body > h1:first-of-type + p,
    数値入力 + スライダー + ±ボタン セット
 ══════════════════════════════════════════ */
 .ds-val-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.ds-val-row-stack { display: flex; flex-direction: column; gap: 10px; }
+.ds-val-row-stack .ds-chip-scroll { margin-left: 0; flex: none; }
 .ds-val-row .ds-input-underline {
   font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
   font-size: clamp(1.1rem, 3.5vw, 1.8rem);
@@ -1100,11 +1106,17 @@ body > h1:first-of-type + p,
   border: 1.5px solid var(--mint-light);
   border-radius: 16px;
 }
-.ds-donut-summary .donut-canvas-wrap {
+.ds-donut-summary .donut-canvas-wrap,
+.ds-donut-summary .donut-svg-wrap {
   flex-shrink: 0;
   width: clamp(90px, 22vw, 120px);
   aspect-ratio: 1;
   position: relative;
+}
+.ds-donut-summary .donut-svg-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .ds-donut-summary .donut-legend {
   flex: 1;

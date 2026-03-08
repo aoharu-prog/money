@@ -105,24 +105,12 @@
   @keyframes barShimmer { 0%{left:-100%} 100%{left:200%} }
   .app-scope .ratio-text { font-size:11px; color:var(--sub-text); text-align:right; }
 
-  /* ─ ドーナツ ─ */
-  .app-scope .donut-wrap {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+  /* ─ ドーナツ（chart-donut.js + ds-donut-summary） ─ */
+  .app-scope .donut-wrap.ds-donut-summary {
     margin: 16px 0 12px;
-    padding: 18px 22px;
-    background: var(--mint-pale);
-    border-radius: 16px;
-    border: 1px solid var(--sys-border);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .app-scope .donut-wrap:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,140,111,0.12); }
-  .app-scope .donut-svg { flex-shrink:0; }
-  .app-scope .donut-legend { flex:1; }
-  .app-scope .donut-legend-item { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; }
-  .app-scope .donut-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-  .app-scope .donut-legend-val { font-size:11px; color:var(--sub-text); margin-left:auto; }
+  .app-scope .donut-wrap.ds-donut-summary:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,140,111,0.12); }
 
   /* ─ 計算式 ─ */
   .app-scope .formula-box {
@@ -181,7 +169,7 @@
   @media(max-width:480px) {
     .app-scope .ds-result-value { font-size:22px; }
     .app-scope h1 { font-size:20px; }
-    .app-scope .donut-wrap { flex-direction:column; }
+    .app-scope .donut-wrap.ds-donut-summary { flex-direction:column; }
   }
 </style>
 </head>
@@ -267,32 +255,8 @@
         </div>
       </div>
 
-      <!-- ドーナツグラフ -->
-      <div class="donut-wrap">
-        <svg class="donut-svg" width="88" height="88" viewBox="0 0 88 88">
-          <circle cx="44" cy="44" r="33" fill="none" stroke="var(--mint-light)" stroke-width="15"/>
-          <circle id="donut-ded" cx="44" cy="44" r="33" fill="none" stroke="var(--data-orange)" stroke-width="15"
-            stroke-dasharray="0 207.3" stroke-linecap="round"
-            transform="rotate(-90 44 44)"
-            style="transition:stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1)"/>
-          <circle id="donut-inc" cx="44" cy="44" r="33" fill="none" stroke="var(--data-blue-1)" stroke-width="15"
-            stroke-dasharray="0 207.3" stroke-linecap="round"
-            transform="rotate(-90 44 44)"
-            style="transition:stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1),stroke-dashoffset 1s cubic-bezier(0.22,0.61,0.36,1)"/>
-        </svg>
-        <div class="donut-legend">
-          <div class="donut-legend-item">
-            <div class="donut-dot" style="background:var(--data-blue-1)"></div>
-            <span>控除後の所得</span>
-            <span class="donut-legend-val" id="legend-income">—</span>
-          </div>
-          <div class="donut-legend-item">
-            <div class="donut-dot" style="background:var(--data-orange)"></div>
-            <span>給与所得控除額</span>
-            <span class="donut-legend-val" id="legend-deduction">—</span>
-          </div>
-        </div>
-      </div>
+      <!-- ドーナツグラフ（chart-donut.js） -->
+      <div class="donut-wrap ds-donut-summary" id="donutChart"></div>
 
       <!-- 計算式 -->
       <div class="formula-box" id="formula-box"></div>
@@ -315,6 +279,7 @@
 </div>
 
 <script src="../../shared/base.js"></script>
+<script src="../../shared/chart-donut.js"></script>
 <script>
 (function(){ 'use strict';
 
@@ -445,17 +410,23 @@ function animateNum(el, from, to, ms) {
   requestAnimationFrame(step);
 }
 
-/* ─ ドーナツ ─ */
+/* ─ ドーナツ（chart-donut.js） ─ */
 function updateDonut(salary, deduction, income) {
-  const circ = 2 * Math.PI * 33; // ≈ 207.3
-  const dRatio = salary > 0 ? deduction / salary : 0;
-  const iRatio = salary > 0 ? income   / salary : 0;
-  const dLen = dRatio * circ, iLen = iRatio * circ;
-  document.getElementById('donut-ded').style.strokeDasharray = `${dLen} ${circ}`;
-  document.getElementById('donut-inc').style.strokeDasharray = `${iLen} ${circ}`;
-  document.getElementById('donut-inc').style.strokeDashoffset = -dLen;
-  document.getElementById('legend-income').textContent    = income.toLocaleString('ja-JP') + '円';
-  document.getElementById('legend-deduction').textContent = deduction.toLocaleString('ja-JP') + '円';
+  if (typeof renderDonutChart === 'function') {
+    const donutSegs = [
+      { value: deduction, label: '給与所得控除額', hint: 'tax' },
+      { value: income, label: '控除後の所得', hint: 'takehome' }
+    ];
+    const donutTotal = donutSegs.reduce((s, x) => s + (x.value || 0), 0) || 1;
+    const donutLargest = donutSegs.reduce((a, b) => (a.value || 0) > (b.value || 0) ? a : b);
+    const donutPct = Math.round(((donutLargest.value || 0) / donutTotal) * 100);
+    renderDonutChart(document.getElementById('donutChart'), donutSegs, {
+      title: '給与の内訳',
+      showPct: true,
+      format: (n) => (n || 0).toLocaleString('ja-JP') + '円',
+      centerLabel: { value: donutPct + '%', sub: donutLargest.label }
+    });
+  }
 }
 
 /* ─ メイン計算 ─ */

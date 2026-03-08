@@ -116,6 +116,31 @@ linkInputs(numId,slId,min,max,step,cb) → number+range 連動
 showToast(msg, duration)               → トースト通知
 initChipScroll(selector)               → チップスクロールフェード
 fireConfetti(count)                    → コンフェッティ演出
+renderDonutChart(container, segments, opts) → ドーナツグラフ（chart-donut.js）
+
+【結果表示のアニメーション】
+計算結果の数値表示には animateNum でカウントアップすること。
+例: animateNum(el, prevVal, newVal, 700, n => (n||0).toLocaleString('ja-JP')+'円')
+    animateNum(el, prevVal, newVal, 700, n => fmtYen(n))  // 万円表示の場合
+
+【入力＋チップのレイアウト】
+- 横並び: ds-val-row 内に input + ds-val-unit + ds-chip-scroll（チップは右端に寄る）
+- 縦並び: ds-val-row-stack でラップ（input の下に ds-chip-scroll を配置）
+- initChipScroll('.ds-chip-scroll') でスクロールフェードを初期化
+
+【結果表示の優先順位】
+- 最優先: ds-hero-result で一番上に大きく表示（グラデーション背景）
+- 2番目: ds-result.highlight
+- その他: ds-result（ds-result-row で横並び可）
+
+【ドーナツグラフ（chart-donut.js）】
+- script: <script src="../../shared/chart-donut.js"></script>（base.js の後）
+- 使い方: renderDonutChart(container, segments, opts)
+- segments: [{ value, label, hint?: 'takehome'|'tax'|'other' }]
+- opts: { title, showPct, format, animate?: true, animateDuration?: 800 }
+- 色ルール: 手取り/面積大→薄いグリーン、税金→オレンジ、その他→--data-blue-1
+- 断面: 直線（stroke-linecap: butt）
+- 描画時アニメーション: デフォルト有効
 ```
 
 ---
@@ -181,6 +206,8 @@ fireConfetti(count)                    → コンフェッティ演出
   - スライダー背景更新         → updateSliderBg(sl)
   - number+range 連動          → linkInputs(...)
   ※ 置き換えた場合はその旨をコメントで明記する
+- 計算結果の数値更新は animateNum で行う
+  （el.textContent = ... の代わりに animateNum(el, prev, next, 700, fmt)）
 
 【Step 4: パス設定】
 - <head> を以下のみにする（<title> と <meta> はそのまま残す）:
@@ -286,6 +313,7 @@ app-raw.html の内容を index.html（money-tools-template ベース）に
 【Step 3: JS 抽出・ラップ】
 - app-raw.html の <script> 内を抜き出す
 - DOMContentLoaded のリスナーを削除し、コールバック内の処理だけを残す
+- 計算結果の数値更新は animateNum で行う（el.textContent の代わりに animateNum(el, prev, next, 700, fmt)）
 - index.html の init() 関数内「Claudeが生成したJSを貼り付ける」箇所に挿入する
 
 【Step 4: パス確認】
@@ -398,6 +426,19 @@ body {
 }
 
 ※ body に padding-top を書かないこと（components.css で共通管理）
+```
+
+### 結果の数値がアニメーションしない
+
+```
+計算結果の数値表示に animateNum を使っていません。
+el.textContent = value の代わりに以下を使用してください:
+
+animateNum(el, prevVal, newVal, 700, n => (n||0).toLocaleString('ja-JP')+'円');
+// または 万円表示の場合:
+animateNum(el, prevVal, newVal, 700, n => fmtYen(n));
+
+※ prevVal は前回表示値、newVal は新しい計算結果。毎回 calculate() 内で更新すること。
 ```
 
 ### base.js が効いていない（ヘッダーが出ない）

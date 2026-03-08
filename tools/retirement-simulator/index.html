@@ -190,61 +190,33 @@ body { background: var(--base-bg); color: var(--text-main); }
 .app-scope .calc-btn:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 8px 28px rgba(74,140,111,0.4); }
 .app-scope .calc-btn:active { transform: scale(0.98); }
 
-/* result items grid */
-/* ds-result-row（6カード） */
-.app-scope .ds-result-row {
+/* 退職金受取額（額面）行の背景 */
+.app-scope .ds-breakdown-block .ds-breakdown-header-row {
+  background: var(--mint-pale);
+}
+
+/* ds-breakdown-block 直下の breakdown-row（アコーディオン外） */
+.app-scope .ds-breakdown-block > .breakdown-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 18px;
+  font-size: clamp(0.78rem, 2.3vw, 0.88rem);
+  border-bottom: 1px solid var(--mint-light);
 }
-.app-scope .ds-result-row .ds-result {
-  flex: 1;
-  min-width: min(160px, 100%);
-  margin-bottom: 0;
+.app-scope .ds-breakdown-block > .breakdown-row .breakdown-label {
+  color: var(--sub-text);
+}
+.app-scope .ds-breakdown-block > .breakdown-row .breakdown-value {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: var(--sub-text);
+  text-align: right;
 }
 
-/* donut + bar area */
-.app-scope .visual-area {
-  display: flex; align-items: center; gap: 20px;
-  margin-bottom: 24px;
-}
-.app-scope .donut-wrap { flex-shrink: 0; position: relative; }
-.app-scope .donut-center-label {
-  position: absolute; inset: 0; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  font-size: 10px; color: var(--sub-text); text-align: center; line-height: 1.3;
-}
-.app-scope .donut-center-label strong { font-size: 13px; color: var(--accent-deep); font-weight: 500; }
-
-.app-scope .bar-area { flex: 1; }
-.app-scope .bar-label-row {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 6px;
-}
-.app-scope .bar-label-text { font-size: 11px; color: var(--sub-text); font-weight: 500; }
-.app-scope .bar-label-pct { font-size: 11px; color: var(--accent-deep); font-weight: 500; }
-.app-scope .ratio-bar {
-  height: 8px; background: var(--mint-light); border-radius: 8px; overflow: hidden; margin-bottom: 10px;
-}
-.app-scope .ratio-bar-fill {
-  height: 100%; border-radius: 8px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
-  transition: width 1s cubic-bezier(0.22, 0.61, 0.36, 1);
-  position: relative; overflow: hidden;
-  width: 0%;
-}
-.app-scope .ratio-bar-fill::after {
-  content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  animation: barShimmer 2s ease-in-out infinite;
-}
-@keyframes barShimmer {
-  0%   { left: -100%; }
-  100% { left: 200%; }
-}
-.app-scope .ratio-bar.tax-bar .ratio-bar-fill {
-  background: linear-gradient(90deg, var(--data-amber), var(--data-orange));
+/* ドーナツと計算の根拠の間隔 */
+.app-scope .ds-calc-basis {
+  margin-top: 20px;
 }
 
 /* disclaimer */
@@ -273,11 +245,6 @@ body { background: var(--base-bg); color: var(--text-main); }
 }
 .app-scope .back-to-index a:hover { background: var(--card-bg); border-color: var(--accent); }
 
-/* responsive */
-@media (max-width: 540px) {
-  .app-scope .ds-result-row .ds-result { min-width: 100%; }
-  .app-scope .visual-area { flex-direction: column; }
-}
 </style>
 </head>
 <body>
@@ -388,7 +355,7 @@ body { background: var(--base-bg); color: var(--text-main); }
       <div class="ds-card" id="resultCard">
         <div class="ds-card-label">シミュレーション結果</div>
 
-        <!-- main -->
+        <!-- ① ヒーロー -->
         <div class="ds-hero-result">
           <div class="hero-eyebrow">🎉 推定 手取り額（税・住民税引き後）</div>
           <div class="hero-amount">
@@ -397,71 +364,42 @@ body { background: var(--base-bg); color: var(--text-main); }
           </div>
         </div>
 
-        <!-- donut + bars -->
-        <div class="visual-area">
-          <div class="donut-wrap">
-            <svg width="100" height="100" viewBox="0 0 88 88">
-              <circle cx="44" cy="44" r="33" fill="none" stroke="#d4ede3" stroke-width="15"/>
-              <circle id="donut-ded" cx="44" cy="44" r="33" fill="none" stroke="#a8d5ba" stroke-width="15"
-                stroke-dasharray="0 207.3" stroke-linecap="round"
-                transform="rotate(-90 44 44)"
-                style="transition: stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1)"/>
-              <circle id="donut-tax" cx="44" cy="44" r="33" fill="none" stroke="var(--data-orange)" stroke-width="15"
-                stroke-dasharray="0 207.3" stroke-linecap="round"
-                transform="rotate(-90 44 44)"
-                style="transition: stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1), stroke-dashoffset 1s cubic-bezier(0.22,0.61,0.36,1)"/>
-              <circle id="donut-take" cx="44" cy="44" r="33" fill="none" stroke="#4a8c6f" stroke-width="15"
-                stroke-dasharray="0 207.3" stroke-linecap="round"
-                transform="rotate(-90 44 44)"
-                style="transition: stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1), stroke-dashoffset 1s cubic-bezier(0.22,0.61,0.36,1)"/>
-            </svg>
-            <div class="donut-center-label">
-              <div id="donutPct">-</div>
-              <div style="font-size: 9px;">手取り率</div>
+        <!-- ② 内訳 -->
+        <div class="ds-breakdown-block">
+          <div class="ds-breakdown-header-row">
+            <span>退職金受取額（額面）</span>
+            <span class="bd-amount" id="bdTotalAmount">¥ 0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">退職所得控除額</span>
+            <span class="breakdown-value bd-amount" id="bdDeduction">¥ 0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">課税退職所得</span>
+            <span class="breakdown-value bd-amount" id="bdTaxable">¥ 0</span>
+          </div>
+          <button type="button" class="ds-accordion-trigger" id="taxAccordionBtn" aria-expanded="false" aria-controls="taxAccordionBody" onclick="toggleAccordion('taxAccordion')">
+            <span class="acc-left">税金 <span class="acc-toggle-label" id="taxToggleLabel">▼ 内訳を見る</span></span>
+            <span class="acc-right bd-amount" id="bdTaxTotal">¥ 0</span>
+          </button>
+          <div class="ds-accordion-body" id="taxAccordionBody">
+            <div class="breakdown-row color-income">
+              <span class="breakdown-label">所得税（復興特別税含む）</span>
+              <span class="breakdown-value bd-amount" id="bdIncomeTax">¥ 0</span>
+            </div>
+            <div class="breakdown-row color-resident">
+              <span class="breakdown-label">住民税（目安）</span>
+              <span class="breakdown-value bd-amount" id="bdResidenceTax">¥ 0</span>
             </div>
           </div>
-          <div class="bar-area">
-            <div class="bar-label-row">
-              <span class="bar-label-text"><span style="color:#4a8c6f;font-size:10px;">●</span> 手取り額</span>
-              <span class="bar-label-pct" id="takePct">-</span>
-            </div>
-            <div class="ratio-bar"><div class="ratio-bar-fill" id="takeBar"></div></div>
-
-            <div class="bar-label-row">
-              <span class="bar-label-text"><span style="color:var(--data-orange);font-size:10px;">●</span> 税金合計（所得税+住民税）</span>
-              <span class="bar-label-pct" id="taxPct">-</span>
-            </div>
-            <div class="ratio-bar tax-bar"><div class="ratio-bar-fill" id="taxBar"></div></div>
+          <div class="ds-breakdown-takehome">
+            <span>手取り額</span>
+            <span class="takehome-value bd-amount" id="flowTakeHome">¥ 0</span>
           </div>
         </div>
 
-        <!-- grid items -->
-        <div class="ds-result-row">
-          <div class="ds-result">
-            <div class="ds-result-label">📥 退職金受取額</div>
-            <div class="ds-result-value"><span id="totalAmountNum">0</span><span class="ds-result-unit">円</span></div>
-          </div>
-          <div class="ds-result">
-            <div class="ds-result-label">🛡️ 退職所得控除額</div>
-            <div class="ds-result-value"><span id="deductionNum">0</span><span class="ds-result-unit">円</span></div>
-          </div>
-          <div class="ds-result">
-            <div class="ds-result-label">💹 課税退職所得</div>
-            <div class="ds-result-value"><span id="taxableNum">0</span><span class="ds-result-unit">円</span></div>
-          </div>
-          <div class="ds-result">
-            <div class="ds-result-label">🏛️ 所得税（復興税含む）</div>
-            <div class="ds-result-value"><span id="incomeTaxNum">0</span><span class="ds-result-unit">円</span></div>
-          </div>
-          <div class="ds-result">
-            <div class="ds-result-label">🏙️ 住民税（目安）</div>
-            <div class="ds-result-value"><span id="residentTaxNum">0</span><span class="ds-result-unit">円</span></div>
-          </div>
-          <div class="ds-result">
-            <div class="ds-result-label">💸 税金合計</div>
-            <div class="ds-result-value"><span id="totalTaxNum">0</span><span class="ds-result-unit">円</span></div>
-          </div>
-        </div>
+        <!-- ④ ドーナツ（chart-donut.js） -->
+        <div class="ds-donut-summary" id="donutChart"></div>
 
         <!-- calc basis -->
         <div class="ds-calc-basis">
@@ -490,6 +428,7 @@ body { background: var(--base-bg); color: var(--text-main); }
 </div><!-- /.ds-page-cols -->
 
 <script src="../../shared/base.js"></script>
+<script src="../../shared/chart-donut.js"></script>
 <script>
 (function() { 'use strict';
 
@@ -529,6 +468,7 @@ function fireConfetti() {
 
 /* -------- animate num -------- */
 let prevTakeHome = 0;
+const _prevRet = {};
 function animateNum(el, from, to, ms) {
   const t0 = performance.now();
   function step(now) {
@@ -539,6 +479,29 @@ function animateNum(el, from, to, ms) {
   }
   requestAnimationFrame(step);
 }
+function animBd(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const from = _prevRet[id] ?? 0;
+  const fmt = v => '¥ ' + Math.round(v).toLocaleString('ja-JP');
+  if (typeof window.animateNum === 'function') {
+    window.animateNum(el, from, val, 600, fmt);
+  } else {
+    el.textContent = fmt(val);
+  }
+  _prevRet[id] = val;
+}
+function toggleAccordion(id) {
+  const body = document.getElementById(id + 'Body');
+  const btn = document.getElementById(id + 'Btn');
+  const label = document.getElementById('taxToggleLabel');
+  if (!body || !btn) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.setAttribute('aria-expanded', String(!isOpen));
+  if (label) label.textContent = isOpen ? '▼ 内訳を見る' : '▲ 閉じる';
+}
+window.toggleAccordion = toggleAccordion;
 
 /* -------- カンマ区切り入力 -------- */
 function formatComma(val) {
@@ -728,39 +691,28 @@ function calculate() {
 
   // --- update DOM ---
   const pct = totalAmount > 0 ? Math.round((takeHome / totalAmount) * 100) : 0;
-  const taxPct = 100 - pct;
 
   animateNum(document.getElementById('takeHomeNum'), prevTakeHome, takeHome, 700);
-  animateNum(document.getElementById('totalAmountNum'), 0, totalAmount, 500);
-  animateNum(document.getElementById('deductionNum'), 0, deduction, 500);
-  animateNum(document.getElementById('taxableNum'), 0, taxableIncome, 500);
-  animateNum(document.getElementById('incomeTaxNum'), 0, incomeTax, 500);
-  animateNum(document.getElementById('residentTaxNum'), 0, residentTax, 500);
-  animateNum(document.getElementById('totalTaxNum'), 0, totalTax, 500);
 
-  // bars
-  setTimeout(() => {
-    document.getElementById('takeBar').style.width = pct + '%';
-    document.getElementById('taxBar').style.width  = taxPct + '%';
-  }, 100);
+  animBd('bdTotalAmount', totalAmount);
+  animBd('bdDeduction', deduction);
+  animBd('bdTaxable', taxableIncome);
+  animBd('bdIncomeTax', incomeTax);
+  animBd('bdResidenceTax', residentTax);
+  animBd('bdTaxTotal', totalTax);
+  animBd('flowTakeHome', takeHome);
 
-  document.getElementById('takePct').textContent = pct + '%';
-  document.getElementById('taxPct').textContent  = taxPct + '%';
-
-  // donut
-  const circ = 207.3;
-  const dedLen  = Math.min((deduction / totalAmount) * circ, circ);
-  const taxLen  = Math.min((totalTax / totalAmount) * circ, circ - dedLen);
-  const takeLen = Math.min((takeHome / totalAmount) * circ, circ);
-  setTimeout(() => {
-    document.getElementById('donut-ded').style.strokeDasharray  = `${dedLen} ${circ}`;
-    document.getElementById('donut-tax').style.strokeDasharray  = `${taxLen} ${circ}`;
-    document.getElementById('donut-tax').style.strokeDashoffset = -dedLen;
-    document.getElementById('donut-take').style.strokeDasharray = `${takeLen} ${circ}`;
-    document.getElementById('donut-take').style.strokeDashoffset = -(dedLen + taxLen);
-  }, 100);
-
-  document.getElementById('donutPct').innerHTML = `<strong>${pct}%</strong>`;
+  if (typeof renderDonutChart === 'function') {
+    renderDonutChart(document.getElementById('donutChart'), [
+      { value: totalTax, label: '税金', hint: 'tax' },
+      { value: takeHome, label: '手取り', hint: 'takehome' }
+    ], {
+      title: '退職金の内訳',
+      showPct: true,
+      format: (n) => (n || 0).toLocaleString('ja-JP') + '円',
+      centerLabel: { value: pct + '%', sub: '手取り率' }
+    });
+  }
 
   // steps
   document.getElementById('calcSteps').innerHTML = steps;
