@@ -264,12 +264,17 @@ canvas { display: block; cursor: default; }
   .page-cols .ds-select-underline { font-size: 1.6rem; }
   .page-cols .ds-pm-btn { width: 26px; height: 26px; font-size: 0.95rem; }
 }
+/* app-scope オーバーライド（既存レイアウト維持） */
+.app-scope { max-width: 900px; padding: 0; }
 </style>
 </head>
 <body>
+<main class="app-scope">
 
-<h1>新NISA 満額積立シミュレーター</h1>
-<p>新NISA総枠 1,800万円を考慮した長期運用シミュレーション</p>
+<header class="ds-page-title">
+  <h1>新NISA 満額積立シミュレーター</h1>
+  <p>新NISA総枠 1,800万円を考慮した長期運用シミュレーション</p>
+</header>
 
 <div class="page-cols">
 <div class="input-col">
@@ -438,6 +443,8 @@ canvas { display: block; cursor: default; }
 <div class="back-to-index">
   <a href="../../index.html">← マネーツールへ戻る</a>
 </div>
+
+</main>
 
 <div id="tooltip" class="ds-chart-tooltip"></div>
 

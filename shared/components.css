@@ -49,32 +49,45 @@ body.has-site-header {
 }
 
 /* ══════════════════════════════════════════
-   ページタイトルエリア
-   .app-scope 直下の h1 + p に統一スタイルを適用
+   ds-page-title
+   ツールページタイトル（統一コンポーネント）
+   <header class="ds-page-title"><h1>…</h1><p>…</p></header>
 ══════════════════════════════════════════ */
-
-/* h1 本体 */
-.app-scope > h1,
-.app-scope > .page-header > h1 {
+.ds-page-title {
+  margin-top: clamp(20px, 4vw, 36px);
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+.ds-page-title h1 {
   font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-weight: 800;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+.ds-page-title p {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* 後方互換：app-scope 直下 h1+p（ds-page-title 未使用時） */
+.app-scope > h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
   color: var(--text-main);
   line-height: 1.25;
   margin-top: clamp(20px, 4vw, 36px);
   margin-bottom: 8px;
   letter-spacing: -0.01em;
 }
-
-/* h1 直後のサブタイトル p */
-.app-scope > h1 + p,
-.app-scope > .page-header > h1 + p {
+.app-scope > h1 + p {
   font-size: clamp(0.82rem, 2vw, 0.95rem);
   color: var(--sub-text);
   line-height: 1.65;
   margin-bottom: clamp(20px, 4vw, 32px);
 }
-
-/* 後方互換：既存セレクタも残す */
 #site-header + h1,
 body > h1:first-of-type,
 .wrapper > h1:first-of-type {
@@ -93,7 +106,7 @@ body > h1:first-of-type + p,
 .app-scope {
   max-width: 1080px;
   margin: 0 auto;
-  padding: clamp(24px, 4vw, 40px) clamp(16px, 4vw, 40px) 80px;
+  padding: 0 clamp(16px, 4vw, 40px) 80px;
 }
 
 /* ══════════════════════════════════════════

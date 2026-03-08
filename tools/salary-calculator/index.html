@@ -230,12 +230,18 @@ body {
   color: var(--sub-text); line-height: 1.8; letter-spacing: 0.04em;
 }
 @media (min-width: 600px) { .disclaimer { padding: 16px 22px; } }
+
+/* app-scope オーバーライド（既存レイアウト維持） */
+.app-scope { max-width: 900px; padding: 0; }
 </style>
 </head>
 <body>
+<main class="app-scope">
 
-<h1>給与・手取り計算シミュレーター</h1>
-<p>社会保険料・所得税・住民税を考慮した実質手取りを試算します</p>
+<header class="ds-page-title">
+  <h1>給与・手取り計算シミュレーター</h1>
+  <p>社会保険料・所得税・住民税を考慮した実質手取りを試算します</p>
+</header>
 
 <div class="page-cols">
 
@@ -529,6 +535,7 @@ body {
   <a href="../../index.html">← マネーツールへ戻る</a>
 </div>
 
+</main>
 <script src="../../shared/base.js"></script>
 <script>
 /* ══════════════════════════════════════════

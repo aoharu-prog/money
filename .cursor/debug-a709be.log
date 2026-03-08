@@ -3737,3 +3737,408 @@
 {"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/retirement-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960714974}
 {"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960714974}
 {"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960714974}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960871795}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960871795}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960871805}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960871806}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960871806}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960871980}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960871980}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960871982}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960871982}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960871982}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960873218}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960873218}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960873226}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960873226}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960873226}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960873351}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960873351}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960873353}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960873353}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960873353}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960873914}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960873915}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960873925}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960873925}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960873925}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960874127}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960874127}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960874129}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960874129}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960874129}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960882187}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960882187}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960882195}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960882195}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960882195}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960882378}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960882378}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960882380}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960882381}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960882381}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960888688}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960888688}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960888695}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960888695}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960888695}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960888906}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960888906}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960888908}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960888908}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960888909}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960900914}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960900914}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960900922}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960900922}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960900922}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960901100}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960901100}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960901102}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960901102}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960901103}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960902019}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960902020}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960902027}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960902027}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960902028}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960902160}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960902160}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960902162}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960902162}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960902162}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960902905}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960902905}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960902913}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960902913}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960902913}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960903013}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960903014}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960903016}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960903016}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960903016}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960910220}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960910220}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960910227}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960910228}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960910228}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960910383}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960910383}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960910385}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960910385}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960910385}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960911254}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960911254}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960911267}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960911267}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960911268}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960911426}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960911426}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960911428}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960911428}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960911428}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960917737}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960917738}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960917746}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960917747}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960917747}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960917945}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960917945}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960917947}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960917947}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960917947}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960918588}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960918588}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960918595}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960918595}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960918595}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960918782}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960918783}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960918785}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960918785}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960918785}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960923105}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960923105}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960923116}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960923116}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960923116}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960923248}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960923249}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960923251}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960923251}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960923251}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960924449}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960924449}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960924457}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960924457}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960924457}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960924599}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960924599}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960924601}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960924601}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960924602}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960954618}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960954619}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960954633}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960954633}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960954634}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960956446}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960956446}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/salary-calculator/index.html"},"hypothesisId":"h2","timestamp":1772960956462}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960956462}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960956462}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960957727}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960957727}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960957732}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960957732}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960957732}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960959081}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960959082}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960959097}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960959097}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960959097}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960964503}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960964503}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960964507}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960964508}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960964508}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960965561}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960965561}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/salary-calculator/index.html"},"hypothesisId":"h2","timestamp":1772960965573}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960965573}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960965573}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960966557}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960966557}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960966558}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960966558}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960966558}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960967240}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960967240}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960967249}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960967249}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960967249}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960968264}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960968264}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960968267}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960968267}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960968268}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960968982}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960968982}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/ideco-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960968994}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960968994}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960968995}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960970426}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960970427}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960970430}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960970430}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960970430}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960971156}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960971156}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/retirement-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960971159}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960971159}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960971159}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960972286}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960972286}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960972287}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960972287}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960972287}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960973043}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960973043}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/kyuyo-shotoku-keisan/index.html"},"hypothesisId":"h2","timestamp":1772960973049}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960973049}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960973049}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960974416}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960974416}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960974419}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960974419}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960974419}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960975184}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960975184}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772960975185}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960975185}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960975186}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960977373}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960977373}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960977376}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960977376}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960977376}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960978209}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960978209}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960978220}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960978220}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960978220}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960987995}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960987995}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772960987996}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772960987996}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960987996}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772960989141}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772960989141}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/retirement-simulator/index.html"},"hypothesisId":"h2","timestamp":1772960989145}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772960989145}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772960989145}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961082531}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961082531}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961082535}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961082536}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961082536}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961084742}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961084742}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/ideco-simulator/index.html"},"hypothesisId":"h2","timestamp":1772961084756}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961084757}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961084757}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961086442}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961086442}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961086443}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961086443}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961086443}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961087678}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961087678}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772961087684}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961087684}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961087684}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961088683}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961088683}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961088687}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961088687}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961088687}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961090309}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961090309}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/kyuyo-shotoku-keisan/index.html"},"hypothesisId":"h2","timestamp":1772961090312}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961090312}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961090313}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961091551}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961091551}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961091554}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961091554}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961091555}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961212597}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961212597}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772961212610}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961212610}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961212610}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961213865}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961213865}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961213868}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961213868}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961213869}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961214751}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961214751}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/retirement-simulator/index.html"},"hypothesisId":"h2","timestamp":1772961214756}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961214756}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961214757}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961216199}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961216199}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961216200}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961216200}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961216200}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961216981}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961216981}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/ideco-simulator/index.html"},"hypothesisId":"h2","timestamp":1772961216986}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961216986}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961216986}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961217921}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961217922}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961217923}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961217923}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961217923}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961218757}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961218757}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/kyuyo-shotoku-keisan/index.html"},"hypothesisId":"h2","timestamp":1772961218761}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961218761}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961218761}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961237838}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961237838}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/kyuyo-shotoku-keisan/index.html"},"hypothesisId":"h2","timestamp":1772961237843}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961237843}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961237843}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961238013}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961238013}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772961238015}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961238015}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961238016}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961240924}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961240924}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961240928}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961240928}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961240928}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961241823}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961241823}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772961241825}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961241825}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961241825}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961249754}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961249755}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961249758}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961249759}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961249759}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961251848}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961251848}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/asset_drawdown_simulator/index.html"},"hypothesisId":"h2","timestamp":1772961251849}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961251849}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961251849}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961311144}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961311144}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961311145}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961311145}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961311146}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961311933}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961311934}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/ideco-simulator/index.html"},"hypothesisId":"h2","timestamp":1772961311944}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961311944}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961311944}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961313137}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961313137}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961313138}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961313138}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961313138}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961313805}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961313806}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772961313816}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961313816}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961313817}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961324343}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961324343}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961324346}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961324346}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961324346}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961325265}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961325265}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/salary-calculator/index.html"},"hypothesisId":"h2","timestamp":1772961325274}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961325274}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961325275}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961326775}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961326775}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961326778}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961326778}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961326778}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961327595}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961327595}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/retirement-simulator/index.html"},"hypothesisId":"h2","timestamp":1772961327598}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961327598}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961327598}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961535957}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961535957}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961535960}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961535960}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961535961}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961536904}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961536904}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/salary-calculator/index.html"},"hypothesisId":"h2","timestamp":1772961536913}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961536913}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961536913}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961538014}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961538015}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961538015}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961538015}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961538016}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961538466}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961538466}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/tools/nisa-simulator/index.html"},"hypothesisId":"h2","timestamp":1772961538476}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":2,"prefix":"../../","href":"../../index.html"},"hypothesisId":"h3","timestamp":1772961538476}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961538476}
+{"sessionId":"a709be","location":"base.js:top","message":"base.js loaded","data":{"readyState":"loading"},"hypothesisId":"h1","timestamp":1772961539979}
+{"sessionId":"a709be","location":"base.js:branch","message":"defer to DOMContentLoaded","data":{},"hypothesisId":"h5","timestamp":1772961539979}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"initSiteHeader called","data":{"readyState":"interactive","hasBody":true,"pathname":"/index.html"},"hypothesisId":"h2","timestamp":1772961539980}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"depth calc","data":{"depth":0,"prefix":"./","href":"./index.html"},"hypothesisId":"h3","timestamp":1772961539981}
+{"sessionId":"a709be","location":"base.js:initSiteHeader","message":"header inserted","data":{"headerInDOM":true},"hypothesisId":"h4","timestamp":1772961539981}

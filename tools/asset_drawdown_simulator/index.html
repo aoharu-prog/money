@@ -254,39 +254,17 @@
     }
     @media (min-width: 600px) { .app-scope .footer { padding: 16px 22px; } }
 
-    /* --- page header（salary-calculator 準拠の余白） --- */
-    .app-scope .page-header{
-      margin-top: clamp(20px, 4vw, 32px);
-      padding: 0 0 clamp(20px, 4vw, 32px);
-      margin-bottom: 0;
-    }
-    .app-scope .page-header h1{
-      margin: 0 0 12px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-      color: var(--text-main);
-    }
-    .app-scope .sub{
-      margin-top: 0;
-      color: var(--sub-text);
-      line-height: 1.65;
-      font-size: clamp(0.875rem, 2vw, 0.95rem);
-    }
   </style>
 </head>
 <!-- [変更6] <body> 直下のコンテンツを <main class="app-scope"> で囲む -->
 <body>
 <main class="app-scope">
 
-  <!-- [変更5] <header> タグを削除し、app-scope 内の div.page-header に変換 -->
-  <div class="page-header">
+  <header class="ds-page-title">
     <h1>資産形成の取り崩しシミュレーション</h1>
-    <div class="sub">
-      つみたて → 運用 → 取り崩しを <span class="pill">年次</span> で試算します。<br>
-      「実質（インフレ調整）」と「名目（額面）」の両方を出します。計算は単純化したモデルです（税金・口座区分・相場変動の年内ブレは未考慮）。
-    </div>
-  </div>
+    <p>つみたて → 運用 → 取り崩しを <span class="pill">年次</span> で試算します。<br>
+    「実質（インフレ調整）」と「名目（額面）」の両方を出します。計算は単純化したモデルです（税金・口座区分・相場変動の年内ブレは未考慮）。</p>
+  </header>
 
   <div class="wrap">
     <section class="card" aria-label="入力">

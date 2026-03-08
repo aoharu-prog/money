@@ -128,6 +128,9 @@ body {
 .file-link-sub  { font-size: clamp(0.62rem, 1.8vw, 0.7rem); color: var(--sub-text); font-weight: 400; margin-top: 2px; }
 .file-link-arr  { color: var(--accent-deep); font-size: 0.8rem; flex-shrink: 0; }
 
+/* ── index 用 app-scope オーバーライド ── */
+.app-scope { max-width: 860px; padding: 0; }
+
 /* ── Footer ── */
 footer {
   margin-top: clamp(40px, 7vw, 60px);
@@ -139,9 +142,12 @@ footer {
 </style>
 </head>
 <body>
+<main class="app-scope">
 
-<h1>Money Tools</h1>
-<p>資産形成・税金・老後資金をシミュレーションするツール集</p>
+<header class="ds-page-title">
+  <h1>Money Tools</h1>
+  <p>資産形成・税金・老後資金をシミュレーションするツール集</p>
+</header>
 
 <!-- ── シミュレーター ── -->
 <div class="section-label">Simulators</div>
@@ -220,5 +226,6 @@ footer {
   Mint Design System &nbsp;·&nbsp; Money Tools &nbsp;·&nbsp; © 2025 AOKI DESIGN WORKS
 </footer>
 
+</main>
 </body>
 </html>
