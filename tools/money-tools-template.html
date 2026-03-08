@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ページタイトル — Money Tools</title>
+
+  <!--
+  ================================================================
+  MINT DESIGN SYSTEM — Money Tools 統合テンプレート
+  ================================================================
+
+  【ファイル構成】
+    project/
+    ├── shared/
+    │   ├── tokens.css
+    │   ├── components.css
+    │   └── base.js
+    └── tools/
+        ├── money-tools-template.html  ← このファイル
+        └── [アプリ名]/
+            └── index.html             ← 新しいアプリはここ
+
+  【新しいアプリの作り方】
+    1. tools/[アプリ名]/ フォルダを作成
+    2. このテンプレートを index.html としてコピー
+    3. CSSパスを ../../shared/ に変更（1段深くなるため）
+    4. 各「貼り付け箇所」にコードを追加する
+
+  【パス対照表】
+    tools/ 直下に置く場合   → ../shared/
+    tools/[app]/ に置く場合 → ../../shared/
+  ================================================================
+  -->
+
+  <!-- ① 共通CSS（順番を変えないこと・パスは配置場所に合わせる）-->
+  <!-- tools/ 直下（このテンプレート自体）のパス -->
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <link rel="stylesheet" href="../shared/components.css">
+  <!-- tools/[アプリ名]/index.html に配置する場合は↓に変更
+  <link rel="stylesheet" href="../../shared/tokens.css">
+  <link rel="stylesheet" href="../../shared/components.css">
+  -->
+
+  <!--
+  ================================================================
+  ② アプリ固有スタイル  ← Claudeが生成したCSSをここに貼る
+  ================================================================
+  ルール:
+  ・body / html / * への直接スタイル指定は書かない
+    （components.css のリセット・フォントと競合するため）
+  ・フォント・カラーは CSS変数 var(--xxx) を使う
+  ・すべてのセレクタは .app-scope 配下にスコープする
+
+  例:
+    .app-scope .ds-card   { background: var(--card-bg); }
+    .app-scope h2         { color: var(--accent-deep); }
+    .app-scope .button    { background: var(--accent); }
+  ================================================================
+  -->
+  <style>
+    /* ── ページ背景（変更不要）── */
+    body {
+      background: var(--base-bg);
+      color: var(--text-main);
+    }
+
+    /* ── .app-scope の max-width / padding は components.css で管理 ── */
+    /* ── ここに書くと上書き競合するため記述しないこと ── */
+
+    /* ↓ ここにClaudeが生成したCSSを貼り付ける
+          ただし以下は必ず削除すること:
+          - body { font-family: ... }
+          - body { background: ... }
+          - html, body { margin: 0; padding: 0; }
+          - * { box-sizing: border-box; }
+          - @import url('fonts.googleapis.com/...') */
+
+  </style>
+</head>
+<body>
+  <!--
+  ================================================================
+  【自動挿入されるヘッダーについて】
+  base.js が読み込まれると body 先頭に自動で以下が挿入されます:
+
+    <header id="site-header">
+      <a href="../../index.html" class="site-header-logo">Money Tools</a>
+    </header>
+
+  padding-top:52px は components.css で body に最初から適用されます
+  （レイアウトシフト防止のため共通化済み）。
+  → <header> や <nav> を自分で書かないこと（二重になります）
+  → body に独自の padding-top を書かないこと（ズレます）
+  ================================================================
+  -->
+
+  <!-- ③ アプリ本体（.app-scope で必ず囲む） -->
+  <main class="app-scope">
+
+    <!-- ページタイトル（ds-page-title 推奨） -->
+    <header class="ds-page-title">
+      <h1>アプリタイトル</h1>
+      <p>サブタイトル・説明文</p>
+    </header>
+
+    <!-- 2カラムレイアウト例（入力左・結果右・各カードにラベル付き） -->
+    <div class="ds-page-cols">
+      <div class="ds-input-col">
+        <div class="ds-card">
+          <div class="ds-card-label">条件設定</div>
+          <!-- ↓ 入力フォーム群をここに貼り付ける -->
+        </div>
+      </div>
+      <div class="ds-result-col">
+        <div class="ds-card">
+          <div class="ds-card-label">シミュレーション結果</div>
+          <!-- ↓ 結果表示群をここに貼り付ける -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 1カラムの場合は上記 ds-page-cols を削除し、以下に貼り付ける -->
+    <!-- <header> / <nav> / <footer> タグは除外すること -->
+
+  </main>
+
+  <!-- トースト（showToast() を使う場合のみ残す） -->
+  <div id="ds-toast" class="ds-toast"></div>
+
+  <!-- コンフェッティ（fireConfetti() を使う場合のみ残す） -->
+  <div id="ds-confetti" style="position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;"></div>
+
+  <!-- ④ 共通JS（アプリscriptより必ず先に置く・パスは配置場所に合わせる） -->
+  <!-- tools/ 直下（このテンプレート自体）のパス -->
+  <script src="../shared/base.js"></script>
+  <!-- tools/[アプリ名]/index.html に配置する場合は↓に変更
+  <script src="../../shared/base.js"></script>
+  -->
+
+  <!--
+  ================================================================
+  ⑤ アプリ固有スクリプト  ← Claudeが生成したJSをここに貼る
+  ================================================================
+  ルール:
+  1. IIFE で囲んでグローバル汚染を防ぐ（変更不要）
+  2. 初期化は window.addEventListener('load') に書く
+     → base.js のヘッダー挿入が完了してから動くため
+  3. DOMContentLoaded のリスナーは削除して init() 内に移動する
+
+  【base.js で使えるユーティリティ関数】
+    fmtYen(n)                              → "1,234万円"
+    fmtYenParts(n)                         → { num:"1,234", unit:"万円" }
+    fmtAxisYen(n)                          → "1.2億"（グラフ軸用）
+    animateNum(el, from, to, ms, fmt)      → カウントアップアニメ
+    updateSliderBg(sl)                     → スライダー背景更新
+    linkInputs(numId,slId,min,max,step,cb) → number+range 連動
+    showToast(msg, duration)               → トースト通知
+    initChipScroll(selector)               → チップスクロールフェード
+    fireConfetti(count)                    → コンフェッティ演出
+  ================================================================
+  -->
+  <script>
+  (function () {
+    'use strict';
+
+    window.addEventListener('load', function () {
+      init();
+    });
+
+    function init() {
+      // ↓ ここにClaudeが生成したJSを貼り付ける
+      //   DOMContentLoaded のコールバック内の処理をここに移動する
+
+    }
+
+  })();
+  </script>
+</body>
+</html>

@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="./components.css">
 <script src="./base.js"></script>
 <script src="./chart-asset-line.js"></script>
+<script src="./chart-stacked-bar.js"></script>
 <style>
 /* ══════════════════════════════════════════
    CATALOG — レイアウト専用スタイル
@@ -200,6 +201,7 @@ body {
   <a class="cat-nav-link" href="#breakdown-accordion">ds-breakdown-accordion</a>
   <a class="cat-nav-link" href="#resident-savings">ds-resident-savings</a>
   <a class="cat-nav-link" href="#asset-line-chart">ds-asset-line-chart</a>
+  <a class="cat-nav-link" href="#stacked-bar-chart">ds-stacked-bar-chart</a>
   <a class="cat-nav-link" href="#calc-basis">ds-calc-basis</a>
 
   <div class="cat-nav-group">注釈・フィードバック</div>
@@ -790,6 +792,25 @@ body {
     </div>
   </section>
 
+  <!-- ds-stacked-bar-chart -->
+  <section class="cat-section" id="stacked-bar-chart">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-stacked-bar-chart</h2>
+      <span class="cat-section-tag">chart-stacked-bar.js</span>
+    </div>
+    <p class="cat-desc">元本＋運用収益の積み上げ棒グラフ。ホバーでツールチップ表示。NISA・iDeCo シミュレーター等で使用。</p>
+    <div class="preview col" style="max-width:640px;">
+      <div class="canvasWrap" style="padding:12px 0;">
+        <canvas id="cat-stacked-bar-demo" width="600" height="280" aria-label="積み上げ棒グラフデモ" style="width:100%;height:280px;background:var(--mint-pale);border:1px solid var(--sys-border);border-radius:14px;display:block;"></canvas>
+        <div class="legend" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;color:var(--sub-text);font-size:12px;">
+          <span><span class="dot" style="width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;background:#a8d5ba;border:1px solid var(--mint-light)"></span>元本</span>
+          <span><span class="dot" style="width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;background:#4a8c6f;border:1px solid var(--mint-light)"></span>運用収益</span>
+        </div>
+      </div>
+      <div id="cat-stacked-bar-tooltip" class="ds-chart-tooltip"></div>
+    </div>
+  </section>
+
   <!-- ds-calc-basis -->
   <section class="cat-section" id="calc-basis">
     <div class="cat-section-header">
@@ -1201,6 +1222,25 @@ document.getElementById('confettiBig').addEventListener('click', () => fireConfe
     });
   }
   drawAssetLineChart(canvas, demoYears, { startAge: 35, retireAge: 60, animate: true });
+})();
+
+// ── ds-stacked-bar-chart デモ ──
+(function initStackedBarChartDemo() {
+  const canvas = document.getElementById('cat-stacked-bar-demo');
+  if (!canvas || typeof drawStackedBarChart !== 'function') return;
+  const demoData = [];
+  for (let y = 1; y <= 30; y++) {
+    const principal = 12000 * 12 * y;
+    const total = principal * Math.pow(1.03, y);
+    demoData.push({
+      year: y,
+      age: 35 + y,
+      principal,
+      gain: Math.max(0, total - principal),
+      total,
+    });
+  }
+  drawStackedBarChart('cat-stacked-bar-demo', demoData, { tooltipId: 'cat-stacked-bar-tooltip' });
 })();
 
 // ── サイドバーアクティブリンク（IntersectionObserver） ──

@@ -33,28 +33,12 @@
         grid-template-columns: minmax(380px, 420px) 1fr;
         gap: 20px;
       }
-      .app-scope .ds-input-col { position: sticky; top: 72px; }
-      .app-scope .ds-input-col .card { margin-bottom: 0; }
+      .app-scope .ds-input-col .ds-card { margin-bottom: 0; }
     }
 
-    /* --- card（ds-card 準拠） --- */
-    .app-scope .card{
-      background: var(--card-bg);
-      border: 1px solid var(--sys-border);
-      border-radius: 28px;
-      box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
-      overflow: hidden;
-      position: relative;
-    }
-    .app-scope .card::before{
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
-      background-size: 200%;
-      animation: shimmerBar 3s linear infinite;
-      border-radius: 28px 28px 0 0;
-    }
-    .app-scope .card .hd{
+    /* --- ds-card（.hd/.bd 構造） --- */
+    .app-scope .ds-card { padding: 0; }
+    .app-scope .ds-card .hd{
       padding: 18px 20px 14px;
       display: flex;
       align-items: center;
@@ -63,15 +47,8 @@
       border-bottom: 1px solid var(--sys-border);
       background: var(--mint-pale);
     }
-    .app-scope .card .hd h2{
-      margin: 0;
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent-deep);
-      font-weight: 700;
-    }
-    .app-scope .card .bd{ padding: 18px 20px; }
+    .app-scope .ds-card .hd .ds-card-label { margin-bottom: 0; }
+    .app-scope .ds-card .bd{ padding: 18px 20px; }
 
     /* --- form grid --- */
     .app-scope .row{
@@ -267,9 +244,9 @@
 
   <div class="ds-page-cols">
     <div class="ds-input-col">
-    <section class="card" aria-label="入力">
+    <section class="ds-card" aria-label="入力">
       <div class="hd">
-        <h2>Inputs</h2>
+        <div class="ds-card-label">条件設定</div>
         <div class="chips" id="presetChips">
           <span class="chip" data-preset="balanced">標準</span>
           <span class="chip" data-preset="conservative">保守</span>
@@ -400,9 +377,9 @@
     </div><!-- /ds-input-col -->
 
     <div class="ds-result-col">
-    <section class="card" aria-label="結果">
+    <section class="ds-card" aria-label="結果">
       <div class="hd">
-        <h2>Results</h2>
+        <div class="ds-card-label">シミュレーション結果</div>
         <div class="pill" id="verPill">v1 (年次/単純モデル)</div>
       </div>
       <div class="bd">

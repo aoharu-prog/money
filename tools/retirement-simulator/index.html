@@ -43,44 +43,9 @@ body { background: var(--base-bg); color: var(--text-main); }
   position: relative; z-index: 1;
 }
 
-/* ---- card ---- */
-.app-scope .card {
-  background: var(--card-bg);
-  border-radius: 28px;
-  padding: 36px 36px 32px;
-  box-shadow:
-    0 8px 40px rgba(74, 140, 111, 0.12),
-    0 1px 4px rgba(0,0,0,0.04),
-    inset 0 1px 0 rgba(255,255,255,0.8);
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
-  animation: fadeInUp 0.7s 0.2s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-}
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.app-scope .card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
-  background-size: 200% 100%;
-  animation: shimmerBar 3s linear infinite;
-}
 @keyframes shimmerBar {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
-}
-
-/* ---- section title ---- */
-.app-scope .section-title {
-  font-size: 13px; font-weight: 500; color: var(--accent-deep);
-  margin-bottom: 18px; display: flex; align-items: center; gap: 6px;
-}
-.app-scope .section-title::after {
-  content: ''; flex: 1; height: 1px;
-  background: linear-gradient(90deg, var(--mint-light), transparent);
 }
 
 /* ---- form group ---- */
@@ -225,28 +190,6 @@ body { background: var(--base-bg); color: var(--text-main); }
 .app-scope .calc-btn:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 8px 28px rgba(74,140,111,0.4); }
 .app-scope .calc-btn:active { transform: scale(0.98); }
 
-/* ---- result card ---- */
-.app-scope .result-card {
-  background: var(--card-bg);
-  border-radius: 28px;
-  padding: 32px;
-  box-shadow:
-    0 8px 40px rgba(74, 140, 111, 0.12),
-    0 1px 4px rgba(0,0,0,0.04),
-    inset 0 1px 0 rgba(255,255,255,0.8);
-  position: relative; overflow: hidden;
-  animation: fadeInUp 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  display: none;
-}
-.app-scope .result-card.show { display: block; }
-.app-scope .result-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--accent-deep), var(--accent), var(--accent-deep));
-  background-size: 200% 100%;
-  animation: shimmerBar 3s linear infinite;
-}
-
 /* result items grid */
 /* ds-result-row（6カード） */
 .app-scope .ds-result-row {
@@ -330,20 +273,8 @@ body { background: var(--base-bg); color: var(--text-main); }
 }
 .app-scope .back-to-index a:hover { background: var(--card-bg); border-color: var(--accent); }
 
-/* initial placeholder */
-.app-scope .empty-state {
-  text-align: center; padding: 40px 20px; color: var(--sub-text);
-  background: var(--card-bg); border-radius: 28px;
-  box-shadow: 0 8px 40px rgba(74, 140, 111, 0.12);
-  animation: fadeInUp 0.7s 0.35s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  display: block;
-}
-.app-scope .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
-.app-scope .empty-state p { font-size: 13px; line-height: 1.7; }
-
 /* responsive */
 @media (max-width: 540px) {
-  .app-scope .card { padding: 28px 20px; }
   .app-scope .ds-result-row .ds-result { min-width: 100%; }
   .app-scope .visual-area { flex-direction: column; }
 }
@@ -365,8 +296,8 @@ body { background: var(--base-bg); color: var(--text-main); }
   <div class="ds-input-col">
 
     <!-- input card -->
-    <div class="card">
-      <p class="section-title">📝 退職情報を入力</p>
+    <div class="ds-card">
+      <div class="ds-card-label">条件設定</div>
 
       <!-- 退職金額 -->
       <div class="form-group">
@@ -454,15 +385,8 @@ body { background: var(--base-bg); color: var(--text-main); }
   </div><!-- /.ds-input-col -->
 
   <div class="ds-result-col">
-      <!-- empty state -->
-      <div class="empty-state" id="emptyState">
-        <div class="icon">🌱</div>
-        <p>退職情報を入力して、<br>手取り額をシミュレーションしましょう。</p>
-      </div>
-
-      <!-- result card -->
-      <div class="result-card" id="resultCard">
-        <p class="section-title">📊 シミュレーション結果</p>
+      <div class="ds-card" id="resultCard">
+        <div class="ds-card-label">シミュレーション結果</div>
 
         <!-- main -->
         <div class="ds-hero-result">
@@ -745,8 +669,6 @@ function calculate() {
   const idecoYrs   = hasIdeco ? Number(document.getElementById('idecoYears').value || 0) : 0;
 
   if (!amount || !years) {
-    document.getElementById('emptyState').style.display = 'block';
-    document.getElementById('resultCard').classList.remove('show');
     return;
   }
 
@@ -805,10 +727,6 @@ function calculate() {
   const takeHome   = totalAmount - totalTax;
 
   // --- update DOM ---
-  document.getElementById('emptyState').style.display = 'none';
-  const rc = document.getElementById('resultCard');
-  rc.classList.add('show');
-
   const pct = totalAmount > 0 ? Math.round((takeHome / totalAmount) * 100) : 0;
   const taxPct = 100 - pct;
 

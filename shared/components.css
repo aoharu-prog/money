@@ -18,9 +18,10 @@ html { scroll-behavior: smooth; }
 /* ══════════════════════════════════════════
    site-header
    共通ヘッダー（base.js で挿入・トップへ戻るリンク）
+   padding-top はヘッダー挿入前のレイアウトシフト防止のため共通化
 ══════════════════════════════════════════ */
-body.has-site-header {
-  padding-top: 52px;
+body {
+  padding-top: 52px !important; /* ページの padding 指定より優先（レイアウトシフト防止） */
 }
 #site-header {
   position: fixed;
@@ -131,6 +132,19 @@ body > h1:first-of-type + p,
     position: sticky;
     top: 72px; /* site-header(52px) + 余白20px */
   }
+  .ds-result-col {
+    position: sticky;
+    top: 72px;
+  }
+  /* 2カラム時の左右フェードイン（トップページの .tool-card に合わせ 0.45s） */
+  .ds-input-col .ds-card {
+    animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .ds-input-col .ds-card:nth-child(1) { animation-delay: 0.04s; }
+  .ds-result-col .ds-card {
+    animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+    animation-delay: 0.1s;
+  }
 }
 
 .ds-result-col {
@@ -179,6 +193,18 @@ body > h1:first-of-type + p,
   background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
   background-size: 200%; animation: shimmerBar 3s linear infinite;
   border-radius: 28px 28px 0 0;
+}
+
+/* ds-card 内ラベル（●条件設定 / ●シミュレーション結果 等） */
+.ds-card-label {
+  font-size: clamp(0.65rem, 1.9vw, 0.75rem); font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--sub-text); margin-bottom: clamp(16px, 3vw, 22px);
+  display: flex; align-items: center; gap: 8px;
+}
+.ds-card-label::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-deep); flex-shrink: 0;
 }
 
 /* ══════════════════════════════════════════

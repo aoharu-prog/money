@@ -31,24 +31,6 @@
       gap: 20px;
       align-items: start;
     }
-    .ds-input-col .card { animation: none; }
-    .ds-result-col {
-      background: var(--card-bg);
-      border-radius: 28px;
-      padding: 24px 20px 28px;
-      box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
-      border: 1px solid var(--sys-border);
-      position: relative;
-      overflow: hidden;
-    }
-    .ds-result-col::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
-      background-size: 200% 100%;
-      animation: shimmerBar 3s linear infinite;
-      border-radius: 28px 28px 0 0;
-    }
   }
 
   /* ─ 背景パーティクル（軽量化） ─ */
@@ -64,31 +46,8 @@
     100% { transform:translateY(-20px) scale(1) rotate(360deg); opacity:0; }
   }
 
-  /* ─ カード ─ */
+  /* ─ コンテナ ─ */
   .app-scope .container { position:relative; z-index:10; margin:0 auto; padding:0; }
-  .app-scope .card {
-    background: var(--card-bg);
-    border: 1px solid var(--sys-border);
-    border-radius: 28px;
-    padding: 32px 24px;
-    box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
-    position: relative;
-    overflow: hidden;
-    animation: fadeInUp 0.5s cubic-bezier(0.22,0.61,0.36,1) both;
-  }
-  @media (min-width: 800px) {
-    .app-scope .ds-input-col .card { animation: none; }
-  }
-  @media (min-width: 600px) { .app-scope .card { padding: 36px 32px; } }
-  @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-  .app-scope .card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
-    background-size: 200% 100%;
-    border-radius: 28px 28px 0 0;
-    animation: shimmerBar 3s linear infinite;
-  }
   @keyframes shimmerBar { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
   /* ─ 入力（ds-input-underline アンダーライン） ─ */
@@ -126,16 +85,7 @@
   /* ─ 区切り ─ */
   .app-scope .divider { height:1px; background:linear-gradient(90deg,transparent,var(--mint-light),transparent); margin:28px 0; }
 
-  /* ─ プレースホルダー ─ */
-  .app-scope .result-placeholder { text-align:center; padding:20px 0 8px; transition:all 0.4s ease; }
-  .app-scope .result-placeholder.hidden { display:none; }
-  .app-scope .placeholder-icon { font-size:38px; margin-bottom:10px; animation:bouncePH 2.2s ease-in-out infinite; }
-  @keyframes bouncePH { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-  .app-scope .placeholder-text { font-size: 13px; color: var(--placeholder); letter-spacing: 0.06em; line-height: 1.9; }
-
   /* ─ 結果 ─ */
-  .app-scope .result-content { display:none; }
-  .app-scope .result-content.visible { display:block; animation: fadeInUp 0.5s cubic-bezier(0.22,0.61,0.36,1) both; }
   .app-scope .result-label { font-size:11px; font-weight:500; letter-spacing:0.14em; color:var(--sub-text); margin-bottom:10px; text-transform:uppercase; }
   .app-scope .ds-result.highlight .ds-result-value { color:var(--accent-deep); }
 
@@ -229,7 +179,6 @@
   }
 
   @media(max-width:480px) {
-    .app-scope .card { padding:28px 20px; border-radius:20px; }
     .app-scope .ds-result-value { font-size:22px; }
     .app-scope h1 { font-size:20px; }
     .app-scope .donut-wrap { flex-direction:column; }
@@ -250,7 +199,8 @@
 
 <div class="ds-page-cols">
   <div class="ds-input-col">
-    <div class="card">
+    <div class="ds-card">
+      <div class="ds-card-label">条件設定</div>
       <!-- 入力エリア -->
       <div class="input-section">
         <label>💴 額面年収を入力してください</label>
@@ -291,17 +241,9 @@
   </div>
 
   <div class="ds-result-col">
-    <!-- 初期プレースホルダー -->
-    <div id="result-placeholder" class="result-placeholder">
-      <div class="placeholder-icon">🌿</div>
-      <div class="placeholder-text">
-        年収を入力すると<br>給与所得控除額と控除後の所得がわかります
-      </div>
-    </div>
-
-    <!-- 計算結果 -->
+    <div class="ds-card">
+      <div class="ds-card-label">シミュレーション結果</div>
     <div id="result-content" class="result-content">
-      <div class="result-label">📊 計算結果</div>
 
       <!-- 控除額 -->
       <div class="ds-result">
@@ -357,6 +299,7 @@
       <!-- 法律メモ -->
       <div class="legal-note" id="legal-note"></div>
     </div>
+    </div><!-- /ds-card -->
   </div>
 </div>
 
@@ -518,18 +461,11 @@ function updateDonut(salary, deduction, income) {
 /* ─ メイン計算 ─ */
 function calculate() {
   const salary = currentRawValue;
-  const ph  = document.getElementById('result-placeholder');
   const rc  = document.getElementById('result-content');
 
   if (salary <= 0) {
-    ph.classList.remove('hidden');
-    rc.classList.remove('visible');
     return;
   }
-
-  ph.classList.add('hidden');
-  const wasHidden = !rc.classList.contains('visible');
-  rc.classList.add('visible');
 
   const income    = calcAfterDeduction(salary, currentYear);
   const deduction = Math.max(0, salary - income);

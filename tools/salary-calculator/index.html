@@ -10,9 +10,6 @@
 /* ══════════════════════════════════════════
    給与シミュレーター固有スタイル
 ══════════════════════════════════════════ */
-:root { --card-px: 20px; }
-@media (min-width: 600px) { :root { --card-px: 28px; } }
-
 body {
   font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
   background: var(--base-bg);
@@ -26,23 +23,7 @@ body {
 }
 @media (min-width: 640px) { body { padding: 36px 24px 60px; } }
 
-/* ── カード共通 ── */
-.ds-card { padding: 24px var(--card-px) 28px; margin-bottom: 16px; }
-@media (min-width: 600px) { .ds-card { padding: 28px var(--card-px); margin-bottom: 20px; } }
-.ds-card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
-.ds-card:nth-child(1) { animation-delay: 0.04s; }
-.ds-card:nth-child(2) { animation-delay: 0.1s; }
-
-.card-label {
-  font-size: clamp(0.65rem, 1.9vw, 0.75rem); font-weight: 700;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--placeholder); margin-bottom: clamp(16px, 3vw, 22px);
-  display: flex; align-items: center; gap: 8px;
-}
-.card-label::before {
-  content: ''; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--accent-deep); flex-shrink: 0;
-}
+/* ── カード共通（ds-card-label は components.css で定義）── */
 .ds-divider { margin: 14px 0; }
 
 /* ══════════════════════════════════════════
@@ -132,40 +113,20 @@ body {
 
 .chart-note { font-size: clamp(0.58rem, 1.7vw, 0.63rem); color: var(--sub-text); line-height: 1.8; }
 
-/* 結果カラム：条件設定と同じカード背景・カード間余白14px・全幅 */
+/* 結果カラム：ds-card でラップ、条件設定と同じカード間余白14px */
 .ds-result-col {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
-.ds-result-col > .ds-hero-result,
-.ds-result-col > .ds-summary-grid,
-.ds-result-col > .ds-breakdown-block,
-.ds-result-col > .ds-resident-savings,
-.ds-result-col > .ds-donut-summary {
+.ds-result-col .ds-card > .ds-hero-result,
+.ds-result-col .ds-card > .ds-summary-grid,
+.ds-result-col .ds-card > .ds-breakdown-block,
+.ds-result-col .ds-card > .ds-resident-savings,
+.ds-result-col .ds-card > .ds-donut-summary {
   margin-top: 14px;
 }
-.ds-result-col > .ds-hero-result { margin-top: 0; }
-.ds-result-col {
-  background: var(--card-bg);
-  border-radius: 28px;
-  padding: 24px var(--card-px) 28px;
-  box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
-  position: relative;
-  overflow: hidden;
-}
-.ds-result-col::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
-  background-size: 200%;
-  animation: shimmerBar 3s linear infinite;
-  border-radius: 28px 28px 0 0;
-}
+.ds-result-col .ds-card > .ds-hero-result { margin-top: 0; }
 .ds-result-col .ds-hero-result {
   text-align: center;
 }
@@ -201,8 +162,6 @@ body {
    align-items: start で sticky が正しく動作
 ══════════════════════════════════════════ */
 @media (min-width: 800px) {
-  /* 入力カラムをスティッキーに（カラムに付けると上揃えが崩れない） */
-  .app-scope .ds-input-col { position: sticky; top: 72px; }
   .app-scope .ds-input-col .ds-card { margin-bottom: 0; }
 
   /* 左列の数値入力をコンパクトに */
@@ -235,7 +194,7 @@ body {
   <!-- ── 入力カード ── -->
   <div class="ds-input-col">
   <div class="ds-card">
-    <div class="card-label">条件設定</div>
+    <div class="ds-card-label">条件設定</div>
     <div class="input-list">
 
       <!-- 時給 -->
@@ -323,7 +282,8 @@ body {
 
   <!-- ── 結果カード ── -->
   <div class="ds-result-col">
-    <div class="card-label">シミュレーション結果</div>
+    <div class="ds-card">
+    <div class="ds-card-label">シミュレーション結果</div>
 
     <!-- ① ヒーロー：推定月間手取り -->
     <div class="ds-hero-result">
@@ -510,6 +470,7 @@ body {
       <p>※ 協会けんぽ（東京）令和5年度料率基準　※ 住民税は課税所得の約10%で簡易計算　※ 所得税は復興特別税を含む簡易計算</p>
     </div>
 
+    </div><!-- /ds-card -->
   </div><!-- /ds-result-col -->
 
 </div><!-- /ds-page-cols -->

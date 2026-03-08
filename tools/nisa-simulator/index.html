@@ -11,10 +11,6 @@
 ══════════════════════════════════════════ */
 :root {
   --form-label-w: 210px;
-  --card-px:      20px;
-}
-@media (min-width: 600px) {
-  :root { --card-px: 32px; }
 }
 
 body {
@@ -33,37 +29,11 @@ body {
 }
 
 
-/* ══════════════════════════════════════════
-   ds-card — NISA固有オーバーライド
-   （共通スタイルは shared/components.css）
-══════════════════════════════════════════ */
-.ds-card {
-  padding: 24px var(--card-px) 28px;
-  margin-bottom: 16px;
-}
-@media (min-width: 600px) {
-  .ds-card { padding: 32px var(--card-px); margin-bottom: 20px; }
-}
-.card-label {
-  font-size: clamp(0.65rem, 1.9vw, 0.75rem);
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--placeholder);
-  display: flex; align-items: center; gap: 8px;
-}
-.card-label::before {
-  content: '';
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--accent-deep); flex-shrink: 0;
-}
-
-
 /* 入力項目間の余白を詰める（ds-form-rows / ds-divider オーバーライド） */
 .ds-form-rows { gap: clamp(10px, 2.5vw, 14px); }
 .ds-divider { margin: 10px 0; }
 .ds-form-row-right { gap: 6px; }
-.card-label { margin-bottom: clamp(12px, 2.5vw, 18px); }
+.app-scope .ds-card-label { margin-bottom: clamp(12px, 2.5vw, 18px); }
 
 /* ds-val-row / ds-num-edit / ds-val-unit — NISA固有オーバーライド */
 .ds-val-row { align-items: center; margin-bottom: 0; }
@@ -229,22 +199,13 @@ canvas { display: block; cursor: default; }
 .disclaimer p + p { margin-top: 6px; }
 
 /* ══════════════════════════════════════════
-   ANIMATIONS（@keyframes secFadeIn は shared/components.css）
-══════════════════════════════════════════ */
-.ds-card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
-.ds-card:nth-child(2) { animation-delay: 0.08s; }
-.ds-card:nth-child(3) { animation-delay: 0.14s; }
-
-/* ══════════════════════════════════════════
    2カラムページレイアウト（ds-page-cols オーバーライド）
 ══════════════════════════════════════════ */
 @media (min-width: 800px) {
   .app-scope .ds-page-cols {
     grid-template-columns: 380px 1fr;
-    gap: 24px;
+    gap: 20px;
   }
-  /* 入力カラムをスティッキーに */
-  .app-scope .ds-input-col { position: sticky; top: 72px; }
   .app-scope .ds-input-col .ds-card { margin-bottom: 0; }
 
   /* 入力フォームを縦積みレイアウト（ラベル上・入力下）に */
@@ -272,7 +233,7 @@ canvas { display: block; cursor: default; }
 <div class="ds-input-col">
 <!-- ── 入力カード ── -->
 <div class="ds-card">
-  <div class="card-label">入力条件</div>
+  <div class="ds-card-label">条件設定</div>
   <div class="ds-form-rows">
 
     <!-- 生年月日 -->
@@ -412,7 +373,7 @@ canvas { display: block; cursor: default; }
 <div class="ds-result-col">
 <!-- ── 結果カード ── -->
 <div class="ds-card" id="resultCard">
-  <div class="card-label">シミュレーション結果</div>
+  <div class="ds-card-label">シミュレーション結果</div>
   <div class="summary" id="summary"></div>
   <div class="ds-chart-legend">
     <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent)"></div>元本</div>
@@ -441,11 +402,26 @@ canvas { display: block; cursor: default; }
 <div id="tooltip" class="ds-chart-tooltip"></div>
 
 <script src="../../shared/base.js"></script>
+<script src="../../shared/chart-stacked-bar.js"></script>
 <script>
 const NISA_MAX = 18_000_000;
-let bars = [];
-let hoveredIdx = -1;
 let nisaFullInfo = null;
+
+function nisaFormatTooltip(d, fmtYen) {
+  const { ageYears, ageMon: startMon } = getAgeFromDOB();
+  const tam = ageYears * 12 + startMon + d.absEndMonth;
+  const dispAge = Math.floor(tam / 12);
+  const dispAgeMon = tam % 12;
+  return `
+    <div class="tt-year">${d.year}年後（${dispAge}歳${dispAgeMon}ヶ月）</div>
+    <div class="tt-total">合計：${fmtYen(d.total)}</div>
+    <div class="tt-sep"></div>
+    <div class="tt-row"><div class="tt-dot" style="background:#a8d5ba"></div>元本：${fmtYen(d.principal)}</div>
+    <div class="tt-row"><div class="tt-dot" style="background:#4a8c6f"></div>運用収益：${fmtYen(d.gain)}</div>
+    <div class="tt-sep"></div>
+    <div class="tt-row"><div class="tt-dot" style="background:#d4ede3"></div>新NISA残枠：${fmtYen(d.nisaLeft)}</div>
+  `;
+}
 
 
 // ---- DOB ----
@@ -590,10 +566,12 @@ function simulate() {
   const finalPrincipal = principal;
 
   checkEvalWarn();
-  bars = data;
-  hoveredIdx = -1;
   renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBalance, finalPrincipal);
-  renderChart(data);
+  drawStackedBarChart('chart', data, {
+    tooltipId: 'tooltip',
+    formatTooltip: nisaFormatTooltip,
+    onResize: () => document.querySelectorAll('.ds-chip-scroll').forEach(updateChipsMask),
+  });
   updatePresetChips();
 }
 
@@ -651,180 +629,6 @@ function renderSummary(data, ageInMonths, monthsLeft, contrib, monthly, finalBal
     if (numEl) animateCountUp(numEl, manEl, val);
   });
 }
-
-// ---- Chart ----
-function rRect(ctx, x, y, w, h, r) {
-  if (h <= 0 || w <= 0) return;
-  if (typeof r === 'number') r = [r,r,r,r];
-  ctx.beginPath();
-  ctx.moveTo(x+r[0], y);
-  ctx.lineTo(x+w-r[1], y); ctx.quadraticCurveTo(x+w, y, x+w, y+r[1]);
-  ctx.lineTo(x+w, y+h-r[2]); ctx.quadraticCurveTo(x+w, y+h, x+w-r[2], y+h);
-  ctx.lineTo(x+r[3], y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r[3]);
-  ctx.lineTo(x, y+r[0]); ctx.quadraticCurveTo(x, y, x+r[0], y);
-  ctx.closePath(); ctx.fill();
-}
-
-function renderChart(data) {
-  const isMobile   = window.innerWidth < 560;
-  const MOBILE_MAX = 20;
-  const hiIdx  = hoveredIdx;
-  const canvas = document.getElementById('chart');
-  const dpr    = window.devicePixelRatio || 1;
-  const containerW = canvas.parentElement.clientWidth;
-  const n      = data.length;
-
-  const PAD = {
-    t: 14,
-    r: isMobile ? 6 : 14,
-    b: isMobile ? 34 : 42,
-    l: isMobile ? 6 : 64,
-  };
-
-  let cW;
-  if (isMobile && n > MOBILE_MAX) {
-    const slotW = (containerW - PAD.l - PAD.r) / MOBILE_MAX;
-    cW = Math.ceil(PAD.l + PAD.r + slotW * n);
-  } else {
-    cW = containerW;
-  }
-
-  const plotW = cW - PAD.l - PAD.r;
-  const BAR   = Math.max(3, plotW / n - Math.max(1, Math.min(4, plotW / n * 0.28)));
-  const GAP   = Math.max(1, plotW / n - BAR);
-  const W     = cW;
-  const H     = isMobile ? 220 : 300;
-  const pH    = H - PAD.t - PAD.b;
-
-  canvas.width  = W * dpr; canvas.height = H * dpr;
-  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, W, H);
-
-  const maxVal = Math.max(...data.map(d => d.total), 1);
-
-  for (let i = 0; i <= 4; i++) {
-    const y = PAD.t + pH - pH * i / 4;
-    ctx.strokeStyle = '#deeee8'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
-    if (!isMobile) {
-      ctx.fillStyle = '#7a9a8e';
-      ctx.font = '500 10px Roboto, sans-serif';
-      ctx.textAlign = 'right';
-      ctx.fillText(fmtAxisYen(maxVal * i / 4), PAD.l - 6, y + 3.5);
-    }
-  }
-
-  const labelStep = isMobile ? 10 : 5;
-
-  bars = data.map((d, i) => {
-    const x        = PAD.l + i * (BAR + GAP);
-    const baseY    = PAD.t + pH;
-    const totalH   = (d.total     / maxVal) * pH;
-    const principH = (d.principal / maxVal) * pH;
-    const gainH    = totalH - principH;
-    const isHov    = i === hiIdx;
-
-    if (isHov) {
-      ctx.fillStyle = 'rgba(74,140,111,0.09)';
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(x - 3, PAD.t, BAR + 6, pH, 5);
-      else ctx.rect(x - 3, PAD.t, BAR + 6, pH);
-      ctx.fill();
-    }
-
-    // 元本: --accent (#a8d5ba)
-    ctx.fillStyle = isHov ? '#7ec9a0' : '#a8d5ba';
-    rRect(ctx, x, baseY - principH, BAR, principH, [0, 0, 4, 4]);
-    if (gainH > 0.5) {
-      // 運用収益: --accent-deep (#4a8c6f)
-      ctx.fillStyle = isHov ? '#3a7a5f' : '#4a8c6f';
-      rRect(ctx, x, baseY - totalH, BAR, gainH, [4, 4, 0, 0]);
-    }
-
-    if (d.year === 1 || d.year % labelStep === 0) {
-      ctx.fillStyle = '#7a9a8e';
-      ctx.font = isMobile ? '500 8.5px Roboto, sans-serif' : '500 9.5px Roboto, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(d.age + '歳', x + BAR / 2, H - PAD.b + 13);
-      ctx.strokeStyle = '#d4ede3'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x + BAR/2, baseY); ctx.lineTo(x + BAR/2, baseY + 4); ctx.stroke();
-    }
-
-    return { ...d, _x: x, _w: BAR };
-  });
-}
-
-// ---- Tooltip ----
-const tip = document.getElementById('tooltip');
-
-function onPointer(e) {
-  const canvas = document.getElementById('chart');
-  const rect   = canvas.getBoundingClientRect();
-  const cx = e.touches ? e.touches[0].clientX : e.clientX;
-  const cy = e.touches ? e.touches[0].clientY : e.clientY;
-  const lx = (cx - rect.left) * (parseFloat(canvas.style.width) / rect.width);
-
-  const idx = bars.findIndex(b => lx >= b._x - 3 && lx <= b._x + b._w + 3);
-  if (idx < 0) {
-    if (hoveredIdx !== -1) { hoveredIdx = -1; renderChart(bars); }
-    tip.classList.remove('show'); return;
-  }
-  if (hoveredIdx !== idx) { hoveredIdx = idx; renderChart(bars); }
-
-  const d = bars[idx];
-  const { ageYears, ageMon: startMon } = getAgeFromDOB();
-  const tam        = ageYears * 12 + startMon + d.absEndMonth;
-  const dispAge    = Math.floor(tam / 12);
-  const dispAgeMon = tam % 12;
-
-  tip.innerHTML = `
-    <div class="tt-year">${d.year}年後（${dispAge}歳${dispAgeMon}ヶ月）</div>
-    <div class="tt-total">合計：${fmtYen(d.total)}</div>
-    <div class="tt-sep"></div>
-    <div class="tt-row"><div class="tt-dot" style="background:#a8d5ba"></div>元本：${fmtYen(d.principal)}</div>
-    <div class="tt-row"><div class="tt-dot" style="background:#4a8c6f"></div>運用収益：${fmtYen(d.gain)}</div>
-    <div class="tt-sep"></div>
-    <div class="tt-row"><div class="tt-dot" style="background:#d4ede3"></div>新NISA残枠：${fmtYen(d.nisaLeft)}</div>
-  `;
-
-  const TW = 220, TH = 182;
-  let tx = cx + 16, ty = cy - 20;
-  if (tx + TW > window.innerWidth)  tx = cx - TW - 16;
-  if (tx < 4) tx = 4;
-  if (ty + TH > window.innerHeight) ty = cy - TH - 10;
-  if (ty < 4) ty = 4;
-  tip.style.left = tx + 'px'; tip.style.top = ty + 'px';
-  tip.classList.add('show');
-}
-
-function hideTip() {
-  if (hoveredIdx !== -1) { hoveredIdx = -1; renderChart(bars); }
-  tip.classList.remove('show');
-}
-
-const cvs = document.getElementById('chart');
-cvs.addEventListener('mousemove',  onPointer);
-cvs.addEventListener('mouseleave', hideTip);
-
-let _touchMoved = false;
-cvs.addEventListener('touchstart', e => {
-  _touchMoved = false;
-  onPointer(e);
-}, { passive: true });
-cvs.addEventListener('touchmove', e => {
-  _touchMoved = true;
-  hideTip();
-}, { passive: true });
-cvs.addEventListener('touchend', e => {
-  if (_touchMoved) hideTip();
-}, { passive: true });
-window.addEventListener('resize', () => {
-  if (bars.length) renderChart(bars);
-  document.querySelectorAll('.ds-chip-scroll').forEach(updateChipsMask);
-});
 
 // ---- Count-up animation (easeOutQuart / 700ms — Mint Design System) ----
 const _cuPrev = {};
