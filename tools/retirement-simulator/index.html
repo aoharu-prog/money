@@ -85,6 +85,18 @@ body { background: var(--base-bg); color: var(--text-main); }
 
 /* ---- form group ---- */
 .app-scope .form-group { margin-bottom: 22px; }
+
+/* ds-input-underline 退職金用（桁数対応） */
+.app-scope #retirementAmount.ds-input-underline { min-width: 140px; flex: 1; }
+/* ds-input-num-underline iDeCo用（桁数対応） */
+.app-scope #idecoAmount.ds-input-num-underline { min-width: 140px; flex: 1; }
+
+/* ds-chip-scroll 入力欄の下に改行表示 */
+.app-scope .ds-chip-scroll--below {
+  margin-top: 10px;
+  flex: none;
+  width: 100%;
+}
 .app-scope .form-label {
   font-size: 12px; font-weight: 500; color: var(--sub-text);
   margin-bottom: 7px; display: flex; align-items: center; gap: 4px;
@@ -235,49 +247,19 @@ body { background: var(--base-bg); color: var(--text-main); }
   animation: shimmerBar 3s linear infinite;
 }
 
-.app-scope .result-main {
-  background: linear-gradient(135deg, var(--mint-pale), var(--base-bg));
-  border-radius: 20px;
-  padding: 24px 28px;
-  margin-bottom: 20px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(74,140,111,0.12);
-}
-.app-scope .result-main-label {
-  font-size: 12px; font-weight: 500; color: var(--sub-text); margin-bottom: 4px;
-}
-.app-scope .result-main-value {
-  font-weight: 300; font-size: 44px;
-  color: var(--accent-deep); letter-spacing: -0.02em; line-height: 1;
-  display: flex; align-items: baseline; justify-content: center; gap: 6px;
-}
-.app-scope .result-main-value .unit {
-  font-size: 16px; font-weight: 400; color: var(--sub-text);
-}
-
 /* result items grid */
-.app-scope .result-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* ds-result-row（6カード） */
+.app-scope .ds-result-row {
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 20px;
 }
-.app-scope .result-item {
-  background: var(--mint-pale);
-  border-radius: 16px;
-  padding: 16px;
-  border: 1.5px solid var(--mint-light);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.app-scope .ds-result-row .ds-result {
+  flex: 1;
+  min-width: min(160px, 100%);
+  margin-bottom: 0;
 }
-.app-scope .result-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74,140,111,0.12); }
-.app-scope .result-item-label {
-  font-size: 11px; font-weight: 500; color: var(--sub-text); margin-bottom: 5px;
-}
-.app-scope .result-item-value {
-  font-weight: 400; font-size: 20px;
-  color: var(--text-main);
-}
-.app-scope .result-item-value .unit { font-size: 12px; color: var(--sub-text); }
 
 /* donut + bar area */
 .app-scope .visual-area {
@@ -319,40 +301,8 @@ body { background: var(--base-bg); color: var(--text-main); }
   100% { left: 200%; }
 }
 .app-scope .ratio-bar.tax-bar .ratio-bar-fill {
-  background: linear-gradient(90deg, #f0c4b8, #d4907a);
+  background: linear-gradient(90deg, var(--data-amber), var(--data-orange));
 }
-
-/* calc basis box */
-.app-scope .calc-basis {
-  background: var(--mint-pale);
-  border: 1px dashed var(--mint-light);
-  border-radius: 12px;
-  padding: 18px 20px;
-  margin-top: 4px;
-}
-.app-scope .calc-basis-title {
-  font-size: 12px; font-weight: 500; color: var(--accent-deep); margin-bottom: 10px;
-  display: flex; align-items: center; gap: 4px;
-}
-.app-scope .calc-step {
-  display: flex; align-items: flex-start; gap: 8px;
-  margin-bottom: 7px; font-size: 12px; color: var(--text-main); line-height: 1.6;
-}
-.app-scope .step-num {
-  width: 18px; height: 18px; border-radius: 50%;
-  background: var(--accent); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
-}
-.app-scope .calc-step .val {
-  font-weight: 500; color: var(--accent-deep);
-}
-.app-scope .calc-eq {
-  font-size: 13px; color: var(--text-main);
-  background: var(--card-bg); border: 1.5px solid var(--mint-light); border-radius: 10px;
-  padding: 10px 14px; margin-top: 10px; line-height: 1.8;
-}
-.app-scope .calc-eq .em { color: var(--accent-deep); font-weight: 500; }
 
 /* disclaimer */
 .app-scope .disclaimer {
@@ -394,9 +344,8 @@ body { background: var(--base-bg); color: var(--text-main); }
 /* responsive */
 @media (max-width: 540px) {
   .app-scope .card { padding: 28px 20px; }
-  .app-scope .result-grid { grid-template-columns: 1fr; }
+  .app-scope .ds-result-row .ds-result { min-width: 100%; }
   .app-scope .visual-area { flex-direction: column; }
-  .app-scope .result-main-value { font-size: 36px; }
 }
 </style>
 </head>
@@ -421,16 +370,16 @@ body { background: var(--base-bg); color: var(--text-main); }
       <!-- 退職金額 -->
       <div class="form-group">
         <div class="form-label">💴 退職金の受取額（税引き前）</div>
-        <div class="input-wrap">
-          <input type="text" id="retirementAmount" placeholder="例：15,000,000" inputmode="numeric">
-          <span class="input-unit">円</span>
+        <div class="ds-val-row">
+          <input class="ds-input-underline" type="text" id="retirementAmount" value="10,000,000" placeholder="例：10,000,000" inputmode="numeric">
+          <span class="ds-val-unit">円</span>
         </div>
-        <div class="quick-btns" id="amountBtns">
-          <button class="quick-btn" data-val="5000000">500万</button>
-          <button class="quick-btn" data-val="10000000">1,000万</button>
-          <button class="quick-btn" data-val="20000000">2,000万</button>
-          <button class="quick-btn" data-val="30000000">3,000万</button>
-          <button class="quick-btn" data-val="50000000">5,000万</button>
+        <div class="ds-chip-scroll ds-chip-scroll--below" id="amountBtns">
+          <button class="ds-chip" data-val="5000000">500万</button>
+          <button class="ds-chip active" data-val="10000000">1,000万</button>
+          <button class="ds-chip" data-val="20000000">2,000万</button>
+          <button class="ds-chip" data-val="30000000">3,000万</button>
+          <button class="ds-chip" data-val="50000000">5,000万</button>
         </div>
       </div>
 
@@ -438,10 +387,10 @@ body { background: var(--base-bg); color: var(--text-main); }
       <div class="form-group">
         <div class="form-label">🏢 退職の種類</div>
         <div class="radio-group" id="retirementType">
-          <div class="radio-btn active" data-val="general">一般退職（会社員・公務員等）</div>
+          <div class="radio-btn active" data-val="ideco">iDeCo一時金のみ</div>
+          <div class="radio-btn" data-val="general">一般退職（会社員・公務員等）</div>
           <div class="radio-btn" data-val="officer">特定役員退職（役員5年以下）</div>
           <div class="radio-btn" data-val="short">短期退職（一般・5年以下）</div>
-          <div class="radio-btn" data-val="ideco">iDeCo一時金のみ</div>
         </div>
       </div>
 
@@ -450,18 +399,18 @@ body { background: var(--base-bg); color: var(--text-main); }
       <!-- 勤続年数 -->
       <div class="form-group">
         <div class="form-label" id="yearsLabel">📅 勤続年数</div>
-        <div class="input-wrap">
-          <input type="number" id="yearsOfService" placeholder="例：30" min="1" max="50">
-          <span class="input-unit">年</span>
+        <div class="ds-val-row">
+          <input class="ds-input-num-underline" type="number" id="yearsOfService" min="1" max="50" value="30" placeholder="0">
+          <span class="ds-val-unit">年</span>
+        </div>
+        <div class="ds-chip-scroll ds-chip-scroll--below" id="yearsBtns">
+          <button class="ds-chip" data-val="5">5年</button>
+          <button class="ds-chip" data-val="10">10年</button>
+          <button class="ds-chip" data-val="20">20年</button>
+          <button class="ds-chip active" data-val="30">30年</button>
+          <button class="ds-chip" data-val="40">40年</button>
         </div>
         <div style="font-size: 11px; color: #a0bdb5; margin-top: 5px;">※ 1年未満の端数は1年に切り上げ</div>
-        <div class="quick-btns" id="yearsBtns">
-          <button class="quick-btn" data-val="5">5年</button>
-          <button class="quick-btn" data-val="10">10年</button>
-          <button class="quick-btn" data-val="20">20年</button>
-          <button class="quick-btn" data-val="30">30年</button>
-          <button class="quick-btn" data-val="40">40年</button>
-        </div>
       </div>
 
       <!-- 障害者退職 -->
@@ -484,24 +433,22 @@ body { background: var(--base-bg); color: var(--text-main); }
           <div class="conditional-section" id="idecoDetails">
             <div class="form-group" style="margin-bottom: 0;">
               <div class="form-label">iDeCo 受取額</div>
-              <div class="input-wrap">
-                <input type="text" id="idecoAmount" placeholder="例：2,000,000" inputmode="numeric">
-                <span class="input-unit">円</span>
+              <div class="ds-val-row">
+                <input class="ds-input-num-underline" type="text" id="idecoAmount" placeholder="例：2,000,000" inputmode="numeric">
+                <span class="ds-val-unit">円</span>
               </div>
             </div>
             <div class="form-group" style="margin-top: 14px; margin-bottom: 0;">
               <div class="form-label">iDeCo 加入期間</div>
-              <div class="input-wrap">
-                <input type="number" id="idecoYears" placeholder="例：20" min="1" max="40">
-                <span class="input-unit">年</span>
+              <div class="ds-val-row">
+                <input class="ds-input-num-underline" type="number" id="idecoYears" placeholder="例：20" min="1" max="40">
+                <span class="ds-val-unit">年</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 計算ボタン -->
-      <button class="calc-btn" id="calcBtn" onclick="calculate()">🌿 手取り額を計算する</button>
     </div>
   </div><!-- /.ds-input-col -->
 
@@ -517,11 +464,11 @@ body { background: var(--base-bg); color: var(--text-main); }
         <p class="section-title">📊 シミュレーション結果</p>
 
         <!-- main -->
-        <div class="result-main">
-          <div class="result-main-label">🎉 推定 手取り額（税・住民税引き後）</div>
-          <div class="result-main-value">
+        <div class="ds-hero-result">
+          <div class="hero-eyebrow">🎉 推定 手取り額（税・住民税引き後）</div>
+          <div class="hero-amount">
             <span id="takeHomeNum">0</span>
-            <span class="unit">円</span>
+            <span class="hero-amount-unit">円</span>
           </div>
         </div>
 
@@ -534,7 +481,7 @@ body { background: var(--base-bg); color: var(--text-main); }
                 stroke-dasharray="0 207.3" stroke-linecap="round"
                 transform="rotate(-90 44 44)"
                 style="transition: stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1)"/>
-              <circle id="donut-tax" cx="44" cy="44" r="33" fill="none" stroke="#d4907a" stroke-width="15"
+              <circle id="donut-tax" cx="44" cy="44" r="33" fill="none" stroke="var(--data-orange)" stroke-width="15"
                 stroke-dasharray="0 207.3" stroke-linecap="round"
                 transform="rotate(-90 44 44)"
                 style="transition: stroke-dasharray 1s cubic-bezier(0.22,0.61,0.36,1), stroke-dashoffset 1s cubic-bezier(0.22,0.61,0.36,1)"/>
@@ -556,7 +503,7 @@ body { background: var(--base-bg); color: var(--text-main); }
             <div class="ratio-bar"><div class="ratio-bar-fill" id="takeBar"></div></div>
 
             <div class="bar-label-row">
-              <span class="bar-label-text"><span style="color:#c4806a;font-size:10px;">●</span> 税金合計（所得税+住民税）</span>
+              <span class="bar-label-text"><span style="color:var(--data-orange);font-size:10px;">●</span> 税金合計（所得税+住民税）</span>
               <span class="bar-label-pct" id="taxPct">-</span>
             </div>
             <div class="ratio-bar tax-bar"><div class="ratio-bar-fill" id="taxBar"></div></div>
@@ -564,36 +511,36 @@ body { background: var(--base-bg); color: var(--text-main); }
         </div>
 
         <!-- grid items -->
-        <div class="result-grid">
-          <div class="result-item">
-            <div class="result-item-label">📥 退職金受取額</div>
-            <div class="result-item-value"><span id="totalAmountNum">0</span><span class="unit"> 円</span></div>
+        <div class="ds-result-row">
+          <div class="ds-result">
+            <div class="ds-result-label">📥 退職金受取額</div>
+            <div class="ds-result-value"><span id="totalAmountNum">0</span><span class="ds-result-unit">円</span></div>
           </div>
-          <div class="result-item">
-            <div class="result-item-label">🛡️ 退職所得控除額</div>
-            <div class="result-item-value"><span id="deductionNum">0</span><span class="unit"> 円</span></div>
+          <div class="ds-result">
+            <div class="ds-result-label">🛡️ 退職所得控除額</div>
+            <div class="ds-result-value"><span id="deductionNum">0</span><span class="ds-result-unit">円</span></div>
           </div>
-          <div class="result-item">
-            <div class="result-item-label">💹 課税退職所得</div>
-            <div class="result-item-value"><span id="taxableNum">0</span><span class="unit"> 円</span></div>
+          <div class="ds-result">
+            <div class="ds-result-label">💹 課税退職所得</div>
+            <div class="ds-result-value"><span id="taxableNum">0</span><span class="ds-result-unit">円</span></div>
           </div>
-          <div class="result-item">
-            <div class="result-item-label">🏛️ 所得税（復興税含む）</div>
-            <div class="result-item-value"><span id="incomeTaxNum">0</span><span class="unit"> 円</span></div>
+          <div class="ds-result">
+            <div class="ds-result-label">🏛️ 所得税（復興税含む）</div>
+            <div class="ds-result-value"><span id="incomeTaxNum">0</span><span class="ds-result-unit">円</span></div>
           </div>
-          <div class="result-item">
-            <div class="result-item-label">🏙️ 住民税（目安）</div>
-            <div class="result-item-value"><span id="residentTaxNum">0</span><span class="unit"> 円</span></div>
+          <div class="ds-result">
+            <div class="ds-result-label">🏙️ 住民税（目安）</div>
+            <div class="ds-result-value"><span id="residentTaxNum">0</span><span class="ds-result-unit">円</span></div>
           </div>
-          <div class="result-item">
-            <div class="result-item-label">💸 税金合計</div>
-            <div class="result-item-value"><span id="totalTaxNum">0</span><span class="unit"> 円</span></div>
+          <div class="ds-result">
+            <div class="ds-result-label">💸 税金合計</div>
+            <div class="ds-result-value"><span id="totalTaxNum">0</span><span class="ds-result-unit">円</span></div>
           </div>
         </div>
 
         <!-- calc basis -->
-        <div class="calc-basis">
-          <div class="calc-basis-title">📋 計算の根拠（国税庁 No.1420 に基づく）</div>
+        <div class="ds-calc-basis">
+          <div class="ds-calc-basis-title">📋 計算の根拠（国税庁 No.1420 に基づく）</div>
           <div id="calcSteps"></div>
         </div>
       </div>
@@ -676,6 +623,7 @@ function formatComma(val) {
 function parseComma(val) {
   return Number(val.replace(/[^\d]/g, '')) || 0;
 }
+// 退職金・idecoAmount はカンマ区切り
 ['retirementAmount', 'idecoAmount'].forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
@@ -691,6 +639,12 @@ function parseComma(val) {
   });
 });
 
+// 入力変更で自動計算
+document.getElementById('retirementAmount').addEventListener('input', calculate);
+document.getElementById('retirementAmount').addEventListener('blur', calculate);
+document.getElementById('yearsOfService').addEventListener('input', calculate);
+document.getElementById('yearsOfService').addEventListener('change', calculate);
+
 /* -------- quick btn → カンマ付きでセット -------- */
 document.querySelectorAll('.radio-group').forEach(group => {
   group.addEventListener('click', e => {
@@ -705,6 +659,7 @@ document.querySelectorAll('.radio-group').forEach(group => {
     // iDeCoのみ選択時は合算チェックを非表示
     const idecoSection = document.getElementById('idecoSection');
     idecoSection.style.display = typeVal === 'ideco' ? 'none' : '';
+    calculate();
   });
 });
 
@@ -721,29 +676,39 @@ function updateYearsLabel() {
     : '📅 勤続年数';
 }
 
-// Quick buttons for amount
+// ds-chip for amount
 document.getElementById('amountBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.quick-btn');
-  if (!btn) return;
-  document.getElementById('retirementAmount').value = Number(btn.dataset.val).toLocaleString('ja-JP');
-  document.querySelectorAll('#amountBtns .quick-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  const chip = e.target.closest('.ds-chip');
+  if (!chip) return;
+  document.getElementById('retirementAmount').value = Number(chip.dataset.val).toLocaleString('ja-JP');
+  document.querySelectorAll('#amountBtns .ds-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  calculate();
 });
 
-// Quick buttons for years
+// ds-chip for years
 document.getElementById('yearsBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.quick-btn');
-  if (!btn) return;
-  document.getElementById('yearsOfService').value = btn.dataset.val;
-  document.querySelectorAll('#yearsBtns .quick-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  const chip = e.target.closest('.ds-chip');
+  if (!chip) return;
+  document.getElementById('yearsOfService').value = chip.dataset.val;
+  document.querySelectorAll('#yearsBtns .ds-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  calculate();
 });
 
 // iDeCo toggle
 document.getElementById('hasIdeco').addEventListener('change', function() {
   const sec = document.getElementById('idecoDetails');
   sec.classList.toggle('open', this.checked);
+  calculate();
 });
+
+// その他入力変更で自動計算
+document.getElementById('disability').addEventListener('change', calculate);
+document.getElementById('idecoAmount').addEventListener('input', calculate);
+document.getElementById('idecoAmount').addEventListener('blur', calculate);
+document.getElementById('idecoYears').addEventListener('input', calculate);
+document.getElementById('idecoYears').addEventListener('change', calculate);
 
 /* -------- 所得税速算表 -------- */
 const TAX_TABLE = [
@@ -771,7 +736,7 @@ function calcIncomeTax(taxableIncome) {
 /* -------- main calc -------- */
 function calculate() {
   const amount = parseComma(document.getElementById('retirementAmount').value);
-  const years  = Number(document.getElementById('yearsOfService').value);
+  const years  = Number(document.getElementById('yearsOfService').value) || 0;
   const type   = getRetirementType();
   const disability = document.getElementById('disability').checked;
   const hasIdeco   = document.getElementById('hasIdeco').checked && type !== 'ideco';
@@ -779,7 +744,8 @@ function calculate() {
   const idecoYrs   = hasIdeco ? Number(document.getElementById('idecoYears').value || 0) : 0;
 
   if (!amount || !years) {
-    showToast('⚠️ 退職金額と勤続年数を入力してください');
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('resultCard').classList.remove('show');
     return;
   }
 
@@ -886,9 +852,6 @@ function calculate() {
     showToast('🎉 計算が完了しました！');
   }
   prevTakeHome = takeHome;
-
-  // scroll
-  setTimeout(() => rc.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 }
 
 function fmt(n) {
@@ -901,7 +864,7 @@ function buildSteps(type, amount, idecoAmt, years, idecoYrs, deduction, diff, ta
 
   let s = '';
 
-  s += `<div class="calc-step"><div class="step-num">1</div><div>`;
+  s += `<div class="ds-calc-step"><div class="ds-calc-step-num">1</div><div>`;
   if (combined) {
     s += `退職金 <span class="val">${fmt(amount)}円</span> ＋ iDeCo一時金 <span class="val">${fmt(idecoAmt)}円</span> ＝ 合計 <span class="val">${fmt(amount + idecoAmt)}円</span>`;
   } else {
@@ -909,7 +872,7 @@ function buildSteps(type, amount, idecoAmt, years, idecoYrs, deduction, diff, ta
   }
   s += `</div></div>`;
 
-  s += `<div class="calc-step"><div class="step-num">2</div><div>`;
+  s += `<div class="ds-calc-step"><div class="ds-calc-step-num">2</div><div>`;
   if (combined) {
     s += `${yearsLabel}：${years}年（会社）／${idecoYrs}年（iDeCo）　→ 実効${Math.max(years,idecoYrs)}年で控除計算`;
   } else {
@@ -919,7 +882,7 @@ function buildSteps(type, amount, idecoAmt, years, idecoYrs, deduction, diff, ta
 
   const y = combined ? Math.max(years, idecoYrs) : years;
   const rawDeduction = y <= 20 ? Math.max(400_000 * y, 800_000) : 8_000_000 + 700_000 * (y - 20);
-  s += `<div class="calc-step"><div class="step-num">3</div><div>`;
+  s += `<div class="ds-calc-step"><div class="ds-calc-step-num">3</div><div>`;
   if (y <= 20) {
     s += `退職所得控除額 ＝ 40万円 × ${y}年 ＝ <span class="val">${fmt(rawDeduction)}円</span>`;
   } else {
@@ -928,11 +891,11 @@ function buildSteps(type, amount, idecoAmt, years, idecoYrs, deduction, diff, ta
   if (disability) s += `　＋ 障害者加算 100万円 → 合計 <span class="val">${fmt(deduction)}円</span>`;
   s += `</div></div>`;
 
-  s += `<div class="calc-step"><div class="step-num">4</div><div>`;
+  s += `<div class="ds-calc-step"><div class="ds-calc-step-num">4</div><div>`;
   s += `課税前金額 ＝ ${fmt(amount + (combined?idecoAmt:0))}円 － 控除額 ${fmt(deduction)}円 ＝ <span class="val">${fmt(diff)}円</span>`;
   s += `</div></div>`;
 
-  s += `<div class="calc-step"><div class="step-num">5</div><div>`;
+  s += `<div class="ds-calc-step"><div class="ds-calc-step-num">5</div><div>`;
   if (type === 'officer') {
     s += `課税退職所得（特定役員：1/2計算なし）＝ <span class="val">${fmt(taxableIncome)}円</span>`;
   } else if (type === 'short') {
@@ -946,21 +909,31 @@ function buildSteps(type, amount, idecoAmt, years, idecoYrs, deduction, diff, ta
   }
   s += `</div></div>`;
 
-  s += `<div class="calc-step"><div class="step-num">6</div><div>`;
+  s += `<div class="ds-calc-step"><div class="ds-calc-step-num">6</div><div>`;
   s += `所得税：超過累進税率（速算表）を適用 → 復興特別所得税（×1.021）を加算`;
   s += `</div></div>`;
 
-  s += `<div class="calc-step"><div class="step-num">7</div><div>`;
+  s += `<div class="ds-calc-step"><div class="ds-calc-step-num">7</div><div>`;
   s += `住民税（目安）＝ 課税退職所得 × 10%（標準税率）`;
   s += `</div></div>`;
 
-  s += `<div class="calc-eq">`;
+  s += `<div class="ds-calc-eq">`;
   s += `<strong>手取り額</strong> ＝ 受取額 <span class="em">${fmt(amount+(combined?idecoAmt:0))}</span>円 － 所得税等 － 住民税`;
   s += `<br><small style="color:var(--sub-text);">根拠：国税庁 No.1420 退職金を受け取ったとき（退職所得）</small>`;
   s += `</div>`;
 
   return s;
 }
+
+// チップスクロールのフェードマスク初期化
+if (typeof initChipScroll === 'function') initChipScroll();
+
+// 初期表示（idecoがデフォルト時のidecoSection非表示・ラベル更新）
+updateYearsLabel();
+document.getElementById('idecoSection').style.display = getRetirementType() === 'ideco' ? 'none' : '';
+
+// 初期値で計算実行
+calculate();
 
 })();
 </script>

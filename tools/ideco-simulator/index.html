@@ -4,17 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iDeCo 節税・資産形成シミュレーター</title>
+<link rel="stylesheet" href="../../shared/tokens.css">
 <link rel="stylesheet" href="../../shared/components.css">
 <style>
 /* ══════════════════════════════════════════
-   iDeCo固有トークン（共通変数は shared/tokens.css）
+   ページ全体（NISA 準拠）
 ══════════════════════════════════════════ */
-:root {
-  --form-label-w: 220px;
-  --card-px:      20px;
-}
-@media (min-width: 600px) { :root { --card-px: 32px; } }
-
 body {
   font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
   background: var(--base-bg);
@@ -24,94 +19,110 @@ body {
   color: var(--text-main);
   min-height: 100vh;
   padding: 20px 16px 48px;
-  max-width: 900px;
   margin: 0 auto;
 }
 @media (min-width: 640px) { body { padding: 36px 24px 60px; } }
 
-/* ── ds-card オーバーライド ── */
-.ds-card { padding: 24px var(--card-px) 28px; margin-bottom: 16px; }
-@media (min-width: 600px) { .ds-card { padding: 32px var(--card-px); margin-bottom: 20px; } }
+.app-scope { max-width: 1500px; margin: 0 auto; }
 
-.card-label {
+/* ══════════════════════════════════════════
+   iDeCo固有トークン（共通変数は shared/tokens.css）
+══════════════════════════════════════════ */
+:root {
+  --form-label-w: 220px;
+  --card-px:      20px;
+}
+@media (min-width: 600px) { :root { --card-px: 32px; } }
+
+
+/* ── ds-card オーバーライド ── */
+.app-scope .ds-card { padding: 24px var(--card-px) 28px; margin-bottom: 16px; }
+@media (min-width: 600px) { .app-scope .ds-card { padding: 32px var(--card-px); margin-bottom: 20px; } }
+
+/* 入力項目間の余白（NISA 準拠） */
+.app-scope .ds-form-rows { gap: clamp(10px, 2.5vw, 14px); }
+.app-scope .ds-divider { margin: 10px 0; }
+.app-scope .ds-form-row-right { gap: 6px; }
+.app-scope .card-label { margin-bottom: clamp(12px, 2.5vw, 18px); }
+
+.app-scope .card-label {
   font-size: clamp(0.65rem, 1.9vw, 0.75rem); font-weight: 700;
   letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--placeholder); margin-bottom: clamp(16px, 3vw, 24px);
+  color: var(--placeholder);
   display: flex; align-items: center; gap: 8px;
 }
-.card-label::before {
+.app-scope .card-label::before {
   content: ''; width: 8px; height: 8px; border-radius: 50%;
   background: var(--accent-deep); flex-shrink: 0;
 }
 
 /* ── 入力パーツ オーバーライド ── */
-.ds-val-row   { align-items: center; margin-bottom: 0; }
-.ds-num-edit  { font-size: clamp(1.6rem, 6vw, 2.1rem); width: 86px; letter-spacing: 0.02em; font-weight: 500; }
-.ds-val-unit  { font-size: clamp(0.82rem, 2.4vw, 0.95rem); }
-.dob-row      { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.ds-select-underline { font-size: clamp(1.5rem, 6vw, 2rem); font-weight: 500; }
-.ds-select-unit      { font-size: clamp(0.85rem, 2.5vw, 1rem); }
-.age-display {
+.app-scope .ds-val-row   { align-items: center; margin-bottom: 0; }
+.app-scope .ds-num-edit  { font-size: clamp(1.6rem, 6vw, 2.1rem); width: 86px; letter-spacing: 0.02em; font-weight: 500; }
+.app-scope .ds-val-unit  { font-size: clamp(0.82rem, 2.4vw, 0.95rem); }
+.app-scope .dob-row      { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.app-scope .ds-select-underline { font-size: clamp(1.5rem, 6vw, 2rem); font-weight: 500; }
+.app-scope .ds-select-unit      { font-size: clamp(0.85rem, 2.5vw, 1rem); }
+.app-scope .age-display {
   font-size: clamp(0.75rem, 2.3vw, 0.88rem); color: var(--label-color);
   font-weight: 500; margin-left: 4px; white-space: nowrap;
 }
-.slider-row { display: flex; align-items: center; gap: 10px; width: 100%; }
-.ds-pm-btn {
+.app-scope .slider-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+.app-scope .ds-pm-btn {
   width: clamp(30px, 8vw, 34px); height: clamp(30px, 8vw, 34px);
   font-size: clamp(1.1rem, 3.5vw, 1.3rem);
 }
-.ds-divider { margin: 16px 0; }
 
 /* ── 職業セグメント ── */
-.occ-seg-scroll {
+.app-scope .occ-seg-scroll {
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
-.occ-seg-scroll::-webkit-scrollbar { display: none; }
-.occ-seg-scroll .ds-segment { white-space: nowrap; }
+.app-scope .occ-seg-scroll::-webkit-scrollbar { display: none; }
+.app-scope .occ-seg-scroll .ds-segment { white-space: nowrap; }
 
-.occ-limit {
+.app-scope .occ-limit {
   display: inline-block; margin-top: 8px;
   font-size: clamp(0.68rem, 2vw, 0.78rem); font-weight: 500; color: var(--accent-deep);
   background: rgba(168,213,186,0.12); border-radius: 8px; padding: 4px 10px;
 }
 
 /* ── 拠出額まわり ── */
-.monthly-preview {
+.app-scope .monthly-preview {
   margin-top: 5px;
   font-size: clamp(0.7rem, 2.1vw, 0.8rem); color: var(--sub-text);
 }
-.monthly-preview .mval {
+.app-scope .monthly-preview .mval {
   font-family: 'Roboto', sans-serif; font-weight: 600;
   color: var(--accent-deep); font-size: clamp(0.78rem, 2.3vw, 0.88rem);
 }
-.inline-warn {
+.app-scope .inline-warn {
   display: none; margin-top: 4px;
   font-size: clamp(0.62rem, 1.8vw, 0.72rem); color: var(--warn-color);
   background: rgba(224,122,58,0.08); border-radius: 8px; padding: 5px 10px;
 }
-.inline-warn.show { display: block; }
+.app-scope .inline-warn.show { display: block; }
 
 /* ── 課税所得・税率 ── */
-.tax-row { display: flex; align-items: center; gap: 8px; margin-top: 7px; flex-wrap: wrap; }
-.tax-label { font-size: clamp(0.65rem, 1.9vw, 0.75rem); color: var(--sub-text); }
-.tax-badge {
+.app-scope .tax-row { display: flex; align-items: center; gap: 8px; margin-top: 7px; flex-wrap: wrap; }
+.app-scope .tax-label { font-size: clamp(0.65rem, 1.9vw, 0.75rem); color: var(--sub-text); }
+.app-scope .tax-badge {
   font-size: clamp(0.68rem, 2vw, 0.78rem); font-weight: 600; color: var(--accent-deep);
   background: rgba(168,213,186,0.15); border: 1px solid var(--mint-light);
   border-radius: 20px; padding: 3px 10px;
 }
 
 /* ── 年金受取期間アコーディオン ── */
-.pension-opts {
+.app-scope .pension-opts {
   overflow: hidden; max-height: 0; opacity: 0;
   transition: max-height 0.35s cubic-bezier(0.22,0.61,0.36,1), opacity 0.25s ease;
 }
-.pension-opts.show { max-height: 100px; opacity: 1; }
-.pension-opts-inner { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
-.pension-opts-label { font-size: clamp(0.75rem, 2.2vw, 0.85rem); color: var(--sub-text); }
+.app-scope .pension-opts.show { max-height: 100px; opacity: 1; }
+.app-scope .pension-opts-inner { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.app-scope .pension-opts-label { font-size: clamp(0.75rem, 2.2vw, 0.85rem); color: var(--sub-text); }
 
 /* ── サマリーグリッド（6カード）── */
-.summary {
+.app-scope .summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -122,41 +133,68 @@ body {
 
 /* ブースト額がマイナスのとき */
 .boost-card.negative { background: rgba(224,122,58,0.06); border-color: var(--warn-color); }
-.boost-card.negative .ds-stat-num,
-.boost-card.negative .ds-stat-unit { color: var(--warn-color); }
-.boost-neg-msg {
+.app-scope .boost-card.negative .ds-stat-num,
+.app-scope .boost-card.negative .ds-stat-unit { color: var(--warn-color); }
+.app-scope .boost-neg-msg {
   font-size: clamp(0.6rem, 1.8vw, 0.7rem); color: var(--warn-color);
   margin-top: 6px; line-height: 1.5;
 }
 
 /* ── グラフ ── */
-canvas { display: block; cursor: default; }
+.app-scope canvas { display: block; cursor: default; }
 
 /* ── ツールチップ（NISA 準拠オーバーライド）── */
-#tooltip { border-radius: 16px; padding: 14px 18px; min-width: 200px; line-height: 1.9; font-size: clamp(0.72rem, 2.2vw, 0.84rem); }
-#tooltip .tt-year  { font-size: clamp(0.82rem, 2.5vw, 0.96rem); }
-#tooltip .tt-total { font-size: clamp(0.88rem, 2.8vw, 1.08rem); }
+.app-scope #tooltip { border-radius: 16px; padding: 14px 18px; min-width: 200px; line-height: 1.9; font-size: clamp(0.72rem, 2.2vw, 0.84rem); }
+.app-scope #tooltip .tt-year  { font-size: clamp(0.82rem, 2.5vw, 0.96rem); }
+.app-scope #tooltip .tt-total { font-size: clamp(0.88rem, 2.8vw, 1.08rem); }
 
 /* ── 免責事項 ── */
-.disclaimer {
+.app-scope .disclaimer {
   margin-top: 12px; padding: 14px 18px;
   background: rgba(168,213,186,0.08); border-left: 3px solid var(--accent);
   border-radius: 12px; font-size: clamp(0.58rem, 1.8vw, 0.65rem);
   color: var(--sub-text); line-height: 1.8; letter-spacing: 0.04em;
 }
-@media (min-width: 600px) { .disclaimer { padding: 16px 22px; } }
-.disclaimer p + p { margin-top: 6px; }
+@media (min-width: 600px) { .app-scope .disclaimer { padding: 16px 22px; } }
+.app-scope .disclaimer p + p { margin-top: 6px; }
 
 /* ── カードアニメーション ── */
-.ds-card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
-.ds-card:nth-child(2) { animation-delay: 0.08s; }
-.ds-card:nth-child(3) { animation-delay: 0.14s; }
+.app-scope .ds-card { animation: secFadeIn 0.4s cubic-bezier(0.22,0.61,0.36,1) both; }
+.app-scope .ds-card:nth-child(2) { animation-delay: 0.08s; }
+.app-scope .ds-card:nth-child(3) { animation-delay: 0.14s; }
+
+/* ══════════════════════════════════════════
+   2カラムページレイアウト（PC・NISA 準拠）
+══════════════════════════════════════════ */
+@media (min-width: 800px) {
+  .app-scope .ds-page-cols {
+    grid-template-columns: minmax(420px, 500px) minmax(580px, 1fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+  .app-scope .ds-input-col { display: flex; flex-direction: column; position: sticky; top: 24px; }
+  .app-scope .ds-input-col .ds-card { flex: 1; margin-bottom: 0; }
+  .app-scope .ds-result-col { display: flex; flex-direction: column; }
+  .app-scope .ds-result-col .ds-card { flex: 1; margin-bottom: 0; min-height: 0; }
+  /* 入力フォームを縦積みレイアウト（ラベル上・入力下）に */
+  .app-scope .ds-page-cols .ds-form-row { grid-template-columns: 1fr; }
+  .app-scope .ds-page-cols .ds-form-row-label { margin-bottom: 6px; }
+  /* 数値入力・ボタンをコンパクトに */
+  .app-scope .ds-page-cols .ds-num-edit { font-size: 1.7rem; }
+  .app-scope .ds-page-cols .ds-select-underline { font-size: 1.6rem; }
+  .app-scope .ds-page-cols .ds-pm-btn { width: 26px; height: 26px; font-size: 0.95rem; }
+}
 </style>
 </head>
 <body>
 
+<main class="app-scope">
+
 <h1>iDeCo 節税・資産形成シミュレーション</h1>
 <p>iDeCo加入による税制優遇効果と老後資産の増加額を試算します</p>
+
+<div class="ds-page-cols">
+  <div class="ds-input-col">
 
 <!-- ── 入力カード ── -->
 <div class="ds-card">
@@ -215,7 +253,10 @@ canvas { display: block; cursor: default; }
         </div>
         <div class="slider-row">
           <button class="ds-pm-btn" id="endAgeMinus">－</button>
-          <input type="range" class="ds-stepper-range" id="slEndAge" min="20" max="75" step="1" value="60">
+          <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+            <div class="ds-stepper-shimmer" id="slEndAge-shimmer"></div>
+            <input type="range" class="ds-stepper-range" id="slEndAge" min="20" max="75" step="1" value="60">
+          </div>
           <button class="ds-pm-btn" id="endAgePlus">＋</button>
         </div>
         <div class="inline-warn" id="ageWarn">⚠ 積立終了年齢が現在年齢以下です。終了年齢を上げてください。</div>
@@ -238,7 +279,10 @@ canvas { display: block; cursor: default; }
         </div>
         <div class="slider-row">
           <button class="ds-pm-btn" id="contribMinus">－</button>
-          <input type="range" class="ds-stepper-range" id="slContrib" min="0" max="27.6" step="0.1" value="27.6">
+          <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+            <div class="ds-stepper-shimmer" id="slContrib-shimmer"></div>
+            <input type="range" class="ds-stepper-range" id="slContrib" min="0" max="27.6" step="0.1" value="27.6">
+          </div>
           <button class="ds-pm-btn" id="contribPlus">＋</button>
         </div>
         <div class="monthly-preview">月あたり <span class="mval" id="monthlyPreview">23,000</span> 円</div>
@@ -265,7 +309,10 @@ canvas { display: block; cursor: default; }
         </div>
         <div class="slider-row">
           <button class="ds-pm-btn" id="rateMinus">－</button>
-          <input type="range" class="ds-stepper-range" id="slRate" min="0.1" max="10" step="0.1" value="5">
+          <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+            <div class="ds-stepper-shimmer" id="slRate-shimmer"></div>
+            <input type="range" class="ds-stepper-range" id="slRate" min="0.1" max="10" step="0.1" value="5">
+          </div>
           <button class="ds-pm-btn" id="ratePlus">＋</button>
         </div>
       </div>
@@ -292,7 +339,10 @@ canvas { display: block; cursor: default; }
         </div>
         <div class="slider-row">
           <button class="ds-pm-btn" id="incomeMinus">－</button>
-          <input type="range" class="ds-stepper-range" id="slIncome" min="0" max="5000" step="50" value="500">
+          <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+            <div class="ds-stepper-shimmer" id="slIncome-shimmer"></div>
+            <input type="range" class="ds-stepper-range" id="slIncome" min="0" max="5000" step="50" value="500">
+          </div>
           <button class="ds-pm-btn" id="incomePlus">＋</button>
         </div>
         <div class="tax-row">
@@ -330,6 +380,9 @@ canvas { display: block; cursor: default; }
   </div>
 </div>
 
+  </div><!-- /.ds-input-col -->
+  <div class="ds-result-col">
+
 <!-- ── 結果カード ── -->
 <div class="ds-card" id="resultCard">
   <div class="card-label">シミュレーション結果</div>
@@ -344,6 +397,9 @@ canvas { display: block; cursor: default; }
   <div class="ds-chart-note">※ iDeCo拠出額の年次推移（税引前）</div>
 </div>
 
+  </div><!-- /.ds-result-col -->
+</div><!-- /.ds-page-cols -->
+
 <div class="disclaimer">
   <p>【計算上の前提・免責事項】退職所得控除はiDeCo単独受取を想定した簡易計算です。退職金と同年に受け取る場合は控除が重複できません。年金受取の公的年金等控除は65歳未満基準（簡易モデル）を使用しています。本シミュレーターは概算であり、税務上の助言ではありません。</p>
   <p>表示される数値は将来の運用成果を保証するものではありません。実際の税額・受取額は加入年数・受取時期・他の所得等によって異なります。投資判断・税務判断はご自身の責任において行い、必要に応じて専門家にご相談ください。</p>
@@ -352,6 +408,8 @@ canvas { display: block; cursor: default; }
 <div class="back-to-index">
   <a href="../../index.html">← マネーツールへ戻る</a>
 </div>
+
+</main><!-- /.app-scope -->
 
 <div id="tooltip" class="ds-chart-tooltip"></div>
 

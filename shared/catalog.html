@@ -198,6 +198,7 @@ body {
   <a class="cat-nav-link" href="#donut-summary">ds-donut-summary</a>
   <a class="cat-nav-link" href="#breakdown-accordion">ds-breakdown-accordion</a>
   <a class="cat-nav-link" href="#resident-savings">ds-resident-savings</a>
+  <a class="cat-nav-link" href="#calc-basis">ds-calc-basis</a>
 
   <div class="cat-nav-group">注釈・フィードバック</div>
   <a class="cat-nav-link" href="#annotations">note-box / warning-inline</a>
@@ -378,10 +379,10 @@ body {
       <h2 class="cat-section-title">ds-input-num-underline</h2>
       <span class="cat-section-tag">.ds-val-row / .ds-val-unit</span>
     </div>
-    <p class="cat-desc">数値入力（アンダーラインのみ）。<code>ds-val-row</code> 内で <code>ds-input-num-underline</code> と <code>ds-val-unit</code> を組み合わせて使用。</p>
+    <p class="cat-desc">数値入力（アンダーラインのみ）。3桁ごとにカンマ区切り。<code>ds-val-row</code> 内で <code>ds-input-num-underline</code> と <code>ds-val-unit</code> を組み合わせて使用。<code>type="text"</code> + <code>inputmode="numeric"</code> でカンマ表示。</p>
     <div class="preview col" style="gap:12px;">
       <div class="ds-val-row">
-        <input class="ds-input-num-underline" type="number" min="0" value="10" placeholder="0">
+        <input class="ds-input-num-underline" type="text" id="inputNumUnderlineDemo" value="1,000" placeholder="0" inputmode="numeric">
         <span class="ds-val-unit">万円</span>
       </div>
     </div>
@@ -768,6 +769,52 @@ body {
     </div>
   </section>
 
+  <!-- ds-calc-basis -->
+  <section class="cat-section" id="calc-basis">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-calc-basis</h2>
+      <span class="cat-section-tag">.ds-calc-basis / .ds-calc-step / .ds-calc-eq</span>
+    </div>
+    <p class="cat-desc">計算の根拠を番号付きステップで表示。数値は <code>.val</code> でアクセント色にハイライト。要約式は <code>.ds-calc-eq</code> で白背景ボックスに表示。退職金シミュレーター等の計算根拠表示に使用。</p>
+    <div class="preview col" style="gap:0;">
+      <div class="ds-calc-basis" style="max-width:480px;">
+        <div class="ds-calc-basis-title">📋 計算の根拠（国税庁 No.1420 に基づく）</div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">1</div>
+          <div>退職金受取額：<span class="val">20,000,000円</span>（一般退職）</div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">2</div>
+          <div>勤続年数：<span class="val">30年</span></div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">3</div>
+          <div>退職所得控除額 ＝ 800万円 ＋ 70万円 × (30年 － 20年) ＝ <span class="val">15,000,000円</span></div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">4</div>
+          <div>課税前金額 ＝ 20,000,000円 － 控除額 15,000,000円 ＝ <span class="val">5,000,000円</span></div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">5</div>
+          <div>課税退職所得 ＝ 5,000,000円 ÷ 2 ＝ <span class="val">2,500,000円</span></div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">6</div>
+          <div>所得税：超過累進税率（速算表）を適用 → 復興特別所得税（×<span class="val">1.021</span>）を加算</div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">7</div>
+          <div>住民税（目安）＝ 課税退職所得 × <span class="val">10%</span>（標準税率）</div>
+        </div>
+        <div class="ds-calc-eq">
+          <strong>手取り額</strong> ＝ 受取額 <span class="em">20,000,000</span>円 － 所得税等 － 住民税<br>
+          <small style="color:var(--sub-text);">根拠：国税庁 No.1420 退職金を受け取ったとき（退職所得）</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
 
   <!-- ════════════════════════════════
        GROUP: 注釈・フィードバック
@@ -993,6 +1040,26 @@ body {
 /* ════════════════════════════════════════
    カタログ初期化スクリプト
 ════════════════════════════════════════ */
+
+// ── ds-input-num-underline カンマ区切り ──
+function formatComma(val) {
+  const num = val.replace(/[^\d]/g, '');
+  return num === '' ? '' : Number(num).toLocaleString('ja-JP');
+}
+(function() {
+  const el = document.getElementById('inputNumUnderlineDemo');
+  if (!el) return;
+  el.addEventListener('input', function() {
+    const pos = this.selectionStart;
+    const prevLen = this.value.length;
+    this.value = formatComma(this.value);
+    const diff = this.value.length - prevLen;
+    this.setSelectionRange(pos + diff, pos + diff);
+  });
+  el.addEventListener('blur', function() {
+    this.value = formatComma(this.value);
+  });
+})();
 
 // ── セグメントコントロール ──
 document.getElementById('seg-demo').addEventListener('click', e => {
