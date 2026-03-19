@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>月給・賞与 手取りシミュレーター — Money Tools</title>
+<link rel="stylesheet" href="../../shared/components.css">
+<style>
+/* ══════════════════════════════════════════
+   正社員版給与シミュレーター固有スタイル
+══════════════════════════════════════════ */
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
+  background: var(--base-bg);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(168,213,186,0.18) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(74,140,111,0.07) 0%, transparent 45%);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 20px 16px 48px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) { body { padding: 36px 24px 60px; } }
+
+.ds-divider { margin: 14px 0; }
+
+/* ══════════════════════════════════════════
+   入力エリア
+══════════════════════════════════════════ */
+.input-list { display: flex; flex-direction: column; }
+
+.input-group { display: flex; flex-direction: column; gap: 10px; }
+.input-group-label {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  font-size: clamp(0.9rem, 2.7vw, 1rem); font-weight: 600; color: var(--text-main);
+}
+.input-group-sub {
+  font-size: clamp(0.65rem, 2vw, 0.73rem); color: var(--sub-text); font-weight: 400;
+}
+
+/* ds-input-num-underline 桁数対応 */
+.app-scope .ds-val-row .ds-input-num-underline { min-width: 120px; flex: 1; }
+
+/* 賞与：数字のみ＋共通ラベル（コンパクト） */
+.bonus-months-row {
+  display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap;
+}
+.bonus-months-btns {
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.bonus-months-btns .ds-chip {
+  padding: 4px 10px; font-size: clamp(0.72rem, 2vw, 0.8rem); min-width: 28px;
+}
+.bonus-months-label {
+  font-size: clamp(0.72rem, 2vw, 0.8rem); color: var(--sub-text); font-weight: 500;
+}
+
+.age-row { --form-label-w: 72px; }
+
+/* 月間タブ：通常月｜賞与月 縦積み（年間と同じデザイン） */
+.ds-breakdown-monthly-stack {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.ds-breakdown-stack-item {
+  background: var(--card-bg); border: 1.5px solid var(--mint-light);
+  border-radius: 16px; overflow: hidden;
+}
+.ds-breakdown-stack-title {
+  font-size: clamp(0.7rem, 2vw, 0.78rem); font-weight: 600; color: var(--accent-deep);
+  padding: 12px 18px 8px; letter-spacing: 0.04em;
+}
+.ds-breakdown-stack-title-sub {
+  font-weight: 500; color: var(--sub-text); font-size: 0.9em;
+}
+
+.chart-note { font-size: clamp(0.58rem, 1.7vw, 0.63rem); color: var(--sub-text); line-height: 1.8; }
+
+/* 結果カラム */
+.ds-result-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ds-result-col .ds-card > .ds-hero-result,
+.ds-result-col .ds-card > .ds-breakdown-block,
+.ds-result-col .ds-card > .ds-donut-summary {
+  margin-top: 14px;
+}
+.ds-result-col .ds-card > .ds-hero-result { margin-top: 0; }
+.ds-result-col .ds-hero-result { text-align: center; }
+.ds-result-col .ds-hero-result .hero-amount { justify-content: center; }
+.ds-result-col .ds-hero-result,
+.ds-result-col .ds-breakdown-block,
+.ds-result-col .ds-donut-summary {
+  margin-bottom: 0;
+}
+.ds-result-col .ds-hero-result .hero-eyebrow {
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+}
+.ds-result-col .ds-breakdown-block,
+.ds-result-col .ds-donut-summary {
+  width: 100%;
+}
+
+@media (min-width: 800px) {
+  .app-scope .ds-input-col .ds-card { margin-bottom: 0; }
+}
+
+.disclaimer {
+  margin-top: 12px; padding: 14px 18px;
+  background: rgba(168,213,186,0.08); border-left: 3px solid var(--accent);
+  border-radius: 12px; font-size: clamp(0.58rem, 1.8vw, 0.65rem);
+  color: var(--sub-text); line-height: 1.8; letter-spacing: 0.04em;
+}
+@media (min-width: 600px) { .disclaimer { padding: 16px 22px; } }
+
+.app-scope { max-width: 900px; padding: 0; }
+</style>
+</head>
+<body>
+<main class="app-scope">
+
+<header class="ds-page-title">
+  <h1>月給・賞与 手取りシミュレーター</h1>
+  <p>正社員・契約社員など月給＋ボーナスの方向け。月給と賞与を入力し、社会保険料・所得税を考慮した手取りを試算します</p>
+</header>
+
+<div class="ds-page-cols">
+
+  <!-- ── 入力カード ── -->
+  <div class="ds-input-col">
+  <div class="ds-card">
+    <div class="ds-card-label">条件設定</div>
+    <div class="input-list">
+
+      <!-- 月給 -->
+      <div class="input-group">
+        <div class="input-group-label">月給（額面）</div>
+        <div class="ds-val-row">
+          <input type="text" class="ds-input-num-underline" id="monthlySalary"
+            inputmode="numeric" value="300,000" placeholder="0">
+          <span class="ds-val-unit">円</span>
+        </div>
+        <div class="ds-chip-scroll salary-chips" style="margin-top:10px;">
+          <button type="button" class="ds-chip" data-val="250000">25万</button>
+          <button type="button" class="ds-chip active" data-val="300000">30万</button>
+          <button type="button" class="ds-chip" data-val="350000">35万</button>
+          <button type="button" class="ds-chip" data-val="400000">40万</button>
+          <button type="button" class="ds-chip" data-val="450000">45万</button>
+          <button type="button" class="ds-chip" data-val="500000">50万</button>
+        </div>
+      </div>
+
+      <hr class="ds-divider">
+
+      <!-- 交通費等 -->
+      <div class="input-group">
+        <div class="input-group-label">
+          交通費等（月額）
+          <span class="input-group-sub">非課税通勤手当（任意）</span>
+        </div>
+        <div class="ds-val-row">
+          <input type="text" class="ds-input-num-underline" id="allowance"
+            inputmode="numeric" value="0" placeholder="0">
+          <span class="ds-val-unit">円</span>
+        </div>
+      </div>
+
+      <hr class="ds-divider">
+
+      <!-- 賞与（年間） -->
+      <div class="input-group">
+        <div class="input-group-label">賞与（年間総額）</div>
+        <div class="ds-val-row ds-val-row--bonus">
+          <input type="text" class="ds-input-num-underline" id="bonusAnnualTotal"
+            inputmode="numeric" value="600,000" placeholder="0">
+          <span class="ds-val-unit">円</span>
+        </div>
+        <div class="bonus-months-row">
+          <div class="bonus-months-btns">
+            <button type="button" class="ds-chip bonus-month-btn" data-months="1">1</button>
+            <button type="button" class="ds-chip bonus-month-btn active" data-months="2">2</button>
+            <button type="button" class="ds-chip bonus-month-btn" data-months="3">3</button>
+            <button type="button" class="ds-chip bonus-month-btn" data-months="4">4</button>
+            <button type="button" class="ds-chip bonus-month-btn" data-months="5">5</button>
+            <button type="button" class="ds-chip bonus-month-btn" data-months="6">6</button>
+          </div>
+          <span class="bonus-months-label">ヶ月分</span>
+        </div>
+      </div>
+
+      <hr class="ds-divider">
+
+      <!-- 年齢 -->
+      <div class="ds-form-row age-row">
+        <div class="ds-form-row-label"><span class="lname">年齢</span></div>
+        <div class="ds-form-row-right">
+          <div class="ds-segment" id="ageSeg">
+            <button class="ds-seg-btn active" data-age="under40">40歳未満</button>
+            <button class="ds-seg-btn" data-age="over40">40〜64歳</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </div><!-- /ds-input-col -->
+
+  <!-- ── 結果カード ── -->
+  <div class="ds-result-col">
+    <div class="ds-card">
+    <div class="ds-card-label">シミュレーション結果</div>
+
+    <!-- ① ヒーロー：年間手取り -->
+    <div class="ds-hero-result">
+      <div class="hero-eyebrow">年間手取り</div>
+      <div class="hero-amount">
+        <span id="statAnnualTakeHome">0</span>
+        <span class="hero-amount-unit">円</span>
+      </div>
+    </div>
+
+    <!-- ② 内訳アコーディオン -->
+    <div class="ds-breakdown-block">
+
+      <div class="ds-period-strip" id="periodStrip">
+        <button type="button" class="ds-period-strip-btn active" id="btnPeriodAnnual" data-period="annual">年間</button>
+        <button type="button" class="ds-period-strip-btn" id="btnPeriodMonthly" data-period="monthly">月間</button>
+      </div>
+
+      <!-- 年間タブ用 -->
+      <div class="ds-breakdown-single" id="breakdownSingle">
+        <div class="ds-breakdown-header-row">
+          <span id="bdPeriodLabel">年間総支給（額面）</span>
+          <span class="bd-amount" id="bdGross">¥ 0</span>
+        </div>
+        <button type="button"
+          class="ds-accordion-trigger"
+          id="socialAccordionBtn"
+          aria-expanded="false"
+          aria-controls="socialAccordionBody"
+          onclick="toggleAccordion('socialAccordion')"
+        >
+          <span class="acc-left">
+            社会保険料
+            <span class="acc-toggle-label" id="socialToggleLabel">▼ 内訳を見る</span>
+          </span>
+          <span class="acc-right bd-amount" id="bdSocialTotal">¥ 0</span>
+        </button>
+        <div class="ds-accordion-body" id="socialAccordionBody">
+          <div class="breakdown-row color-health">
+            <span class="breakdown-label">健康保険料（協会けんぽ東京）</span>
+            <span class="breakdown-value bd-amount" id="bdHealth">¥ 0</span>
+          </div>
+          <div class="breakdown-row color-care" id="bdCareRow">
+            <span class="breakdown-label">介護保険料</span>
+            <span class="breakdown-value bd-amount" id="bdCare">¥ 0</span>
+          </div>
+          <div class="breakdown-row color-pension">
+            <span class="breakdown-label">厚生年金保険料</span>
+            <span class="breakdown-value bd-amount" id="bdPension">¥ 0</span>
+          </div>
+          <div class="breakdown-row color-employ">
+            <span class="breakdown-label">雇用保険料</span>
+            <span class="breakdown-value bd-amount" id="bdEmployment">¥ 0</span>
+          </div>
+        </div>
+        <button type="button"
+          class="ds-accordion-trigger"
+          id="taxAccordionBtn"
+          aria-expanded="false"
+          aria-controls="taxAccordionBody"
+          onclick="toggleAccordion('taxAccordion')"
+        >
+          <span class="acc-left">
+            税金
+            <span class="acc-toggle-label" id="taxToggleLabel">▼ 内訳を見る</span>
+          </span>
+          <span class="acc-right bd-amount" id="bdTaxTotal">¥ 0</span>
+        </button>
+        <div class="ds-accordion-body" id="taxAccordionBody">
+          <div class="breakdown-row color-income">
+            <span class="breakdown-label">所得税（復興特別税含む）</span>
+            <span class="breakdown-value bd-amount" id="bdIncomeTax">¥ 0</span>
+          </div>
+          <div class="breakdown-row color-resident" id="bdResidenceTaxRow">
+            <span class="breakdown-label">住民税（推定）</span>
+            <span class="breakdown-value bd-amount" id="bdResidenceTax">¥ 0</span>
+          </div>
+        </div>
+        <div class="ds-breakdown-takehome">
+          <span id="bdTakeHomeLabel">年間手取り額</span>
+          <span class="takehome-value bd-amount" id="flowTakeHome">¥ 0</span>
+        </div>
+      </div>
+
+      <!-- 月間タブ用（通常月｜賞与月 縦積み・年間と同じデザイン） -->
+      <div class="ds-breakdown-monthly-stack" id="breakdownMonthly" style="display:none;">
+        <div class="ds-breakdown-stack-item">
+          <div class="ds-breakdown-stack-title">通常月</div>
+          <div class="ds-breakdown-header-row">
+            <span>通常月の総支給（額面）</span>
+            <span class="bd-amount" id="bdGrossNormal">¥ 0</span>
+          </div>
+          <button type="button" class="ds-accordion-trigger" id="monthlyNormalSocialBtn" aria-expanded="false" aria-controls="monthlyNormalSocialBody" onclick="toggleMonthlyAccordion('monthlyNormalSocial')">
+            <span class="acc-left">社会保険料<span class="acc-toggle-label" id="monthlyNormalSocialLabel">▼ 内訳を見る</span></span>
+            <span class="acc-right bd-amount" id="bdSocialNormal">¥ 0</span>
+          </button>
+          <div class="ds-accordion-body" id="monthlyNormalSocialBody">
+            <div class="breakdown-row color-health"><span class="breakdown-label">健康保険料（協会けんぽ東京）</span><span class="breakdown-value bd-amount" id="bdHealthNormal">¥ 0</span></div>
+            <div class="breakdown-row color-care" id="bdCareRowNormal"><span class="breakdown-label">介護保険料</span><span class="breakdown-value bd-amount" id="bdCareNormal">¥ 0</span></div>
+            <div class="breakdown-row color-pension"><span class="breakdown-label">厚生年金保険料</span><span class="breakdown-value bd-amount" id="bdPensionNormal">¥ 0</span></div>
+            <div class="breakdown-row color-employ"><span class="breakdown-label">雇用保険料</span><span class="breakdown-value bd-amount" id="bdEmploymentNormal">¥ 0</span></div>
+          </div>
+          <button type="button" class="ds-accordion-trigger" id="monthlyNormalTaxBtn" aria-expanded="false" aria-controls="monthlyNormalTaxBody" onclick="toggleMonthlyAccordion('monthlyNormalTax')">
+            <span class="acc-left">税金<span class="acc-toggle-label" id="monthlyNormalTaxLabel">▼ 内訳を見る</span></span>
+            <span class="acc-right bd-amount" id="bdTaxNormal">¥ 0</span>
+          </button>
+          <div class="ds-accordion-body" id="monthlyNormalTaxBody">
+            <div class="breakdown-row color-income"><span class="breakdown-label">所得税（復興特別税含む）</span><span class="breakdown-value bd-amount" id="bdIncomeTaxNormal">¥ 0</span></div>
+            <div class="breakdown-row color-resident"><span class="breakdown-label">住民税（推定）</span><span class="breakdown-value bd-amount" id="bdResidenceTaxNormal">¥ 0</span></div>
+          </div>
+          <div class="ds-breakdown-takehome">
+            <span>通常月の手取り額</span>
+            <span class="takehome-value bd-amount" id="flowTakeHomeNormal">¥ 0</span>
+          </div>
+        </div>
+        <div class="ds-breakdown-stack-item">
+          <div class="ds-breakdown-stack-title">賞与月<span class="ds-breakdown-stack-title-sub">（年2回支給のうち1回分）</span></div>
+          <div class="ds-breakdown-header-row">
+            <span>賞与月の総支給（額面）</span>
+            <span class="bd-amount" id="bdGrossBonus">¥ 0</span>
+          </div>
+          <button type="button" class="ds-accordion-trigger" id="monthlyBonusSocialBtn" aria-expanded="false" aria-controls="monthlyBonusSocialBody" onclick="toggleMonthlyAccordion('monthlyBonusSocial')">
+            <span class="acc-left">社会保険料<span class="acc-toggle-label" id="monthlyBonusSocialLabel">▼ 内訳を見る</span></span>
+            <span class="acc-right bd-amount" id="bdSocialBonus">¥ 0</span>
+          </button>
+          <div class="ds-accordion-body" id="monthlyBonusSocialBody">
+            <div class="breakdown-row color-health"><span class="breakdown-label">健康保険料（協会けんぽ東京）</span><span class="breakdown-value bd-amount" id="bdHealthBonus">¥ 0</span></div>
+            <div class="breakdown-row color-care" id="bdCareRowBonus"><span class="breakdown-label">介護保険料</span><span class="breakdown-value bd-amount" id="bdCareBonus">¥ 0</span></div>
+            <div class="breakdown-row color-pension"><span class="breakdown-label">厚生年金保険料</span><span class="breakdown-value bd-amount" id="bdPensionBonus">¥ 0</span></div>
+            <div class="breakdown-row color-employ"><span class="breakdown-label">雇用保険料</span><span class="breakdown-value bd-amount" id="bdEmploymentBonus">¥ 0</span></div>
+          </div>
+          <button type="button" class="ds-accordion-trigger" id="monthlyBonusTaxBtn" aria-expanded="false" aria-controls="monthlyBonusTaxBody" onclick="toggleMonthlyAccordion('monthlyBonusTax')">
+            <span class="acc-left">税金<span class="acc-toggle-label" id="monthlyBonusTaxLabel">▼ 内訳を見る</span></span>
+            <span class="acc-right bd-amount" id="bdTaxBonus">¥ 0</span>
+          </button>
+          <div class="ds-accordion-body" id="monthlyBonusTaxBody">
+            <div class="breakdown-row color-income"><span class="breakdown-label">所得税（賞与・復興特別税含む）</span><span class="breakdown-value bd-amount" id="bdIncomeTaxBonus">¥ 0</span></div>
+            <div class="breakdown-row color-resident"><span class="breakdown-label">住民税（推定）</span><span class="breakdown-value bd-amount" id="bdResidenceTaxBonus">¥ 0</span></div>
+          </div>
+          <div class="ds-breakdown-takehome">
+            <span>賞与月の手取り額</span>
+            <span class="takehome-value bd-amount" id="flowTakeHomeBonus">¥ 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-donut-summary" id="donutChart"></div>
+
+    <div class="chart-note" style="margin-top:12px; text-align:left;">
+      <p>※ 賞与は年2回支給を想定　※ 協会けんぽ（東京）令和5年度料率基準　※ 賞与の源泉徴収は簡易テーブルで算出　※ 住民税は課税所得の約10%で簡易計算　※ 所得税は復興特別税を含む簡易計算</p>
+    </div>
+
+    </div><!-- /ds-card -->
+  </div><!-- /ds-result-col -->
+
+</div><!-- /ds-page-cols -->
+
+<div class="disclaimer">
+  <p>本シミュレーターは参考値の試算です。実際の保険料・税額は標準報酬月額の等級・加入する健康保険組合・自治体等によって異なります。賞与の源泉徴収は前月給与により変動します。税務・社会保険の詳細はご自身でご確認ください。</p>
+</div>
+
+<div class="back-to-index">
+  <a href="../../index.html">← マネーツールへ戻る</a>
+</div>
+
+</main>
+<script src="../../shared/base.js"></script>
+<script src="../../shared/chart-donut.js"></script>
+<script>
+/* ══════════════════════════════════════════
+   正社員版 給与・手取りシミュレーター
+══════════════════════════════════════════ */
+
+(function(){
+'use strict';
+
+let ageCategory   = 'under40';
+let currentPeriod = 'annual'; // 'annual' | 'monthly'
+const BONUS_PAYMENTS_PER_YEAR = 2; // 年2回支給（夏・冬）で按分
+const _prev       = {};
+const _prevBd     = {};
+
+/* 賞与の源泉徴収税 簡易テーブル（扶養0人・甲欄）
+   前月給与（社会保険控除後）のレンジ → 賞与額レンジ → 税率（%）
+   国税庁「賞与に対する源泉徴収税額の算出率の表」令和7年分を簡略化 */
+const BONUS_TAX_RATE_TABLE = [
+  /* 前月給与(控除後) 賞与(控除後)上限 税率% */
+  { prevMax: 88000,  bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 88000,  bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 88000,  bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 88000,  bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 88000,  bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 100000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 100000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 100000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 100000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 100000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 120000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 120000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 120000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 120000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 120000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 140000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 140000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 140000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 140000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 140000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 160000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 160000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 160000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 160000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 160000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 180000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 180000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 180000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 180000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 180000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 220000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 220000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 220000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 220000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 220000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 260000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 260000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 260000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 260000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 260000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 320000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 320000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 320000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 320000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 320000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 360000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 360000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 360000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 360000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 360000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 400000, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 400000, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 400000, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 400000, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 400000, bonusMax: 999999999, rate: 0.1836 },
+  { prevMax: 999999999, bonusMax: 87000,  rate: 0.0306 },
+  { prevMax: 999999999, bonusMax: 170000, rate: 0.0612 },
+  { prevMax: 999999999, bonusMax: 360000, rate: 0.1020 },
+  { prevMax: 999999999, bonusMax: 730000, rate: 0.1428 },
+  { prevMax: 999999999, bonusMax: 999999999, rate: 0.1836 }
+];
+
+function getBonusTaxRate(prevAfterSocial, bonusAfterSocial) {
+  const prev = Math.max(0, Math.floor(prevAfterSocial));
+  const bonus = Math.max(0, Math.floor(bonusAfterSocial));
+  for (let i = 0; i < BONUS_TAX_RATE_TABLE.length; i++) {
+    const row = BONUS_TAX_RATE_TABLE[i];
+    if (prev < row.prevMax && bonus < row.bonusMax) {
+      return row.rate;
+    }
+  }
+  return 0.1020;
+}
+
+window.toggleAccordion = function(id) {
+  const body    = document.getElementById(id + 'Body');
+  const btn     = document.getElementById(id + 'Btn');
+  const label   = document.getElementById(id === 'socialAccordion' ? 'socialToggleLabel' : 'taxToggleLabel');
+  const isOpen  = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.setAttribute('aria-expanded', String(!isOpen));
+  label.textContent = isOpen ? '▼ 内訳を見る' : '▲ 閉じる';
+};
+
+window.toggleMonthlyAccordion = function(prefix) {
+  const body  = document.getElementById(prefix + 'Body');
+  const btn   = document.getElementById(prefix + 'Btn');
+  const label = document.getElementById(prefix + 'Label');
+  if (!body || !btn || !label) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.setAttribute('aria-expanded', String(!isOpen));
+  label.textContent = isOpen ? '▼ 内訳を見る' : '▲ 閉じる';
+};
+
+function stdRemuneration(amount) {
+  if (amount < 63000)   return 58000;
+  if (amount >= 635000) return 650000;
+  return Math.round(amount / 10000) * 10000;
+}
+
+function stdBonusAmount(amount) {
+  return Math.floor(amount / 1000) * 1000;
+}
+
+function setPeriod(period) {
+  currentPeriod = period;
+  document.getElementById('btnPeriodAnnual').classList.toggle('active', period === 'annual');
+  document.getElementById('btnPeriodMonthly').classList.toggle('active', period === 'monthly');
+
+  const periodLabel = document.getElementById('bdPeriodLabel');
+  const takeHomeLabel = document.getElementById('bdTakeHomeLabel');
+  if (period === 'annual') {
+    if (periodLabel) periodLabel.textContent = '年間総支給（額面）';
+    if (takeHomeLabel) takeHomeLabel.textContent = '年間手取り額';
+  } else {
+    if (periodLabel) periodLabel.textContent = '月間総支給（額面）';
+    if (takeHomeLabel) takeHomeLabel.textContent = '月間手取り額';
+  }
+
+  const block = document.querySelector('.ds-breakdown-block');
+  if (block) {
+    block.classList.add('period-switching');
+    document.getElementById('breakdownSingle').style.display = (period === 'annual') ? '' : 'none';
+    document.getElementById('breakdownMonthly').style.display = (period === 'monthly') ? '' : 'none';
+    setTimeout(() => {
+      calculate(true);
+      /* フェードインアニメーション完了後にクラス除去（0.4s） */
+      setTimeout(() => block.classList.remove('period-switching'), 500);
+    }, 50);
+  } else {
+    document.getElementById('breakdownSingle').style.display = (period === 'annual') ? '' : 'none';
+    document.getElementById('breakdownMonthly').style.display = (period === 'monthly') ? '' : 'none';
+    calculate(true);
+  }
+}
+
+function calculate(fromTabSwitch) {
+  const monthly   = parseComma(document.getElementById('monthlySalary').value);
+  const allowance = parseComma(document.getElementById('allowance').value);
+  const isOver40  = ageCategory === 'over40';
+
+  const bonusAnnualTotal = parseComma(document.getElementById('bonusAnnualTotal').value);
+  const bonusPerPayment = BONUS_PAYMENTS_PER_YEAR > 0 ? bonusAnnualTotal / BONUS_PAYMENTS_PER_YEAR : 0;
+
+  const gross = monthly + allowance;
+  const stdGross = stdRemuneration(monthly);
+
+  /* ── 月給の社会保険・税金 ── */
+  let health = 0, care = 0, pension = 0, employment = 0;
+  let incomeTax = 0, residenceTax = 0;
+
+  if (gross > 0) {
+    health     = Math.floor(stdGross * 0.04905);
+    care       = isOver40 ? Math.floor(stdGross * 0.0091) : 0;
+    pension    = Math.floor(stdGross * 0.0915);
+    employment = Math.floor(gross * 0.006);
+
+    const annualGross  = gross * 12 + bonusAnnualTotal;
+    const annualSocial = (health + care + pension + employment) * 12;
+    const taxableBase = Math.max(0, annualGross - annualSocial - 1_030_000);
+    incomeTax   = Math.floor((taxableBase * 0.05) / 12);
+    residenceTax = Math.floor((taxableBase * 0.10) / 12);
+  }
+
+  const socialTotal = health + care + pension + employment;
+  const takeHome = Math.max(0, gross - socialTotal - incomeTax - residenceTax);
+
+  /* ── 賞与の社会保険・源泉税 ── */
+  let bonusHealth = 0, bonusCare = 0, bonusPension = 0, bonusEmployment = 0;
+  let bonusIncomeTax = 0;
+  let bonusSocialTotal = 0;
+  let bonusTakeHome = 0;
+
+  if (bonusPerPayment > 0) {
+    const stdBonus = stdBonusAmount(bonusPerPayment);
+    bonusHealth    = Math.floor(stdBonus * 0.04905);
+    bonusCare      = isOver40 ? Math.floor(stdBonus * 0.0091) : 0;
+    bonusPension   = Math.floor(stdBonus * 0.0915);
+    bonusEmployment = Math.floor(bonusPerPayment * 0.006);
+    bonusSocialTotal = bonusHealth + bonusCare + bonusPension + bonusEmployment;
+
+    const prevAfterSocial = gross - socialTotal;
+    const bonusAfterSocial = bonusPerPayment - bonusSocialTotal;
+    const rate = getBonusTaxRate(prevAfterSocial, bonusAfterSocial);
+    bonusIncomeTax = Math.floor(bonusAfterSocial * rate);
+    bonusTakeHome = Math.max(0, bonusPerPayment - bonusSocialTotal - bonusIncomeTax);
+  }
+
+  const annualTakeHome = takeHome * 12 + bonusTakeHome * BONUS_PAYMENTS_PER_YEAR;
+  const taxDisplayTotal = incomeTax + residenceTax;
+
+  /* ── ヒーロー: 年間手取り（タブ切り替え=即時、入力変更=カウントアップ） ── */
+  const animStat = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (fromTabSwitch) {
+      el.textContent = Math.round(val).toLocaleString('ja-JP');
+    } else {
+      const from = _prev[id] ?? 0;
+      animateNum(el, from, val, 600, v => Math.round(v).toLocaleString('ja-JP'));
+    }
+    _prev[id] = val;
+  };
+  animStat('statAnnualTakeHome', annualTakeHome);
+
+  /* ── 内訳（period に応じて表示値を切り替え） ── */
+  let mult = 1;
+  let dispGross = gross;
+  let dispHealth = health, dispCare = care, dispPension = pension, dispEmployment = employment;
+  let dispSocialTotal = socialTotal;
+  let dispIncomeTax = incomeTax;
+  let dispResidenceTax = residenceTax;
+  let dispTakeHome = takeHome;
+
+  if (currentPeriod === 'annual') {
+    mult = 12;
+    dispGross = gross * 12 + bonusAnnualTotal;
+    dispHealth = health * 12 + bonusHealth * BONUS_PAYMENTS_PER_YEAR;
+    dispCare = care * 12 + bonusCare * BONUS_PAYMENTS_PER_YEAR;
+    dispPension = pension * 12 + bonusPension * BONUS_PAYMENTS_PER_YEAR;
+    dispEmployment = employment * 12 + bonusEmployment * BONUS_PAYMENTS_PER_YEAR;
+    dispSocialTotal = socialTotal * 12 + bonusSocialTotal * BONUS_PAYMENTS_PER_YEAR;
+    dispIncomeTax = incomeTax * 12 + bonusIncomeTax * BONUS_PAYMENTS_PER_YEAR;
+    dispResidenceTax = residenceTax * 12;
+    dispTakeHome = annualTakeHome;
+  }
+
+  const taxDisplayTotalDisp = dispIncomeTax + dispResidenceTax;
+
+  const fmtYenBd = n => '¥\u00a0' + Math.round(n).toLocaleString('ja-JP');
+  const animBd = (id, toVal) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (fromTabSwitch) {
+      el.textContent = fmtYenBd(toVal);
+    } else {
+      const from = _prevBd[id] ?? 0;
+      animateNum(el, from, toVal, 600, fmtYenBd);
+    }
+    _prevBd[id] = toVal;
+  };
+
+  animBd('bdGross', dispGross);
+  animBd('bdHealth', dispHealth);
+  animBd('bdCare', dispCare);
+  animBd('bdPension', dispPension);
+  animBd('bdEmployment', dispEmployment);
+  animBd('bdSocialTotal', dispSocialTotal);
+  animBd('bdIncomeTax', dispIncomeTax);
+  animBd('bdResidenceTax', dispResidenceTax);
+  animBd('bdTaxTotal', taxDisplayTotalDisp);
+  animBd('flowTakeHome', dispTakeHome);
+
+  document.getElementById('bdCareRow').style.display = isOver40 ? '' : 'none';
+
+  /* ── 月間タブ（通常月｜賞与月）の値を更新 ── */
+  const bonusMonthGross = gross + bonusPerPayment;
+  const bonusMonthSocial = socialTotal + bonusSocialTotal;
+  const bonusMonthTax = incomeTax + bonusIncomeTax + residenceTax;
+  const bonusMonthTakeHome = takeHome + bonusTakeHome;
+  animBd('bdGrossNormal', gross);
+  animBd('bdSocialNormal', socialTotal);
+  animBd('bdHealthNormal', health);
+  animBd('bdCareNormal', care);
+  animBd('bdPensionNormal', pension);
+  animBd('bdEmploymentNormal', employment);
+  animBd('bdTaxNormal', taxDisplayTotal);
+  animBd('bdIncomeTaxNormal', incomeTax);
+  animBd('bdResidenceTaxNormal', residenceTax);
+  animBd('flowTakeHomeNormal', takeHome);
+  animBd('bdGrossBonus', bonusMonthGross);
+  animBd('bdSocialBonus', bonusMonthSocial);
+  animBd('bdHealthBonus', health + bonusHealth);
+  animBd('bdCareBonus', care + bonusCare);
+  animBd('bdPensionBonus', pension + bonusPension);
+  animBd('bdEmploymentBonus', employment + bonusEmployment);
+  animBd('bdTaxBonus', bonusMonthTax);
+  animBd('bdIncomeTaxBonus', incomeTax + bonusIncomeTax);
+  animBd('bdResidenceTaxBonus', residenceTax);
+  animBd('flowTakeHomeBonus', bonusMonthTakeHome);
+  const careRowNormal = document.getElementById('bdCareRowNormal');
+  const careRowBonus = document.getElementById('bdCareRowBonus');
+  if (careRowNormal) careRowNormal.style.display = isOver40 ? '' : 'none';
+  if (careRowBonus) careRowBonus.style.display = isOver40 ? '' : 'none';
+
+  /* ── ドーナツ（年間ベース・タブ切り替え時はアニメなし） ── */
+  if (typeof renderDonutChart === 'function') {
+    const annualTakeHomeVal = annualTakeHome;
+    const annualSocialVal = socialTotal * 12 + bonusSocialTotal * BONUS_PAYMENTS_PER_YEAR;
+    const annualTaxVal = (incomeTax + residenceTax) * 12 + bonusIncomeTax * BONUS_PAYMENTS_PER_YEAR;
+
+    const donutSegs = [
+      { value: annualTakeHomeVal || 1, label: '手取り', hint: 'takehome' },
+      { value: annualSocialVal, label: '社会保険料', hint: 'other' },
+      { value: annualTaxVal, label: '税金', hint: 'tax' }
+    ];
+    const donutTotal = donutSegs.reduce((s, x) => s + (x.value || 0), 0) || 1;
+    const donutLargest = donutSegs.reduce((a, b) => (a.value || 0) > (b.value || 0) ? a : b);
+    const donutPct = Math.round(((donutLargest.value || 0) / donutTotal) * 100);
+    renderDonutChart(document.getElementById('donutChart'), donutSegs, {
+      title: '年間給与の内訳',
+      showPct: true,
+      format: (n) => '¥ ' + (n || 0).toLocaleString('ja-JP'),
+      centerLabel: { value: donutPct + '%', sub: donutLargest.label },
+      animate: !fromTabSwitch
+    });
+  }
+}
+
+function updateBonusChipsActive() {
+  const monthly = parseComma(document.getElementById('monthlySalary').value);
+  const bonus = parseComma(document.getElementById('bonusAnnualTotal').value);
+  document.querySelectorAll('.bonus-month-btn').forEach(c => {
+    const months = parseInt(c.dataset.months, 10);
+    const expected = monthly * months;
+    c.classList.toggle('active', monthly > 0 && Math.abs(bonus - expected) < 1000);
+  });
+}
+
+/* ── イベントリスナー ── */
+['monthlySalary', 'allowance', 'bonusAnnualTotal'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => { updateBonusChipsActive(); calculate(); });
+});
+
+document.querySelectorAll('.salary-chips .ds-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const val = parseInt(chip.dataset.val, 10);
+    document.getElementById('monthlySalary').value = (val || 0).toLocaleString('ja-JP');
+    document.querySelectorAll('.salary-chips .ds-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    updateBonusChipsActive();
+    calculate();
+  });
+});
+document.getElementById('monthlySalary').addEventListener('input', () => {
+  const val = parseComma(document.getElementById('monthlySalary').value);
+  document.querySelectorAll('.salary-chips .ds-chip').forEach(c => {
+    c.classList.toggle('active', parseInt(c.dataset.val, 10) === val);
+  });
+  updateBonusChipsActive();
+});
+
+document.querySelectorAll('.bonus-month-btn').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const months = parseInt(chip.dataset.months, 10);
+    const monthly = parseComma(document.getElementById('monthlySalary').value);
+    document.getElementById('bonusAnnualTotal').value = (monthly * months).toLocaleString('ja-JP');
+    document.querySelectorAll('.bonus-month-btn').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    calculate();
+  });
+});
+document.getElementById('ageSeg').addEventListener('click', e => {
+  const btn = e.target.closest('[data-age]');
+  if (!btn) return;
+  document.querySelectorAll('#ageSeg .ds-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ageCategory = btn.dataset.age;
+  calculate();
+});
+
+/* タブ切り替え（年間／月間） */
+document.getElementById('periodStrip').addEventListener('click', e => {
+  const btn = e.target.closest('.ds-period-strip-btn');
+  if (!btn) return;
+  const period = btn.dataset.period;
+  if (period) setPeriod(period);
+});
+
+if (typeof initCommaInput === 'function') initCommaInput(['monthlySalary', 'allowance', 'bonusAnnualTotal']);
+if (typeof initChipScroll === 'function') initChipScroll();
+updateBonusChipsActive();
+calculate();
+
+})();
+</script>
+</body>
+</html>

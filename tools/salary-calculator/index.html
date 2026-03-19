@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>給与・手取り計算シミュレーター</title>
+<title>時給ベース 手取りシミュレーター — Money Tools</title>
 <link rel="stylesheet" href="../../shared/components.css">
 <style>
 /* ══════════════════════════════════════════
@@ -184,8 +184,8 @@ body {
 <main class="app-scope">
 
 <header class="ds-page-title">
-  <h1>給与・手取り計算シミュレーター</h1>
-  <p>社会保険料・所得税・住民税を考慮した実質手取りを試算します</p>
+  <h1>時給ベース 手取りシミュレーター</h1>
+  <p>パート・アルバイト・派遣社員など時給計算の方向け。社会保険料・所得税・住民税を考慮した実質手取りを試算します</p>
 </header>
 
 <div class="ds-page-cols">
@@ -505,20 +505,20 @@ function setPeriod(period) {
     takeHomeLabel.textContent = period === 'monthly' ? '月間手取り額' : '年間手取り額';
   }
 
-  // フェードアウト → 再計算 → フェードイン
+  // フェードインアニメーション（period-switching を先に付与 → 再計算 → 完了後に除去）
   const block = document.querySelector('.ds-breakdown-block');
   if (block) {
     block.classList.add('period-switching');
     setTimeout(() => {
-      calculate();
-      block.classList.remove('period-switching');
-    }, 150);
+      calculate(true);
+      setTimeout(() => block.classList.remove('period-switching'), 500);
+    }, 50);
   } else {
-    calculate();
+    calculate(true);
   }
 }
 
-function calculate() {
+function calculate(fromTabSwitch) {
   const hourly     = parseFloat(document.getElementById('hourlyRate').value)   || 0;
   const hours      = parseFloat(document.getElementById('hoursPerDay').value)   || 0;
   const days       = parseFloat(document.getElementById('daysPerMonth').value)  || 0;
@@ -552,12 +552,16 @@ function calculate() {
   const annualNet      = Math.round(takeHome * 12 / 10000);
   const taxDisplayTotal = excludeRes ? incomeTax : (incomeTax + residenceTax);
 
-  /* ── サマリーアニメーション ── */
+  /* ── サマリー（タブ切り替え=即時、入力変更=カウントアップ） ── */
   const animStat = (id, val) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const from = _prev[id] ?? 0;
-    animateNum(el, from, val, 600, v => Math.round(v).toLocaleString('ja-JP'));
+    if (fromTabSwitch) {
+      el.textContent = Math.round(val).toLocaleString('ja-JP');
+    } else {
+      const from = _prev[id] ?? 0;
+      animateNum(el, from, val, 600, v => Math.round(v).toLocaleString('ja-JP'));
+    }
     _prev[id] = val;
   };
   animStat('statTakeHome',  takeHome);
@@ -602,8 +606,12 @@ function calculate() {
   const animBd = (id, toVal) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const from = _prevBd[id] ?? 0;
-    animateNum(el, from, toVal, 600, fmtYenBd);
+    if (fromTabSwitch) {
+      el.textContent = fmtYenBd(toVal);
+    } else {
+      const from = _prevBd[id] ?? 0;
+      animateNum(el, from, toVal, 600, fmtYenBd);
+    }
     _prevBd[id] = toVal;
   };
 
@@ -636,7 +644,8 @@ function calculate() {
       title: '給与の内訳',
       showPct: true,
       format: (n) => '¥ ' + (n || 0).toLocaleString('ja-JP'),
-      centerLabel: { value: donutPct + '%', sub: donutLargest.label }
+      centerLabel: { value: donutPct + '%', sub: donutLargest.label },
+      animate: !fromTabSwitch
     });
   }
 }

@@ -55,6 +55,49 @@ function fmtYen(n) {
 }
 
 /**
+ * 3桁カンマ区切りフォーマット（入力欄用）
+ * @param {string} val  入力文字列
+ * @returns {string}  例: "1234567" → "1,234,567"
+ */
+function formatComma(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  const num = val.replace(/[^\d]/g, '');
+  return num === '' ? '' : Number(num).toLocaleString('ja-JP');
+}
+
+/**
+ * カンマ付き文字列を数値に変換
+ * @param {string} val
+ * @returns {number}
+ */
+function parseComma(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  return Number(val.replace(/[^\d]/g, '')) || 0;
+}
+
+/**
+ * 数値入力欄に3桁カンマ区切りを適用する
+ * @param {string|string[]} selectorOrIds  CSSセレクタ、または id の配列
+ */
+function initCommaInput(selectorOrIds) {
+  const els = Array.isArray(selectorOrIds)
+    ? selectorOrIds.map(id => document.getElementById(id)).filter(Boolean)
+    : document.querySelectorAll(selectorOrIds);
+  els.forEach(el => {
+    el.addEventListener('input', function() {
+      const pos = this.selectionStart;
+      const prevLen = this.value.length;
+      this.value = formatComma(this.value);
+      const diff = this.value.length - prevLen;
+      this.setSelectionRange(pos + diff, pos + diff);
+    });
+    el.addEventListener('blur', function() {
+      this.value = formatComma(this.value);
+    });
+  });
+}
+
+/**
  * グラフ軸ラベル用の短縮フォーマット
  * @param {number} n  円単位の数値
  * @returns {string}  例: "1.2億" / "1,234万"

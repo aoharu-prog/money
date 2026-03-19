@@ -702,7 +702,8 @@ body {
       <span class="cat-section-tag">.ds-breakdown-block / .ds-accordion-trigger</span>
     </div>
     <p class="cat-desc">社会保険料・税金の内訳をアコーディオンで表示。クリックで展開・折りたたみ。</p>
-    <div class="ds-breakdown-block" style="max-width:480px;">
+    <div style="max-width:480px;">
+    <div class="ds-breakdown-block" id="catBreakdownBlock">
       <div class="ds-breakdown-header-row">
         <span>月間総支給（額面）</span>
         <span>¥ 256,000</span>
@@ -726,6 +727,8 @@ body {
         <span>振込額</span>
         <span class="takehome-value">¥ 211,317</span>
       </div>
+    </div>
+    <button type="button" class="cat-demo-btn" onclick="var b=document.getElementById('catBreakdownBlock');b.classList.add('period-switching');setTimeout(function(){b.classList.remove('period-switching');},500);" style="margin-top:10px;font-size:11px;padding:6px 12px;background:var(--mint-pale);border:1px solid var(--mint-light);border-radius:8px;color:var(--accent-deep);cursor:pointer;">フェードインを試す</button>
     </div>
   </section>
 

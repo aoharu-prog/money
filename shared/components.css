@@ -1369,6 +1369,28 @@ body > h1:first-of-type + p,
   transform: translateY(3px);
 }
 
+/* タブ切り替え: まとめてフェードイン */
+@keyframes breakdownFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ds-breakdown-block.period-switching .ds-breakdown-single > *,
+.ds-breakdown-block.period-switching .ds-breakdown-stack-item > * {
+  opacity: 0;
+  animation: breakdownFadeIn 0.4s ease forwards;
+}
+.ds-breakdown-block.period-switching > *:not(.ds-period-strip):not(.ds-breakdown-single):not(.ds-breakdown-monthly-stack) {
+  opacity: 0;
+  animation: breakdownFadeIn 0.4s ease forwards;
+}
+.ds-breakdown-block.period-switching .ds-breakdown-single .bd-amount,
+.ds-breakdown-block.period-switching .ds-breakdown-stack-item .bd-amount,
+.ds-breakdown-block.period-switching .bd-amount {
+  opacity: inherit;
+  transform: inherit;
+  transition: none;
+}
+
 /* ══════════════════════════════════════════
    ds-work-fields
    稼働条件（時間/日・日数/月・交通費）横並びグリッド
