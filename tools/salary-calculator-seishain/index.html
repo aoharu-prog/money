@@ -9,6 +9,7 @@
 /* ══════════════════════════════════════════
    正社員版給与シミュレーター固有スタイル
 ══════════════════════════════════════════ */
+html { scrollbar-gutter: stable; }
 body {
   font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
   background: var(--base-bg);
@@ -41,18 +42,38 @@ body {
 /* ds-input-num-underline 桁数対応 */
 .app-scope .ds-val-row .ds-input-num-underline { min-width: 120px; flex: 1; }
 
-/* 賞与：数字のみ＋共通ラベル（コンパクト） */
+/* 月給：入力欄＋数字ボタン＋右に「万円」固定、1行で横スクロール */
+.salary-man-row {
+  display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: nowrap;
+}
+.salary-man-row .ds-chip-scroll {
+  flex: 1; min-width: 0;
+}
+.salary-man-row .ds-chip {
+  padding: 4px 12px; flex-shrink: 0;
+  border-radius: 20px;
+  font-size: clamp(0.72rem, 2vw, 0.8rem); font-weight: 500;
+}
+.salary-man-label {
+  font-size: clamp(0.72rem, 2vw, 0.8rem); color: var(--sub-text); font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* 賞与：1行で表示、はみ出し時は横スクロール（ds-chip-scroll） */
 .bonus-months-row {
-  display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: nowrap;
 }
-.bonus-months-btns {
-  display: flex; gap: 4px; flex-wrap: wrap;
+.bonus-months-row .ds-chip-scroll {
+  flex: 1; min-width: 0;
 }
-.bonus-months-btns .ds-chip {
-  padding: 4px 10px; font-size: clamp(0.72rem, 2vw, 0.8rem); min-width: 28px;
+.bonus-months-row .ds-chip {
+  padding: 4px 10px; min-width: 28px; flex-shrink: 0;
+  border-radius: 20px;
+  font-size: clamp(0.72rem, 2vw, 0.8rem);
 }
 .bonus-months-label {
   font-size: clamp(0.72rem, 2vw, 0.8rem); color: var(--sub-text); font-weight: 500;
+  flex-shrink: 0;
 }
 
 .age-row { --form-label-w: 72px; }
@@ -74,6 +95,35 @@ body {
 }
 
 .chart-note { font-size: clamp(0.58rem, 1.7vw, 0.63rem); color: var(--sub-text); line-height: 1.8; }
+
+/* 年間総支給：ヘッダー行デザインのままアコーディオン化 */
+.ds-gross-accordion-trigger {
+  width: 100%; border: none; background: var(--card-bg); cursor: pointer;
+  font-family: inherit; text-align: left; transition: background 0.2s;
+}
+.ds-gross-accordion-trigger:hover { background: var(--mint-pale); }
+.gross-header-left {
+  display: flex; align-items: center; gap: 10px;
+}
+/* 他アコーディオンと同じ「内訳を見る」ボタンデザイン */
+.ds-gross-accordion-trigger .acc-toggle-label {
+  font-size: 10px;
+  background: var(--mint-pale);
+  border: 1px solid var(--mint-light);
+  color: var(--accent-deep);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: background 0.2s;
+}
+.ds-gross-accordion-trigger[aria-expanded="true"] .acc-toggle-label {
+  background: var(--mint-light);
+}
+/* 年間総支給・賞与月総支給アコーディオン内の内訳（ドット色） */
+#grossAccordionBody .breakdown-row .breakdown-label::before,
+#monthlyBonusGrossBody .breakdown-row .breakdown-label::before { background: var(--sub-text); }
 
 /* 結果カラム */
 .ds-result-col {
@@ -141,13 +191,16 @@ body {
             inputmode="numeric" value="300,000" placeholder="0">
           <span class="ds-val-unit">円</span>
         </div>
-        <div class="ds-chip-scroll salary-chips" style="margin-top:10px;">
-          <button type="button" class="ds-chip" data-val="250000">25万</button>
-          <button type="button" class="ds-chip active" data-val="300000">30万</button>
-          <button type="button" class="ds-chip" data-val="350000">35万</button>
-          <button type="button" class="ds-chip" data-val="400000">40万</button>
-          <button type="button" class="ds-chip" data-val="450000">45万</button>
-          <button type="button" class="ds-chip" data-val="500000">50万</button>
+        <div class="salary-man-row">
+          <div class="ds-chip-scroll salary-man-scroll">
+            <button type="button" class="ds-chip" data-val="250000">25</button>
+            <button type="button" class="ds-chip active" data-val="300000">30</button>
+            <button type="button" class="ds-chip" data-val="350000">35</button>
+            <button type="button" class="ds-chip" data-val="400000">40</button>
+            <button type="button" class="ds-chip" data-val="450000">45</button>
+            <button type="button" class="ds-chip" data-val="500000">50</button>
+          </div>
+          <span class="salary-man-label">万円</span>
         </div>
       </div>
 
@@ -177,7 +230,8 @@ body {
           <span class="ds-val-unit">円</span>
         </div>
         <div class="bonus-months-row">
-          <div class="bonus-months-btns">
+          <div class="ds-chip-scroll bonus-months-scroll">
+            <button type="button" class="ds-chip bonus-month-btn" data-months="0">0</button>
             <button type="button" class="ds-chip bonus-month-btn" data-months="1">1</button>
             <button type="button" class="ds-chip bonus-month-btn active" data-months="2">2</button>
             <button type="button" class="ds-chip bonus-month-btn" data-months="3">3</button>
@@ -230,9 +284,28 @@ body {
 
       <!-- 年間タブ用 -->
       <div class="ds-breakdown-single" id="breakdownSingle">
-        <div class="ds-breakdown-header-row">
-          <span id="bdPeriodLabel">年間総支給（額面）</span>
+        <button type="button"
+          class="ds-breakdown-header-row ds-gross-accordion-trigger"
+          id="grossAccordionBtn"
+          aria-expanded="false"
+          aria-controls="grossAccordionBody"
+          onclick="toggleAccordion('grossAccordion')"
+        >
+          <span class="gross-header-left">
+            <span id="bdPeriodLabel">年間総支給（額面）</span>
+            <span class="acc-toggle-label" id="grossToggleLabel">▼ 内訳を見る</span>
+          </span>
           <span class="bd-amount" id="bdGross">¥ 0</span>
+        </button>
+        <div class="ds-accordion-body" id="grossAccordionBody">
+          <div class="breakdown-row">
+            <span class="breakdown-label">月給×12</span>
+            <span class="breakdown-value bd-amount" id="bdBasicSalary">¥ 0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">賞与</span>
+            <span class="breakdown-value bd-amount" id="bdBonus">¥ 0</span>
+          </div>
         </div>
         <button type="button"
           class="ds-accordion-trigger"
@@ -327,9 +400,28 @@ body {
         </div>
         <div class="ds-breakdown-stack-item">
           <div class="ds-breakdown-stack-title">賞与月<span class="ds-breakdown-stack-title-sub">（年2回支給のうち1回分）</span></div>
-          <div class="ds-breakdown-header-row">
-            <span>賞与月の総支給（額面）</span>
+          <button type="button"
+            class="ds-breakdown-header-row ds-gross-accordion-trigger"
+            id="monthlyBonusGrossBtn"
+            aria-expanded="false"
+            aria-controls="monthlyBonusGrossBody"
+            onclick="toggleMonthlyAccordion('monthlyBonusGross')"
+          >
+            <span class="gross-header-left">
+              <span>賞与月の総支給（額面）</span>
+              <span class="acc-toggle-label" id="monthlyBonusGrossLabel">▼ 内訳を見る</span>
+            </span>
             <span class="bd-amount" id="bdGrossBonus">¥ 0</span>
+          </button>
+          <div class="ds-accordion-body" id="monthlyBonusGrossBody">
+            <div class="breakdown-row">
+              <span class="breakdown-label">月給</span>
+              <span class="breakdown-value bd-amount" id="bdGrossBonusBase">¥ 0</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="breakdown-label">賞与</span>
+              <span class="breakdown-value bd-amount" id="bdBonusPayment">¥ 0</span>
+            </div>
           </div>
           <button type="button" class="ds-accordion-trigger" id="monthlyBonusSocialBtn" aria-expanded="false" aria-controls="monthlyBonusSocialBody" onclick="toggleMonthlyAccordion('monthlyBonusSocial')">
             <span class="acc-left">社会保険料<span class="acc-toggle-label" id="monthlyBonusSocialLabel">▼ 内訳を見る</span></span>
@@ -475,11 +567,12 @@ function getBonusTaxRate(prevAfterSocial, bonusAfterSocial) {
 window.toggleAccordion = function(id) {
   const body    = document.getElementById(id + 'Body');
   const btn     = document.getElementById(id + 'Btn');
-  const label   = document.getElementById(id === 'socialAccordion' ? 'socialToggleLabel' : 'taxToggleLabel');
+  const labelId = id === 'socialAccordion' ? 'socialToggleLabel' : id === 'taxAccordion' ? 'taxToggleLabel' : 'grossToggleLabel';
+  const label   = document.getElementById(labelId);
   const isOpen  = body.classList.contains('open');
   body.classList.toggle('open', !isOpen);
   btn.setAttribute('aria-expanded', String(!isOpen));
-  label.textContent = isOpen ? '▼ 内訳を見る' : '▲ 閉じる';
+  if (label) label.textContent = isOpen ? '▼ 内訳を見る' : '▲ 閉じる';
 };
 
 window.toggleMonthlyAccordion = function(prefix) {
@@ -642,6 +735,8 @@ function calculate(fromTabSwitch) {
   };
 
   animBd('bdGross', dispGross);
+  animBd('bdBasicSalary', gross * 12);
+  animBd('bdBonus', bonusAnnualTotal);
   animBd('bdHealth', dispHealth);
   animBd('bdCare', dispCare);
   animBd('bdPension', dispPension);
@@ -670,6 +765,8 @@ function calculate(fromTabSwitch) {
   animBd('bdResidenceTaxNormal', residenceTax);
   animBd('flowTakeHomeNormal', takeHome);
   animBd('bdGrossBonus', bonusMonthGross);
+  animBd('bdGrossBonusBase', gross);
+  animBd('bdBonusPayment', bonusPerPayment);
   animBd('bdSocialBonus', bonusMonthSocial);
   animBd('bdHealthBonus', health + bonusHealth);
   animBd('bdCareBonus', care + bonusCare);
@@ -718,28 +815,36 @@ function updateBonusChipsActive() {
   });
 }
 
+/** 月給変更時：賞与ボタンが選択されていれば、そのヶ月分で賞与を再計算 */
+function syncBonusFromMonthlyIfButtonSelected() {
+  const activeBtn = document.querySelector('.bonus-month-btn.active');
+  if (!activeBtn) return;
+  const months = parseInt(activeBtn.dataset.months, 10);
+  const monthly = parseComma(document.getElementById('monthlySalary').value);
+  document.getElementById('bonusAnnualTotal').value = (monthly * months).toLocaleString('ja-JP');
+}
+
 /* ── イベントリスナー ── */
 ['monthlySalary', 'allowance', 'bonusAnnualTotal'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) el.addEventListener('input', () => { updateBonusChipsActive(); calculate(); });
-});
-
-document.querySelectorAll('.salary-chips .ds-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    const val = parseInt(chip.dataset.val, 10);
-    document.getElementById('monthlySalary').value = (val || 0).toLocaleString('ja-JP');
-    document.querySelectorAll('.salary-chips .ds-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
+  if (el) el.addEventListener('input', () => {
+    if (id === 'monthlySalary') syncBonusFromMonthlyIfButtonSelected();
+    updateSalaryChipsActive();
     updateBonusChipsActive();
     calculate();
   });
 });
-document.getElementById('monthlySalary').addEventListener('input', () => {
-  const val = parseComma(document.getElementById('monthlySalary').value);
-  document.querySelectorAll('.salary-chips .ds-chip').forEach(c => {
-    c.classList.toggle('active', parseInt(c.dataset.val, 10) === val);
+
+document.querySelectorAll('.salary-man-scroll .ds-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const val = parseInt(chip.dataset.val, 10);
+    document.getElementById('monthlySalary').value = (val || 0).toLocaleString('ja-JP');
+    document.querySelectorAll('.salary-man-scroll .ds-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    syncBonusFromMonthlyIfButtonSelected();
+    updateBonusChipsActive();
+    calculate();
   });
-  updateBonusChipsActive();
 });
 
 document.querySelectorAll('.bonus-month-btn').forEach(chip => {
@@ -769,8 +874,15 @@ document.getElementById('periodStrip').addEventListener('click', e => {
   if (period) setPeriod(period);
 });
 
+function updateSalaryChipsActive() {
+  const val = parseComma(document.getElementById('monthlySalary').value);
+  document.querySelectorAll('.salary-man-scroll .ds-chip').forEach(c => {
+    c.classList.toggle('active', parseInt(c.dataset.val, 10) === val);
+  });
+}
 if (typeof initCommaInput === 'function') initCommaInput(['monthlySalary', 'allowance', 'bonusAnnualTotal']);
 if (typeof initChipScroll === 'function') initChipScroll();
+updateSalaryChipsActive();
 updateBonusChipsActive();
 calculate();
 
