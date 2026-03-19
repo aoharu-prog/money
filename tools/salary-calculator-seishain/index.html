@@ -96,7 +96,7 @@ body {
 
 .chart-note { font-size: clamp(0.58rem, 1.7vw, 0.63rem); color: var(--sub-text); line-height: 1.8; }
 
-/* 年間総支給：ヘッダー行デザインのままアコーディオン化 */
+/* 年収：ヘッダー行デザインのままアコーディオン化 */
 .ds-gross-accordion-trigger {
   width: 100%; border: none; background: var(--card-bg); cursor: pointer;
   font-family: inherit; text-align: left; transition: background 0.2s;
@@ -121,7 +121,7 @@ body {
 .ds-gross-accordion-trigger[aria-expanded="true"] .acc-toggle-label {
   background: var(--mint-light);
 }
-/* 年間総支給・賞与月総支給アコーディオン内の内訳（ドット色） */
+/* 年収・賞与月総支給アコーディオン内の内訳（ドット色） */
 #grossAccordionBody .breakdown-row .breakdown-label::before,
 #monthlyBonusGrossBody .breakdown-row .breakdown-label::before { background: var(--sub-text); }
 
@@ -292,7 +292,7 @@ body {
           onclick="toggleAccordion('grossAccordion')"
         >
           <span class="gross-header-left">
-            <span id="bdPeriodLabel">年間総支給（額面）</span>
+            <span id="bdPeriodLabel">年収（額面）</span>
             <span class="acc-toggle-label" id="grossToggleLabel">▼ 内訳を見る</span>
           </span>
           <span class="bd-amount" id="bdGross">¥ 0</span>
@@ -604,7 +604,7 @@ function setPeriod(period) {
   const periodLabel = document.getElementById('bdPeriodLabel');
   const takeHomeLabel = document.getElementById('bdTakeHomeLabel');
   if (period === 'annual') {
-    if (periodLabel) periodLabel.textContent = '年間総支給（額面）';
+    if (periodLabel) periodLabel.textContent = '年収（額面）';
     if (takeHomeLabel) takeHomeLabel.textContent = '年間手取り額';
   } else {
     if (periodLabel) periodLabel.textContent = '月間総支給（額面）';
