@@ -1,0 +1,3121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新NISA 積立シミュレーター（インフレ考慮版） — Money Tools</title>
+<!-- snapshot: nisa-inflation 65-60 result toggle -->
+<style>
+/* === tokens.css === */
+/* ══════════════════════════════════════════
+   DESIGN TOKENS — Mint Design System
+   このファイルは base-design-system.html の
+   :root {} から抽出したCSS変数定義のみを含む
+══════════════════════════════════════════ */
+:root {
+  /* ── ブランドカラー ── */
+  --base-bg:     #e8f5f1;   /* ベース背景（淡いミント）*/
+  --accent:      #a8d5ba;   /* アクセント（若葉ミント）*/
+  --accent-deep: #4a8c6f;   /* アクセント深（深みミント）*/
+
+  /* ── テキスト ── */
+  --text-main:   #44504c;   /* メイン文字（チャコールグレー）*/
+  --text-sub:    #ccd6d1;   /* サブ文字（極薄グレー）*/
+  --sub-text:    #7a9a8e;   /* セカンダリテキスト */
+  --placeholder: #b8d4cc;   /* プレースホルダー */
+  --label-color: #5a7a70;   /* ラベル */
+
+  /* ── 面・背景 ── */
+  --card-bg:     #ffffff;   /* カード背景（純白）*/
+  --mint-light:  #d4ede3;   /* ボーダー・バー背景 */
+  --mint-pale:   #f0faf5;   /* 入力・ホバー背景 */
+
+  /* ── エフェクト ── */
+  --shadow:         rgba(74, 140, 111, 0.12);  /* グリーン系シャドウ */
+  --accent-border:  rgba(168,213,186,0.5);      /* アクセントの半透明ボーダー */
+
+  /* ── セマンティック ── */
+  --warn-color:  #e07a3a;   /* 警告・注意（オレンジ）*/
+
+  /* Data Colors（データ識別用） */
+  --data-blue-1:  #4a7fd4;
+  --data-blue-2:  #7aa8e8;
+  --data-blue-3:  #aac8f4;
+  --data-orange:  #e07a3a;
+  --data-amber:   #f0c060;
+
+  /* ── システムUI専用（デザインシステム閲覧画面用）── */
+  --sys-sidebar: #f8fcfa;
+  --sys-border:  #e2f0e9;
+  --sys-code-bg: #1e2d28;
+  --sys-code-fg: #a8d5ba;
+}
+
+
+/* === components.css === */
+/* ══════════════════════════════════════════
+   COMPONENTS — Mint Design System
+   base-design-system.html のスタイル定義を抽出
+══════════════════════════════════════════ */
+@import './tokens.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+/* ── Reset ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--mint-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ══════════════════════════════════════════
+   site-header
+   共通ヘッダー（base.js で挿入・トップへ戻るリンク）
+   padding-top はヘッダー挿入前のレイアウトシフト防止のため共通化
+══════════════════════════════════════════ */
+body {
+  padding-top: 52px !important; /* ページの padding 指定より優先（レイアウトシフト防止） */
+}
+#site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 52px;
+  z-index: 1000;
+  background: var(--card-bg, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px var(--shadow, rgba(74, 140, 111, 0.12));
+  border-bottom: 1px solid var(--mint-light, #d4ede3);
+}
+.site-header-logo {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 600;
+  color: var(--accent-deep, #4a8c6f);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s ease;
+}
+.site-header-logo:hover {
+  color: var(--accent, #a8d5ba);
+}
+
+/* ══════════════════════════════════════════
+   ds-page-title
+   ツールページタイトル（統一コンポーネント）
+   <header class="ds-page-title"><h1>…</h1><p>…</p></header>
+══════════════════════════════════════════ */
+.ds-page-title {
+  margin-top: clamp(20px, 4vw, 36px);
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+.ds-page-title h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+.ds-page-title p {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* 後方互換：app-scope 直下 h1+p（ds-page-title 未使用時） */
+.app-scope > h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin-top: clamp(20px, 4vw, 36px);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.app-scope > h1 + p {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.65;
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+#site-header + h1,
+body > h1:first-of-type,
+.wrapper > h1:first-of-type {
+  margin-top: clamp(20px, 4vw, 32px);
+}
+#site-header + h1 + p,
+body > h1:first-of-type + p,
+.wrapper > h1:first-of-type + p {
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+
+/* ══════════════════════════════════════════
+   app-scope — ページ基本レイアウト
+   すべてのアプリの <main class="app-scope"> に適用
+══════════════════════════════════════════ */
+.app-scope {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 40px) 80px;
+}
+
+/* ══════════════════════════════════════════
+   2カラムページレイアウト
+   PC: 入力(左固定幅) + 結果(右可変)
+   SP: 縦1カラム
+══════════════════════════════════════════ */
+.ds-page-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 800px) {
+  .ds-page-cols {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .ds-input-col {
+    position: sticky;
+    top: 72px; /* site-header(52px) + 余白20px */
+  }
+  .ds-result-col {
+    position: sticky;
+    top: 72px;
+  }
+  /* 2カラム時の左右フェードイン（トップページの .tool-card に合わせ 0.45s） */
+  .ds-input-col .ds-card {
+    animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .ds-input-col .ds-card:nth-child(1) { animation-delay: 0.04s; }
+  .ds-result-col .ds-card {
+    animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+    animation-delay: 0.1s;
+  }
+  /* ds-input-col は 340px 幅のため、フォームを縦並びに（はみ出し防止） */
+  .ds-input-col .ds-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-result-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0; /* grid内でのはみ出し防止 */
+}
+
+/* ══════════════════════════════════════════
+   KEYFRAMES
+══════════════════════════════════════════ */
+@keyframes shimmerBar    { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+@keyframes secFadeIn     { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulseBadge    { 0%,100%{box-shadow:0 2px 12px var(--accent-border)} 50%{box-shadow:0 4px 22px rgba(74,140,111,0.45)} }
+@keyframes barShimmer    { 0%{left:-100%} 100%{left:200%} }
+@keyframes dsConfettiFall{ 0%{transform:translateY(-20px) rotate(0deg) scale(0);opacity:1} 100%{transform:translateY(100vh) rotate(720deg) scale(0.4);opacity:0} }
+@keyframes fadeInDown    { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInUp      { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes floatLeaf     { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-8px) rotate(3deg)} }
+
+/* ══════════════════════════════════════════
+   ds-badge
+   インラインバッジ（ステータス・ラベル表示）
+══════════════════════════════════════════ */
+.ds-badge {
+  display: inline-block;
+  background: var(--accent); color: #fff;
+  font-size: 11px; letter-spacing: 0.14em;
+  padding: 4px 16px; border-radius: 20px; font-weight: 500;
+  box-shadow: 0 2px 12px var(--accent-border);
+  animation: pulseBadge 3s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+   ds-card
+   ホワイトカード（グリーンシマーバー付き）
+══════════════════════════════════════════ */
+.ds-card {
+  background: var(--card-bg); border-radius: 28px; padding: 28px;
+  box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
+  position: relative; overflow: hidden;
+}
+.ds-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
+  background-size: 200%; animation: shimmerBar 3s linear infinite;
+  border-radius: 28px 28px 0 0;
+}
+
+/* ds-card 内ラベル（●条件設定 / ●シミュレーション結果 等） */
+.ds-card-label {
+  font-size: clamp(0.65rem, 1.9vw, 0.75rem); font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--sub-text); margin-bottom: clamp(16px, 3vw, 22px);
+  display: flex; align-items: center; gap: 8px;
+}
+.ds-card-label::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-deep); flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   ds-input
+   ボーダー付きテキスト入力（フルワイド）
+══════════════════════════════════════════ */
+.ds-input-wrap { position: relative; }
+.ds-input {
+  width: 100%; padding: 16px 56px 16px 20px;
+  font-size: 20px; font-family: 'Roboto', sans-serif; font-weight: 500;
+  color: var(--text-main); border: 2px solid var(--mint-light);
+  border-radius: 16px; outline: none; background: var(--mint-pale);
+  transition: all 0.3s ease; letter-spacing: 0.04em;
+}
+.ds-input::placeholder { color: var(--placeholder); font-weight: 500; font-size: 16px; }
+.ds-input:focus { border-color: var(--accent); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(168,213,186,0.25); }
+.ds-input-unit {
+  position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; color: var(--sub-text); pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   Buttons
+══════════════════════════════════════════ */
+.ds-btn-primary {
+  background: var(--accent-deep); color: #fff;
+  border: none; border-radius: 20px; padding: 10px 24px;
+  font-size: 13px; font-family: inherit; font-weight: 500; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 2px 12px rgba(74,140,111,0.35);
+}
+.ds-btn-primary:hover { transform: scale(1.05); box-shadow: 0 4px 18px rgba(74,140,111,0.45); }
+.ds-btn-primary:active { transform: scale(0.96); }
+
+.ds-btn-secondary {
+  background: transparent; color: var(--sub-text);
+  border: 1.5px solid var(--mint-light); border-radius: 20px; padding: 9px 22px;
+  font-size: 13px; font-family: inherit; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ds-btn-secondary:hover { border-color: var(--accent-deep); color: var(--accent-deep); background: var(--mint-pale); transform: scale(1.05); }
+.ds-btn-secondary:active { transform: scale(0.96); }
+
+.ds-btn-ghost {
+  background: transparent; color: var(--sub-text);
+  border: none; border-radius: 8px; padding: 8px 16px;
+  font-size: 13px; font-family: inherit; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ds-btn-ghost:hover { background: var(--mint-pale); color: var(--text-main); }
+
+/* ══════════════════════════════════════════
+   ds-segment
+   セグメントコントロール（タブ切り替え）
+══════════════════════════════════════════ */
+.ds-segment {
+  display: flex; gap: 6px; background: var(--mint-pale);
+  padding: 5px; border-radius: 14px; width: fit-content;
+}
+.ds-seg-btn {
+  padding: 9px 20px; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  color: var(--sub-text); background: transparent; letter-spacing: 0.04em;
+  font-family: inherit;
+}
+.ds-seg-btn.active {
+  background: var(--card-bg); color: var(--accent-deep);
+  box-shadow: 0 2px 10px var(--shadow); transform: scale(1.02);
+}
+.ds-seg-btn:hover:not(.active) { background: rgba(168,213,186,0.2); }
+
+/* ══════════════════════════════════════════
+   ds-result
+   結果カード（KPI単体表示）
+══════════════════════════════════════════ */
+.ds-result {
+  background: var(--mint-pale); border-radius: 16px; padding: 18px 20px;
+  border: 1.5px solid var(--mint-light); margin-bottom: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ds-result:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.ds-result.highlight {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  border-color: var(--accent); box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-result-label { font-size: 11px; color: var(--sub-text); margin-bottom: 5px; letter-spacing: 0.08em; }
+.ds-result-value {
+  font-family: 'Roboto', sans-serif; font-size: 26px; font-weight: 500;
+  color: var(--text-main); display: flex; align-items: baseline; gap: 4px;
+}
+.ds-result-unit { font-family: 'Hiragino Kaku Gothic ProN', sans-serif; font-size: 13px; color: var(--sub-text); font-weight: 400; }
+.ds-result-sub { font-size: 11px; color: var(--sub-text); margin-top: 6px; line-height: 1.4; }
+
+/* ══════════════════════════════════════════
+   ds-progress
+   進捗バー（グラデーション＋シマー）
+══════════════════════════════════════════ */
+.ds-progress-bg { height: 6px; background: var(--mint-light); border-radius: 3px; overflow: hidden; }
+.ds-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: 3px; transition: width 1s cubic-bezier(0.22,0.61,0.36,1);
+  position: relative; overflow: hidden;
+}
+.ds-progress-fill::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+   ds-divider
+   区切り線（フェードグラデーション）
+══════════════════════════════════════════ */
+.ds-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--mint-light), transparent); margin: 20px 0; }
+
+/* ══════════════════════════════════════════
+   ds-form-row
+   ラベル＋インプットの横並びレイアウト
+   --form-label-w でラベル幅をカスタマイズ可能（デフォルト 200px）
+══════════════════════════════════════════ */
+.ds-form-rows { display: flex; flex-direction: column; gap: clamp(18px, 3.5vw, 26px); }
+.ds-form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 560px) {
+  .ds-form-row {
+    grid-template-columns: var(--form-label-w, 200px) 1fr;
+    align-items: center;
+    gap: 20px;
+  }
+}
+.ds-form-row-label { display: flex; flex-direction: column; gap: 4px; }
+.ds-form-row-label .lname {
+  font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+.ds-form-row-label .ldesc {
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
+  color: var(--sub-text);
+  line-height: 1.5;
+}
+.ds-form-row-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ══════════════════════════════════════════
+   ds-toast
+   フローティングトースト通知
+══════════════════════════════════════════ */
+.ds-toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--accent-deep); color: #fff; padding: 12px 28px;
+  border-radius: 40px; font-size: 13px; letter-spacing: 0.08em;
+  box-shadow: 0 6px 24px rgba(74,140,111,0.4);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+  opacity: 0; z-index: 9999; white-space: nowrap; pointer-events: none;
+}
+.ds-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ══════════════════════════════════════════
+   ds-confetti
+   コンフェッティエフェクト用コンテナ
+══════════════════════════════════════════ */
+#ds-confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998; overflow: hidden; }
+.ds-confetti-piece { position: absolute; animation: dsConfettiFall linear forwards; opacity: 0; }
+
+/* ══════════════════════════════════════════
+   ds-range
+   シンプルスライダー（ds-progress と同じ fill＋シマーアニメーション）
+══════════════════════════════════════════ */
+.ds-range-wrap {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mint-light);
+  overflow: visible;
+}
+.ds-range-wrap .ds-range {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+}
+.ds-range-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--pct, 0%);
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: 3px;
+  overflow: hidden;
+  /* transition なし：thumb と fill を完全同期させるため */
+  pointer-events: none;
+}
+.ds-range-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+.ds-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  z-index: 1;
+  /* 単体使用時のフォールバック（wrap 内では transparent で上書き） */
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent-deep) var(--pct, 0%),
+    var(--mint-light) var(--pct, 0%),
+    var(--mint-light) 100%
+  );
+}
+.ds-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: grab;
+}
+.ds-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.ds-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  cursor: grab;
+}
+
+/* ══════════════════════════════════════════
+   note-box / dashed-box
+   注釈・補足ボックス
+══════════════════════════════════════════ */
+.note-box {
+  background: rgba(168,213,186,0.1); border-left: 3px solid var(--accent);
+  border-radius: 12px; padding: 14px 18px; font-size: 12px;
+  color: var(--sub-text); line-height: 1.8; letter-spacing: 0.05em;
+}
+.dashed-box {
+  border: 1px dashed var(--mint-light); border-radius: 12px;
+  padding: 14px 18px; background: var(--mint-pale); font-size: 12px;
+  color: var(--sub-text); line-height: 1.8; font-family: 'Roboto Mono', monospace;
+}
+
+/* ══════════════════════════════════════════
+   ① ds-input-stepper
+   数値入力 + スライダー + ±ボタン セット
+══════════════════════════════════════════ */
+.ds-val-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.ds-val-row-stack { display: flex; flex-direction: column; gap: 10px; }
+.ds-val-row-stack .ds-chip-scroll { margin-left: 0; flex: none; }
+.ds-val-row .ds-input-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  background: transparent;
+  padding: 4px 0 6px;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s ease;
+  -moz-appearance: textfield;
+}
+.ds-val-row .ds-input-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-val-row .ds-input-underline::-webkit-outer-spin-button,
+.ds-val-row .ds-input-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ds-num-edit {
+  font-size: clamp(1.5rem, 5.5vw, 2rem); font-weight: 500;
+  color: var(--text-main); font-family: 'Roboto', sans-serif;
+  border: none; border-bottom: 2px solid var(--mint-light); outline: none;
+  background: transparent; width: 100px; -moz-appearance: textfield;
+  padding: 0 4px 4px; transition: border-color .25s ease; line-height: 1.1;
+}
+.ds-num-edit:focus { border-bottom-color: var(--accent-deep); }
+.ds-num-edit::-webkit-outer-spin-button,
+.ds-num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
+.ds-val-unit { font-size: 0.95rem; color: var(--sub-text); font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   ds-input-num-underline
+   数値入力（アンダーラインのみ・単位付き）
+   ds-val-row 内で使用: <input class="ds-input-num-underline"> + <span class="ds-val-unit">万円</span>
+══════════════════════════════════════════ */
+.ds-input-num-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.5rem, 5.5vw, 2rem);
+  font-weight: 500;
+  color: var(--text-main);
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  outline: none;
+  background: transparent;
+  width: 100px;
+  padding: 0 4px 4px;
+  transition: border-color 0.25s ease;
+  line-height: 1.1;
+  -moz-appearance: textfield;
+}
+.ds-input-num-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-input-num-underline::placeholder {
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+}
+.ds-input-num-underline::-webkit-outer-spin-button,
+.ds-input-num-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ds-input-stepper { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ds-pm-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: transparent;
+  color: var(--accent-deep);
+  border: 1.5px solid var(--accent);
+  cursor: pointer; font-size: 1rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(74,140,111,0.12);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  user-select: none; line-height: 1;
+}
+.ds-pm-btn:hover {
+  background: var(--mint-pale);
+  border-color: var(--accent-deep);
+  box-shadow: 0 1px 4px rgba(74,140,111,0.12);
+  transform: none;
+}
+.ds-pm-btn:active { transform: scale(0.9); }
+
+/* ピル+縦線のラッパー */
+.ds-stepper-wrap {
+  flex: 1; min-width: 0;
+  position: relative;
+}
+/* ピルの高さ分の余白。padding-bottom でスライダーバーと±ボタンの上下中央揃え */
+.ds-stepper-wrap-inner {
+  position: relative;
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+/* B1フローティングピル */
+.ds-stepper-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ds-stepper-pill-label {
+  background: #fff;
+  color: var(--accent-deep);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  border: 1.5px solid var(--mint-light);
+  line-height: 1.4;
+}
+.ds-stepper-pill-line {
+  width: 1.5px;
+  height: 4px;
+  background: var(--mint-light);
+  flex-shrink: 0;
+}
+/* シマーオーバーレイ（ds-progressと同じ） */
+.ds-stepper-shimmer {
+  pointer-events: none;
+  position: absolute;
+  top: 38px;
+  left: 0;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  overflow: hidden;
+  /* transition なし：thumb と fill を完全同期させるため */
+}
+.ds-stepper-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+
+/* ピル無しバージョン（.ds-stepper-wrap--no-pill を付与） */
+.ds-stepper-wrap--no-pill .ds-stepper-shimmer {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* サム：白抜き＋深緑リング */
+.ds-stepper-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent var(--pct, 0%),
+    var(--mint-light) var(--pct, 0%),
+    var(--mint-light) 100%
+  );
+}
+.ds-stepper-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: grab;
+}
+.ds-stepper-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.ds-stepper-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  cursor: grab;
+}
+
+/* ══════════════════════════════════════════
+   ② ds-warning-inline
+   オレンジ系インライン警告ボックス
+══════════════════════════════════════════ */
+.ds-warning-inline {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 14px;
+  background: rgba(224,122,58,0.08);
+  border-radius: 10px;
+  font-size: 12px; color: var(--warn-color);
+  line-height: 1.7; letter-spacing: 0.04em;
+}
+.ds-warning-inline .wi-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+/* ══════════════════════════════════════════
+   ③ ds-select-underline
+   アンダーラインスタイルのセレクトボックス
+══════════════════════════════════════════ */
+.ds-select-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.ds-select-underline {
+  font-size: clamp(1.4rem, 5vw, 1.8rem); font-weight: 500;
+  color: var(--text-main);
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  border: none; border-bottom: 2px solid var(--mint-light);
+  background: transparent; outline: none; cursor: pointer;
+  padding: 0 4px 4px; -webkit-appearance: none; appearance: none;
+  transition: border-color .25s ease; line-height: 1.1;
+}
+.ds-select-underline:focus { border-bottom-color: var(--accent-deep); }
+.ds-select-unit { font-size: 0.95rem; color: var(--sub-text); font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   ④ ds-summary-grid / ds-stat-card
+   KPI・サマリーグリッドレイアウト
+══════════════════════════════════════════ */
+.ds-summary-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+@media (min-width: 480px) {
+  .ds-summary-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+@media (max-width: 479px) {
+  .ds-summary-grid .ds-stat-card:last-child { grid-column: 1 / -1; }
+}
+.ds-stat-card {
+  background: var(--mint-pale); border-radius: 16px;
+  padding: clamp(14px, 3vw, 20px) clamp(10px, 2vw, 16px) clamp(12px, 2.5vw, 18px);
+  text-align: center; border: 1.5px solid var(--mint-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ds-stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.ds-stat-card.highlight {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  border-color: var(--accent); box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-stat-label {
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem); color: var(--sub-text);
+  font-weight: 600; margin-bottom: clamp(6px, 1.8vw, 10px); line-height: 1.4; letter-spacing: 0.04em;
+}
+.ds-stat-value { font-family: 'Roboto', sans-serif; line-height: 1.1; }
+.ds-stat-num {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 500; color: var(--accent-deep);
+}
+.ds-stat-unit { font-size: clamp(0.85rem, 2.8vw, 1.1rem); font-weight: 400; color: var(--accent-deep); margin-left: 3px; }
+.ds-stat-detail { font-size: clamp(0.72rem, 2.3vw, 0.88rem); color: var(--sub-text); font-weight: 500; margin-top: 8px; }
+.ds-stat-detail-num {
+  font-family: 'Roboto', sans-serif; font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 500; color: var(--accent-deep);
+}
+.ds-stat-detail-unit {
+  font-size: clamp(0.75rem, 2.5vw, 0.95rem); font-weight: 400;
+  color: var(--accent-deep); margin-left: 1px; margin-right: 2px;
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif; vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════
+   ⑤ ds-chip-scroll / ds-chip
+   横スクロール可能なプリセットチップ群
+══════════════════════════════════════════ */
+.ds-chip-scroll {
+  display: flex; gap: 6px; flex-wrap: nowrap;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; min-width: 0; padding: 4px;
+}
+/* ds-val-row 内では残スペースを埋めて右端に寄せる */
+.ds-val-row .ds-chip-scroll { flex: 1 1 0; margin-left: auto; }
+.ds-chip-scroll::-webkit-scrollbar { display: none; }
+.ds-chip {
+  padding: 5px 14px;
+  border: 1.5px solid var(--mint-light); border-radius: 20px;
+  font-size: clamp(0.7rem, 2.2vw, 0.78rem); font-weight: 500;
+  font-family: inherit; color: var(--sub-text); background: transparent;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  letter-spacing: 0.04em; line-height: 1.4; white-space: nowrap; flex-shrink: 0;
+}
+.ds-chip:hover {
+  border-color: var(--accent-deep); color: var(--accent-deep);
+  background: var(--mint-pale); transform: scale(1.05);
+}
+.ds-chip:active { transform: scale(0.95); }
+.ds-chip.active {
+  background: var(--accent-deep); border-color: var(--accent-deep);
+  color: #fff; box-shadow: 0 2px 10px rgba(74,140,111,0.35);
+}
+
+/* ══════════════════════════════════════════
+   ⑥ ds-sim-chart
+   積立シミュレーション棒グラフ
+══════════════════════════════════════════ */
+.ds-chart-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+.ds-chart-li { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--sub-text); font-weight: 500; }
+.ds-chart-ld { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.ds-chart-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+.ds-chart-note { font-size: 11px; color: var(--sub-text); text-align: right; margin-top: 8px; letter-spacing: 0.04em; }
+.ds-chart-tooltip {
+  position: fixed; background: #2c3a35; color: #fff;
+  border-radius: 14px; padding: 12px 16px;
+  font-size: 12px; pointer-events: none;
+  opacity: 0; transition: opacity .15s; z-index: 9999;
+  min-width: 190px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(74,140,111,0.2);
+  line-height: 1.8; border: 1px solid rgba(168,213,186,0.2);
+}
+.ds-chart-tooltip.show { opacity: 1; }
+.ds-chart-tooltip .tt-year  { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 3px; }
+.ds-chart-tooltip .tt-total { font-size: 14px; font-weight: 500; font-family: 'Roboto', sans-serif; margin-bottom: 2px; }
+.ds-chart-tooltip .tt-row   { display: flex; align-items: center; gap: 8px; }
+.ds-chart-tooltip .tt-dot   { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.ds-chart-tooltip .tt-sep   { border-top: 1px solid rgba(255,255,255,0.12); margin: 4px 0; }
+
+/* ══════════════════════════════════════════
+   back-to-index
+   マネーツール一覧へ戻るボタン（各シミュレーター下部）
+══════════════════════════════════════════ */
+.back-to-index { margin-top: 24px; text-align: center; }
+.back-to-index a {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  background: var(--mint-pale); border: 1px solid var(--mint-light);
+  border-radius: 12px; color: var(--accent-deep);
+  text-decoration: none; font-size: 14px; font-weight: 500;
+  transition: background 0.2s, border-color 0.2s;
+}
+.back-to-index a:hover { background: #fff; border-color: var(--accent); }
+
+/* ══════════════════════════════════════════
+   ds-hero-result
+   手取りヒーローカード（グラデーション背景）
+══════════════════════════════════════════ */
+.ds-hero-result {
+  background: linear-gradient(135deg, #5aaa8e 0%, #6ec4a8 100%);
+  border-radius: 20px;
+  padding: 24px 24px 20px;
+  color: #fff;
+  box-shadow: 0 4px 22px rgba(74,140,111,0.22);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.ds-hero-result .hero-eyebrow {
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+.ds-hero-result .hero-amount {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(2.2rem, 7vw, 3rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+.ds-hero-result .hero-amount-unit {
+  font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  font-weight: 400;
+}
+.ds-hero-result .hero-sub {
+  margin-top: 14px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ds-hero-result .hero-sub-value {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════
+   ds-calc-basis
+   計算の根拠（番号付きステップ＋要約式）
+══════════════════════════════════════════ */
+.ds-calc-basis {
+  background: var(--mint-pale);
+  border: 1.5px dashed var(--mint-light);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 4px;
+}
+.ds-calc-basis-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-deep);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ds-calc-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+.ds-calc-step-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.ds-calc-step .val {
+  font-weight: 500;
+  color: var(--accent-deep);
+}
+.ds-calc-eq {
+  font-size: 13px;
+  color: var(--text-main);
+  background: var(--card-bg);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  line-height: 1.8;
+}
+.ds-calc-eq .em {
+  color: var(--accent-deep);
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════
+   ds-breakdown-accordion
+   社会保険料・税金の内訳アコーディオン
+══════════════════════════════════════════ */
+.ds-breakdown-block {
+  background: var(--card-bg);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.ds-breakdown-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--card-bg);
+  font-size: clamp(0.82rem, 2.4vw, 0.92rem);
+  font-weight: 700;
+  color: var(--text-main);
+  border-bottom: 1.5px solid var(--mint-light);
+}
+.ds-accordion-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 18px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--mint-light);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.ds-accordion-trigger:hover {
+  background: var(--mint-pale);
+}
+.ds-accordion-trigger .acc-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--sub-text);
+  text-transform: uppercase;
+}
+.ds-accordion-trigger .acc-toggle-label {
+  font-size: 10px;
+  background: var(--mint-pale);
+  border: 1px solid var(--mint-light);
+  color: var(--accent-deep);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: background 0.2s;
+}
+.ds-accordion-trigger[aria-expanded="true"] .acc-toggle-label {
+  background: var(--mint-light);
+}
+.ds-accordion-trigger .acc-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  font-weight: 500;
+  color: var(--sub-text);
+  text-align: right;
+}
+.acc-resident-hint {
+  font-size: 10px;
+  color: var(--warn-color);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+.ds-accordion-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+  background: #fafcfb;
+}
+.ds-accordion-body.open {
+  max-height: 400px;
+}
+.ds-accordion-body .breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 18px;
+  font-size: clamp(0.78rem, 2.3vw, 0.88rem);
+  border-bottom: 1px solid var(--mint-light);
+}
+.ds-accordion-body .breakdown-row .breakdown-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sub-text);
+}
+.ds-accordion-body .breakdown-row .breakdown-label::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.ds-accordion-body .breakdown-row.color-health .breakdown-label::before { background: var(--data-blue-2); }
+.ds-accordion-body .breakdown-row.color-care .breakdown-label::before { background: var(--data-blue-2); }
+.ds-accordion-body .breakdown-row.color-pension .breakdown-label::before { background: var(--data-blue-1); }
+.ds-accordion-body .breakdown-row.color-employ .breakdown-label::before { background: var(--data-blue-3); }
+.ds-accordion-body .breakdown-row.color-income .breakdown-label::before { background: var(--data-orange); }
+.ds-accordion-body .breakdown-row.color-resident .breakdown-label::before { background: var(--data-amber); }
+.ds-accordion-body .breakdown-row .breakdown-value {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: var(--sub-text);
+  text-align: right;
+}
+.ds-accordion-body .breakdown-row:last-child {
+  border-bottom: none;
+}
+.ds-breakdown-subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 18px;
+  font-size: clamp(0.8rem, 2.3vw, 0.9rem);
+  font-weight: 600;
+  color: var(--sub-text);
+  border-top: 1px solid var(--mint-light);
+}
+.ds-breakdown-takehome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  font-size: clamp(0.88rem, 2.5vw, 1rem);
+  font-weight: 700;
+  color: var(--text-main);
+}
+.ds-breakdown-takehome .takehome-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 500;
+  color: var(--accent-deep);
+}
+
+/* ══════════════════════════════════════════
+   ds-donut-summary
+   ドーナツグラフ＋内訳を横並びにしたカード
+══════════════════════════════════════════ */
+.ds-donut-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  background: var(--mint-pale);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 16px;
+}
+.ds-donut-summary .donut-canvas-wrap,
+.ds-donut-summary .donut-svg-wrap {
+  flex-shrink: 0;
+  width: clamp(90px, 22vw, 120px);
+  aspect-ratio: 1;
+  position: relative;
+}
+.ds-donut-summary .donut-svg-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ds-donut-summary .donut-legend {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ds-donut-summary .donut-legend-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--placeholder);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.ds-donut-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(0.72rem, 2vw, 0.82rem);
+}
+.ds-donut-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.ds-donut-legend-name {
+  flex: 1;
+  color: var(--sub-text);
+}
+.ds-donut-legend-val {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: var(--text-main);
+  text-align: right;
+}
+.ds-donut-legend-pct {
+  font-size: 10px;
+  color: var(--placeholder);
+  margin-left: 3px;
+}
+
+/* ══════════════════════════════════════════
+   ds-resident-savings
+   住民税取り置きブロック（翌年払い注意）
+   住民税を計算から外すON時に表示
+══════════════════════════════════════════ */
+.ds-resident-savings {
+  display: none;                          /* JSでshow/hide */
+  background: rgba(224,122,58,0.07);
+  border: 1.5px solid rgba(224,122,58,0.25);
+  border-radius: 16px;
+  padding: 16px 18px;
+  animation: fadeInUp 0.3s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+.ds-resident-savings.visible {
+  display: block;
+}
+
+/* ヘッダー行 */
+.drs-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.drs-header-icon { font-size: 16px; }
+.drs-header-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--warn-color);
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+.drs-badge {
+  font-size: 10px;
+  background: rgba(224,122,58,0.12);
+  color: var(--warn-color);
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* 月額→年額カード行 */
+.drs-amounts {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 14px;
+}
+.drs-amount-card {
+  flex: 1;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  padding: 11px 13px;
+  border: 1px solid rgba(224,122,58,0.22);
+}
+.drs-amount-card.annual {
+  background: rgba(224,122,58,0.1);
+  border-color: rgba(224,122,58,0.3);
+  border-width: 1.5px;
+}
+.drs-amount-label {
+  font-size: 10px;
+  color: var(--warn-color);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.drs-amount-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 500;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+.drs-amount-card.annual .drs-amount-value {
+  font-weight: 500;
+  color: var(--warn-color);
+}
+.drs-amount-unit {
+  font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: 12px;
+  color: var(--sub-text);
+  margin-left: 2px;
+}
+.drs-amount-card.annual .drs-amount-unit {
+  color: var(--warn-color);
+  opacity: 0.8;
+}
+.drs-arrow {
+  padding: 0 10px;
+  font-size: 16px;
+  color: rgba(224,122,58,0.35);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* プログレスバー */
+.drs-bar-wrap {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.drs-bar-track {
+  flex: 1;
+  min-width: 0;
+}
+.drs-bar-bg {
+  height: 14px;
+  background: rgba(224,122,58,0.12);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.drs-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(224,122,58,0.55), var(--warn-color));
+  border-radius: 7px;
+  transition: width 0.7s cubic-bezier(0.22,0.61,0.36,1);
+  position: relative;
+  overflow: hidden;
+}
+.drs-bar-fill::after {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+.drs-bar-pct {
+  font-size: 11px;
+  color: var(--warn-color);
+  font-weight: 600;
+  opacity: 0.9;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 注記 */
+.drs-note {
+  font-size: 11px;
+  color: var(--sub-text);
+  line-height: 1.75;
+  border-top: 1px dashed rgba(224,122,58,0.25);
+  padding-top: 10px;
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════
+   ds-explain-panel
+   用語・考え方の短い説明（ds-resident-savings と同系の枠・Mint系）
+   インフレ実質額の説明などに使用
+══════════════════════════════════════════ */
+.ds-explain-panel {
+  display: block;
+  background: rgba(168,213,186,0.12);
+  border: 1.5px solid rgba(74,140,111,0.22);
+  border-radius: 16px;
+  padding: 18px 20px 20px;
+  margin-top: 16px;
+  animation: fadeInUp 0.35s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+.ds-explain-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ds-explain-head-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.ds-explain-head-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-deep);
+  letter-spacing: 0.04em;
+  flex: 1;
+  line-height: 1.35;
+}
+.ds-explain-badge {
+  font-size: 10px;
+  background: rgba(74,140,111,0.12);
+  color: var(--accent-deep);
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ds-explain-body {
+  font-size: clamp(0.78rem, 2.2vw, 0.88rem);
+  color: var(--text-main);
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+}
+.ds-explain-body p {
+  margin: 0;
+}
+.ds-explain-body p + p {
+  margin-top: 7px;
+}
+.ds-explain-body strong {
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+.ds-explain-note {
+  font-size: 11px;
+  color: var(--sub-text);
+  line-height: 1.65;
+  border-top: 1px dashed rgba(74,140,111,0.3);
+  padding-top: 9px;
+  margin-top: 10px;
+  letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════
+   ds-period-strip
+   内訳ブロック上部 月間／年間 切り替えストリップ
+══════════════════════════════════════════ */
+.ds-period-strip {
+  display: flex;
+  border-bottom: 1.5px solid var(--mint-light);
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  background: var(--mint-pale);
+}
+.ds-period-strip-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  position: relative;
+  background: transparent;
+  color: var(--sub-text);
+  transition: color 0.2s ease;
+}
+.ds-period-strip-btn.active {
+  color: var(--accent-deep);
+}
+/* アクティブのアンダーライン */
+.ds-period-strip-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--accent-deep);
+  transition: width 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ds-period-strip-btn.active::after {
+  width: 40px;
+}
+/* ボタン間の区切り線 */
+.ds-period-strip-btn:not(:last-child) {
+  border-right: 1px solid var(--mint-light);
+}
+
+/* 金額切り替えアニメーション */
+.bd-amount {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  display: inline-block;
+}
+.ds-breakdown-block.period-switching .bd-amount {
+  opacity: 0;
+  transform: translateY(3px);
+}
+
+/* タブ切り替え: まとめてフェードイン */
+@keyframes breakdownFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ds-breakdown-block.period-switching .ds-breakdown-single > *,
+.ds-breakdown-block.period-switching .ds-breakdown-stack-item > * {
+  opacity: 0;
+  animation: breakdownFadeIn 0.4s ease forwards;
+}
+.ds-breakdown-block.period-switching > *:not(.ds-period-strip):not(.ds-breakdown-single):not(.ds-breakdown-monthly-stack) {
+  opacity: 0;
+  animation: breakdownFadeIn 0.4s ease forwards;
+}
+.ds-breakdown-block.period-switching .ds-breakdown-single .bd-amount,
+.ds-breakdown-block.period-switching .ds-breakdown-stack-item .bd-amount,
+.ds-breakdown-block.period-switching .bd-amount {
+  opacity: inherit;
+  transform: inherit;
+  transition: none;
+}
+
+/* ══════════════════════════════════════════
+   ds-work-fields
+   稼働条件（時間/日・日数/月・交通費）横並びグリッド
+══════════════════════════════════════════ */
+.ds-work-fields {
+  display: grid;
+  grid-template-columns: 1fr 0.4fr 1fr 0.4fr 1.8fr 0.4fr;
+  align-items: end;
+  column-gap: 12px;
+  row-gap: 8px;
+}
+.ds-work-fields .ds-input-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  font-weight: 500;
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  background: transparent;
+  padding: 4px 0 6px;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s ease;
+  -moz-appearance: textfield;
+}
+.ds-work-fields .ds-input-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-work-fields .ds-input-underline::-webkit-outer-spin-button,
+.ds-work-fields .ds-input-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ds-work-fields .field-label {
+  font-size: clamp(0.68rem, 2vw, 0.76rem);
+  font-weight: 600;
+  color: var(--sub-text);
+  white-space: nowrap;
+}
+.ds-work-fields .field-unit {
+  font-size: clamp(0.82rem, 2.4vw, 0.95rem);
+  color: var(--sub-text);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  /* ── 稼働条件グリッド：幅を絞り交通費のみ広く ── */
+  .ds-work-fields {
+    grid-template-columns: 44px auto 44px auto 80px auto;
+    align-items: end;
+    column-gap: 6px;
+    row-gap: 0;
+  }
+
+  /* ── 稼働条件の入力欄フォントサイズを1段階アップ ── */
+  .ds-work-fields .ds-input-underline {
+    font-size: 22px;
+  }
+}
+
+
+/* === ツール固有CSS === */
+/* ══════════════════════════════════════════
+   NISA固有トークン（共通変数は shared/tokens.css）
+══════════════════════════════════════════ */
+:root {
+  --form-label-w: 210px;
+}
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
+  background: var(--base-bg);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(168,213,186,0.18) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(74,140,111,0.07) 0%, transparent 45%);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 20px 16px 48px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) {
+  body { padding: 36px 24px 60px; }
+}
+
+.ds-form-rows { gap: clamp(10px, 2.5vw, 14px); }
+.ds-divider { margin: 10px 0; }
+.ds-form-row-right { gap: 6px; }
+.app-scope .ds-card-label { margin-bottom: clamp(12px, 2.5vw, 18px); }
+
+.ds-val-row { align-items: center; margin-bottom: 0; }
+.ds-num-edit { font-size: clamp(1.6rem, 6vw, 2.1rem); width: 82px; letter-spacing: 0.02em; font-weight: 500; }
+.ds-val-unit { font-size: clamp(0.85rem, 2.5vw, 1rem); }
+
+.dob-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.ds-select-underline { font-size: clamp(1.5rem, 6vw, 2rem); font-weight: 500; }
+.ds-select-unit { font-size: clamp(0.85rem, 2.5vw, 1rem); }
+.age-display {
+  font-size: clamp(0.75rem, 2.3vw, 0.88rem);
+  color: var(--label-color);
+  font-weight: 500;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.age-display.warn { color: var(--warn-color); font-weight: 600; margin-left: 0; }
+.eval-warn {
+  font-size: clamp(0.62rem, 1.8vw, 0.72rem);
+  color: var(--warn-color);
+  margin-top: 2px;
+  display: none;
+  padding: 6px 10px;
+  background: rgba(224,122,58,0.08);
+  border-radius: 8px;
+}
+.eval-warn.show { display: block; }
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.ds-pm-btn {
+  width: clamp(26px, 7vw, 28px);
+  height: clamp(26px, 7vw, 28px);
+  font-size: clamp(0.95rem, 3vw, 1rem);
+}
+
+.optional-section {
+  border-top: 1px solid var(--sys-border);
+  padding-top: clamp(12px, 2.5vw, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2.5vw, 14px);
+}
+.optional-header { display: flex; align-items: center; gap: 12px; }
+@media (max-width: 559px) {
+  .optional-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+.optional-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--accent); color: #fff;
+  font-size: clamp(0.6rem, 1.8vw, 0.7rem);
+  letter-spacing: 0.14em; padding: 4px 12px 4px 14px;
+  border-radius: 20px; font-weight: 500;
+  box-shadow: 0 2px 10px var(--accent-border);
+  white-space: nowrap; flex-shrink: 0;
+  cursor: pointer; user-select: none;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  border: none; font-family: inherit;
+}
+.optional-badge:hover { background: var(--accent-deep); box-shadow: 0 4px 14px rgba(74,140,111,0.4); }
+.optional-badge::after {
+  content: '▾';
+  font-size: 1em;
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.optional-badge.open::after { transform: rotate(180deg); }
+
+.optional-body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2.5vw, 14px);
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.4s cubic-bezier(0.22,0.61,0.36,1), opacity 0.3s ease;
+}
+.optional-body.open {
+  max-height: 900px;
+  opacity: 1;
+}
+.optional-desc {
+  font-size: clamp(0.7rem, 2.2vw, 0.78rem);
+  color: var(--sub-text);
+  line-height: 1.6;
+}
+.br-sp { display: none; }
+
+.summary-wrap {
+  margin-bottom: clamp(16px, 3.5vw, 24px);
+}
+.summary-wrap .ds-hero-result .ds-stat-num,
+.summary-wrap .ds-hero-result .ds-stat-unit { color: inherit; }
+.summary-wrap .ds-hero-result .hero-amount .ds-stat-num {
+  font-size: clamp(2.2rem, 7vw, 3rem);
+}
+.summary-wrap .ds-hero-result .real-sub {
+  font-size: clamp(0.68rem, 2vw, 0.78rem);
+  color: rgba(255,255,255,0.9);
+  margin-top: 12px;
+  line-height: 1.55;
+  text-align: center;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.summary-wrap .ds-summary-grid {
+  margin-top: 2px;
+}
+.result-age-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  margin-bottom: clamp(12px, 2.5vw, 16px);
+}
+.result-age-row .ds-card-label {
+  margin-bottom: 0;
+}
+.result-age-row .ds-segment {
+  max-width: 100%;
+}
+.result-age-row .ds-seg-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ds-stat-prefix { font-weight: 500; color: var(--accent-deep); margin-right: 2px; }
+
+canvas { display: block; cursor: default; width: 100%; height: min(320px, 52vw); min-height: 220px; }
+
+.ds-divider { margin: 16px 0; }
+.note-br { display: none; }
+@media (max-width: 559px) {
+  .note-br { display: block; }
+}
+
+.disclaimer {
+  margin-top: 12px;
+  padding: 14px 18px;
+  background: rgba(168,213,186,0.08);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  font-size: clamp(0.58rem, 1.8vw, 0.65rem);
+  color: var(--sub-text);
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+}
+@media (min-width: 600px) {
+  .disclaimer { padding: 16px 22px; }
+}
+.disclaimer p + p { margin-top: 6px; }
+
+@media (min-width: 800px) {
+  .app-scope .ds-page-cols {
+    grid-template-columns: 380px 1fr;
+    gap: 20px;
+  }
+  .app-scope .ds-input-col .ds-card { margin-bottom: 0; }
+
+  .app-scope .ds-page-cols .ds-num-edit { font-size: 1.7rem; }
+  .app-scope .ds-page-cols .ds-select-underline { font-size: 1.6rem; }
+  .app-scope .ds-page-cols .ds-pm-btn { width: 26px; height: 26px; font-size: 0.95rem; }
+}
+.app-scope { max-width: 1200px; padding: 0; }
+</style>
+</head>
+<body>
+<main class="app-scope">
+
+<header class="ds-page-title">
+  <h1>新NISA 積立シミュレーター（インフレ考慮版）</h1>
+  <p>新NISA総枠 1,800万円と年率インフレを考慮し、65歳時の名目・実質資産を試算します</p>
+</header>
+
+<div class="ds-page-cols">
+<div class="ds-input-col">
+<div class="ds-card">
+  <div class="ds-card-label">条件設定</div>
+  <div class="ds-form-rows">
+
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">生年月日</span>
+        <span class="ldesc">年・月を選択してください</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="dob-row">
+          <select id="dobYear" class="ds-select-underline"></select><span class="ds-select-unit">年</span>
+          <select id="dobMonth" class="ds-select-underline"></select><span class="ds-select-unit">月</span>
+          <span class="age-display" id="ageDisplay"></span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">毎月の積立額</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inMonthly" min="0" max="30" step="0.1" value="5">
+          <span class="ds-val-unit">万円</span>
+          <div class="ds-chip-scroll">
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="3">3万円</button>
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="5">5万円</button>
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="10">10万円</button>
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="15">15万円</button>
+            <button class="ds-chip" data-target="inMonthly" data-sl="slMonthly" data-value="20">20万円</button>
+          </div>
+        </div>
+        <div class="slider-row">
+          <button class="ds-pm-btn" data-target="slMonthly" data-step="-0.1">－</button>
+          <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+            <div class="ds-stepper-shimmer" id="slMonthly-shimmer"></div>
+            <input type="range" class="ds-stepper-range" id="slMonthly" min="0" max="30" step="0.1" value="5">
+          </div>
+          <button class="ds-pm-btn" data-target="slMonthly" data-step="0.1">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">想定利回り（年率）</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inRate" min="0" max="10" step="0.1" value="5">
+          <span class="ds-val-unit">%</span>
+          <div class="ds-chip-scroll">
+            <button class="ds-chip" data-target="inRate" data-sl="slRate" data-value="3">3%</button>
+            <button class="ds-chip" data-target="inRate" data-sl="slRate" data-value="5">5%</button>
+            <button class="ds-chip" data-target="inRate" data-sl="slRate" data-value="7">7%</button>
+          </div>
+        </div>
+        <div class="slider-row">
+          <button class="ds-pm-btn" data-target="slRate" data-step="-0.1">－</button>
+          <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+            <div class="ds-stepper-shimmer" id="slRate-shimmer"></div>
+            <input type="range" class="ds-stepper-range" id="slRate" min="0" max="10" step="0.1" value="5">
+          </div>
+          <button class="ds-pm-btn" data-target="slRate" data-step="0.1">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="ds-divider">
+
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">インフレ率（年率）</span>
+        <span class="ldesc">物価指数は年1回更新の単純モデル</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inInflation" min="-5" max="20" step="0.1" value="2">
+          <span class="ds-val-unit">%</span>
+          <div class="ds-chip-scroll">
+            <button class="ds-chip" data-target="inInflation" data-sl="slInflation" data-value="0">0%</button>
+            <button class="ds-chip" data-target="inInflation" data-sl="slInflation" data-value="1">1%</button>
+            <button class="ds-chip" data-target="inInflation" data-sl="slInflation" data-value="2">2%</button>
+            <button class="ds-chip" data-target="inInflation" data-sl="slInflation" data-value="3">3%</button>
+          </div>
+        </div>
+        <div class="slider-row">
+          <button class="ds-pm-btn" data-target="slInflation" data-step="-0.1">－</button>
+          <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+            <div class="ds-stepper-shimmer" id="slInflation-shimmer"></div>
+            <input type="range" class="ds-stepper-range" id="slInflation" min="-5" max="20" step="0.1" value="2">
+          </div>
+          <button class="ds-pm-btn" data-target="slInflation" data-step="0.1">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="optional-section">
+      <div class="optional-header">
+        <button class="optional-badge" id="optionalToggle" type="button">任意入力</button>
+      </div>
+
+      <div class="optional-body" id="optionalBody">
+        <span class="optional-desc">新NISAですでに投資している方のみ入力してください。<br class="br-sp">まだ投資していない方は入力不要です。</span>
+
+      <div class="ds-form-row">
+        <div class="ds-form-row-label">
+          <span class="lname">新NISA投資累計額</span>
+          <span class="ldesc">これまでに新NISAへ投資した合計額</span>
+        </div>
+        <div class="ds-form-row-right">
+          <div class="ds-val-row">
+            <input class="ds-num-edit" type="number" id="inContrib" min="0" max="1800" step="1" value="0">
+            <span class="ds-val-unit">万円</span>
+          </div>
+          <div class="slider-row">
+            <button class="ds-pm-btn" data-target="slContrib" data-step="-1">－</button>
+            <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+              <div class="ds-stepper-shimmer" id="slContrib-shimmer"></div>
+              <input type="range" class="ds-stepper-range" id="slContrib" min="0" max="1800" step="1" value="0">
+            </div>
+            <button class="ds-pm-btn" data-target="slContrib" data-step="1">＋</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-form-row">
+        <div class="ds-form-row-label">
+          <span class="lname">現在の評価額</span>
+          <span class="ldesc">現在の新NISAの時価評価額</span>
+        </div>
+        <div class="ds-form-row-right">
+          <div class="ds-val-row">
+            <input class="ds-num-edit" type="number" id="inEval" min="0" max="9999" step="1" value="0">
+            <span class="ds-val-unit">万円</span>
+          </div>
+          <div class="slider-row">
+            <button class="ds-pm-btn" data-target="slEval" data-step="-10">－</button>
+            <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+              <div class="ds-stepper-shimmer" id="slEval-shimmer"></div>
+              <input type="range" class="ds-stepper-range" id="slEval" min="0" max="9999" step="1" value="0">
+            </div>
+            <button class="ds-pm-btn" data-target="slEval" data-step="10">＋</button>
+          </div>
+          <div id="evalWarn" class="eval-warn">⚠ 評価額が投資累計額を下回っています（含み損の状態）</div>
+        </div>
+      </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="ds-result-col">
+<div class="ds-card" id="resultCard">
+  <div class="result-age-row">
+    <div class="ds-card-label">シミュレーション結果</div>
+    <div class="ds-segment" id="resultAgeSeg" role="tablist" aria-label="表示する年齢">
+      <button type="button" class="ds-seg-btn active" id="resultAgeBtn65" role="tab" aria-selected="true" data-result-age="65">65歳時点</button>
+      <button type="button" class="ds-seg-btn" id="resultAgeBtn60" role="tab" aria-selected="false" data-result-age="60">60歳時点</button>
+    </div>
+  </div>
+  <div class="summary-wrap" id="summary"></div>
+  <div class="ds-chart-legend">
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--data-blue-2)"></div>名目残高</div>
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent-deep)"></div>元本</div>
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--data-orange)"></div>実質残高（今日の価値）</div>
+  </div>
+  <div class="ds-chart-wrap">
+    <canvas id="chart"></canvas>
+  </div>
+  <div class="ds-chart-note">※ グラフは年次のスナップショットです。インフレは年1回の単純モデルです。<br class="note-br">※ 新NISA枠（1,800万円）到達後は新規積立停止・運用のみ継続</div>
+
+  <div class="ds-explain-panel" aria-label="実質残高の説明">
+    <div class="ds-explain-head">
+      <span class="ds-explain-head-icon">💡</span>
+      <span class="ds-explain-head-title">実質残高（今日の価値）とは</span>
+      <span class="ds-explain-badge">参考</span>
+    </div>
+    <div class="ds-explain-body">
+      <p><strong>名目残高</strong>は、将来その時点で口座にある金額です。</p>
+      <p><strong>実質残高</strong>は、それを今の物価感覚に直した金額です。</p>
+      <p>たとえば65歳で4,000万円あっても、物価が上がれば、今の感覚では約3,000万円の価値になることがあります。</p>
+    </div>
+    <div class="ds-explain-note">
+      ※ 物価指数は年1回だけ更新する単純モデルです。実際の物価や制度とは異なる場合があります。
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="disclaimer">
+  <p>【免責事項】本シミュレーターは、一定の前提条件のもとで試算した参考値であり、将来の運用成果を保証するものではありません。実際の投資においては、元本割れのリスクを含む様々なリスクが存在します。</p>
+  <p>表示される数値は税金・手数料等を考慮していません。新NISAの制度内容は今後変更される可能性があります。投資判断はご自身の責任において行ってください。具体的な投資については、金融機関や専門家にご相談ください。</p>
+  <p>インフレは年1回の単純な物価指数モデルです（年内の複利・デフレは簡略化しています）。実質額は「現在の価値」への換算です。</p>
+  <p>本シミュレーターの情報の正確性・完全性について、一切の保証を行いません。</p>
+</div>
+
+<div class="back-to-index">
+  <a href="../../index.html">← マネーツールへ戻る</a>
+</div>
+
+</main>
+<script>
+/* === base.js === */
+/**
+ * base.js — Mint Design System ユーティリティ関数
+ * base-design-system.html から汎用ロジックを抽出
+ *
+ * 使い方:
+ *   <script src="../shared/base.js"></script>
+ *   または ES module として import して使用
+ */
+
+/* ══════════════════════════════════════════
+   汎用ユーティリティ
+══════════════════════════════════════════ */
+
+/**
+ * 値を [min, max] の範囲に丸める
+ * @param {number} v
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+function clamp(v, min, max) {
+  return Math.min(max, Math.max(min, v));
+}
+
+/* ══════════════════════════════════════════
+   数値フォーマット（日本円）
+══════════════════════════════════════════ */
+
+/**
+ * 円単位の数値を「億円 / 万円」形式に分解して返す
+ * @param {number} n  円単位の数値
+ * @returns {{ num: string, unit: string }}
+ *   例: 123_456_789 → { num: "1億2,346", unit: "万円" }
+ *   例:   1_234_000 → { num: "123",      unit: "万円" }
+ */
+function fmtYenParts(n) {
+  n = Math.round(n);
+  if (n >= 100_000_000) {
+    const oku = Math.floor(n / 100_000_000);
+    const man = Math.round((n % 100_000_000) / 10_000);
+    if (man === 0) return { num: oku.toLocaleString('ja-JP'), unit: '億円' };
+    return { num: oku.toLocaleString('ja-JP') + '億' + man.toLocaleString('ja-JP'), unit: '万円' };
+  }
+  return { num: Math.round(n / 10_000).toLocaleString('ja-JP'), unit: '万円' };
+}
+
+/**
+ * 円単位の数値を「億円 / 万円」の文字列で返す
+ * @param {number} n
+ * @returns {string}  例: "1億2,346万円" / "123万円"
+ */
+function fmtYen(n) {
+  const { num, unit } = fmtYenParts(n);
+  return num + unit;
+}
+
+/**
+ * 3桁カンマ区切りフォーマット（入力欄用）
+ * @param {string} val  入力文字列
+ * @returns {string}  例: "1234567" → "1,234,567"
+ */
+function formatComma(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  const num = val.replace(/[^\d]/g, '');
+  return num === '' ? '' : Number(num).toLocaleString('ja-JP');
+}
+
+/**
+ * カンマ付き文字列を数値に変換
+ * @param {string} val
+ * @returns {number}
+ */
+function parseComma(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  return Number(val.replace(/[^\d]/g, '')) || 0;
+}
+
+/**
+ * 数値入力欄に3桁カンマ区切りを適用する
+ * @param {string|string[]} selectorOrIds  CSSセレクタ、または id の配列
+ */
+function initCommaInput(selectorOrIds) {
+  const els = Array.isArray(selectorOrIds)
+    ? selectorOrIds.map(id => document.getElementById(id)).filter(Boolean)
+    : document.querySelectorAll(selectorOrIds);
+  els.forEach(el => {
+    el.addEventListener('input', function() {
+      const pos = this.selectionStart;
+      const prevLen = this.value.length;
+      this.value = formatComma(this.value);
+      const diff = this.value.length - prevLen;
+      this.setSelectionRange(pos + diff, pos + diff);
+    });
+    el.addEventListener('blur', function() {
+      this.value = formatComma(this.value);
+    });
+  });
+}
+
+/**
+ * グラフ軸ラベル用の短縮フォーマット
+ * @param {number} n  円単位の数値
+ * @returns {string}  例: "1.2億" / "1,234万"
+ */
+function fmtAxisYen(n) {
+  if (n >= 100_000_000) {
+    return (n / 100_000_000).toFixed(1).replace(/\.0$/, '') + '億';
+  }
+  return Math.round(n / 10_000).toLocaleString('ja-JP') + '万';
+}
+
+/* ══════════════════════════════════════════
+   カウントアップアニメーション
+   easeOutQuart / 700ms — Mint Design System
+══════════════════════════════════════════ */
+
+/**
+ * 数値要素をカウントアップアニメーションで更新する
+ * @param {HTMLElement} el      表示対象の要素（textContent を更新）
+ * @param {number}      from    開始値（円単位）
+ * @param {number}      to      終了値（円単位）
+ * @param {number}      [ms=700] アニメーション時間（ミリ秒）
+ * @param {function}    [fmt]   フォーマット関数（省略時は toLocaleString）
+ * @returns {number}  requestAnimationFrame の ID
+ *
+ * 使用例:
+ *   animateNum(document.getElementById('total'), 0, 12_345_678);
+ *   animateNum(el, prev, next, 700, n => fmtYen(n));
+ */
+function animateNum(el, from, to, ms = 700, fmt = null) {
+  const t0 = performance.now();
+  let rafId;
+  function step(now) {
+    const p    = Math.min((now - t0) / ms, 1);
+    const ease = 1 - Math.pow(1 - p, 4); // easeOutQuart
+    const cur  = Math.round(from + (to - from) * ease);
+    el.textContent = fmt ? fmt(cur) : cur.toLocaleString('ja-JP');
+    if (p < 1) rafId = requestAnimationFrame(step);
+  }
+  rafId = requestAnimationFrame(step);
+  return rafId;
+}
+
+/* ══════════════════════════════════════════
+   スライダー
+══════════════════════════════════════════ */
+
+/**
+ * range input のトラック塗りつぶし（--pct カスタムプロパティ）を更新する
+ * CSS 側で background に --pct を参照していること
+ * @param {HTMLInputElement} sl  input[type="range"] 要素
+ */
+function updateSliderBg(sl) {
+  const pct = clamp(
+    ((parseFloat(sl.value) - parseFloat(sl.min)) /
+     (parseFloat(sl.max)  - parseFloat(sl.min))) * 100,
+    0, 100
+  );
+  sl.style.setProperty('--pct', pct + '%');
+
+  const rangeWrap = sl.closest('.ds-range-wrap');
+  if (rangeWrap) rangeWrap.style.setProperty('--pct', pct + '%');
+
+  const shimmer = document.getElementById(sl.id + '-shimmer');
+  if (shimmer) shimmer.style.width = pct + '%';
+
+  const pill = document.getElementById(sl.id + '-pill');
+  const pillLabel = document.getElementById(sl.id + '-pill-label');
+  if (pill && pillLabel) {
+    const thumbD = 22;
+    const trackW = sl.getBoundingClientRect().width;
+    const p = (parseFloat(sl.value) - parseFloat(sl.min)) / (parseFloat(sl.max) - parseFloat(sl.min));
+    pill.style.left = (p * (trackW - thumbD) + thumbD / 2) + 'px';
+
+    const unit = sl.dataset.unit || '';
+    const val = parseFloat(sl.value);
+    pillLabel.textContent = (Number.isInteger(val) ? val : val.toFixed(1)) + unit;
+  }
+}
+
+/* ══════════════════════════════════════════
+   インプット連動
+══════════════════════════════════════════ */
+
+/**
+ * number input と range input を双方向にリンクする
+ * @param {string}   numId     number input の id
+ * @param {string}   slId      range input の id
+ * @param {number}   slMin     スライダーの最小値
+ * @param {number}   slMax     スライダーの最大値
+ * @param {number}   step      ステップ幅（1未満の場合は小数点1桁表示）
+ * @param {function} [onChange] 値変更時に呼ぶコールバック（例: simulate）
+ */
+function linkInputs(numId, slId, slMin, slMax, step, onChange = null) {
+  const num = document.getElementById(numId);
+  const sl  = document.getElementById(slId);
+  num.addEventListener('input', () => {
+    let v = parseFloat(num.value);
+    if (isNaN(v)) { if (onChange) onChange(); return; }
+    sl.value = clamp(v, slMin, slMax);
+    updateSliderBg(sl);
+    if (onChange) onChange();
+  });
+  sl.addEventListener('input', () => {
+    num.value = parseFloat(sl.value).toFixed(step < 1 ? 1 : 0);
+    updateSliderBg(sl);
+    if (onChange) onChange();
+  });
+  updateSliderBg(sl);
+}
+
+/* ══════════════════════════════════════════
+   トースト通知
+══════════════════════════════════════════ */
+
+/**
+ * .ds-toast 要素にメッセージを表示する
+ * @param {string}          msg          表示テキスト
+ * @param {number}          [duration=2600] 表示時間（ミリ秒）
+ * @param {HTMLElement|null} [el]        対象要素（省略時は #ds-toast）
+ */
+let _toastTimer = null;
+function showToast(msg, duration = 2600, el = null) {
+  const t = el || document.getElementById('ds-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+}
+
+/* ══════════════════════════════════════════
+   チップスクロール
+══════════════════════════════════════════ */
+
+/**
+ * .ds-chip-scroll 要素の右端フェードマスクを更新する
+ * スクロール可能かつ末端に達していない場合のみマスクを表示
+ * @param {HTMLElement} el  .ds-chip-scroll 要素
+ */
+const _CHIPS_FADE = 'linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%)';
+
+function updateChipsMask(el) {
+  const overflows = el.scrollWidth > el.clientWidth + 2;
+  const atEnd     = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+  const mask = (overflows && !atEnd) ? _CHIPS_FADE : '';
+  el.style.webkitMaskImage = mask;
+  el.style.maskImage       = mask;
+}
+
+/**
+ * 指定セレクタにマッチする .ds-chip-scroll 要素にスクロールフェードを初期化する
+ * @param {string} [selector='.ds-chip-scroll']  対象セレクタ
+ */
+function initChipScroll(selector = '.ds-chip-scroll') {
+  document.querySelectorAll(selector).forEach(el => {
+    el.addEventListener('scroll', () => updateChipsMask(el), { passive: true });
+    updateChipsMask(el);
+  });
+}
+
+/* ══════════════════════════════════════════
+   コンフェッティ
+══════════════════════════════════════════ */
+
+/**
+ * コンフェッティエフェクトを発火する
+ * #ds-confetti コンテナが DOM に存在していること
+ * @param {number} [count=60]  パーティクル数
+ */
+function fireConfetti(count = 60) {
+  const wrap = document.getElementById('ds-confetti');
+  if (!wrap) return;
+  const colors = ['#a8d5ba', '#4a8c6f', '#d4ede3', '#e8f5f1', '#7fc49e', '#2d7a5a'];
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('div');
+    c.className = 'ds-confetti-piece';
+    c.style.cssText = [
+      `left:${10 + Math.random() * 80}%`,
+      'top:-10px',
+      `width:${6 + Math.random() * 8}px`,
+      `height:${6 + Math.random() * 8}px`,
+      `background:${colors[Math.floor(Math.random() * colors.length)]}`,
+      `border-radius:${Math.random() > 0.5 ? '50%' : '2px'}`,
+      `animation-duration:${1.2 + Math.random() * 1.3}s`,
+      `animation-delay:${Math.random() * 0.5}s`,
+    ].join(';');
+    wrap.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
+  }
+}
+
+/* ══════════════════════════════════════════
+   サイト共通ヘッダー
+   ページ読み込み時に body 先頭に prepend
+══════════════════════════════════════════ */
+
+function initSiteHeader() {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'initSiteHeader called',data:{readyState:document.readyState,hasBody:!!document.body,pathname:location.pathname},hypothesisId:'h2',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  const depth = location.pathname.split('/').filter(Boolean).length - 1;
+  const prefix = depth > 0 ? '../'.repeat(depth) : './';
+  const href = prefix + 'index.html';
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'depth calc',data:{depth,prefix,href},hypothesisId:'h3',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+
+  const header = document.createElement('header');
+  header.id = 'site-header';
+  header.innerHTML = '<a href="' + href + '" class="site-header-logo">Money Tools</a>';
+  document.body.insertBefore(header, document.body.firstChild);
+  document.body.classList.add('has-site-header');
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'header inserted',data:{headerInDOM:!!document.getElementById('site-header')},hypothesisId:'h4',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+}
+
+// #region agent log
+fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:top',message:'base.js loaded',data:{readyState:document.readyState},hypothesisId:'h1',timestamp:Date.now()})}).catch(()=>{});
+// #endregion
+if (document.readyState === 'loading') {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:branch',message:'defer to DOMContentLoaded',data:{},hypothesisId:'h5',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  document.addEventListener('DOMContentLoaded', initSiteHeader);
+} else {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:branch',message:'run initSiteHeader immediately',data:{},hypothesisId:'h5',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  initSiteHeader();
+}
+
+
+/* === chart-asset-line.js === */
+/**
+ * chart-asset-line.js — 資産推移ラインチャート
+ * 名目残高・実質残高・取り崩し額の3本線グラフ。ホバーでツールチップ表示。
+ *
+ * 前提: base.js を先に読み込むこと（clamp を使用）
+ *
+ * 使い方:
+ *   <script src="./base.js"></script>
+ *   <script src="./chart-asset-line.js"></script>
+ *   drawAssetLineChart(document.getElementById('chart'), years, { startAge: 35, retireAge: 60, animate: true });
+ *
+ * years: [{ age, end, realEnd, realWithdraw, principal? }, ...]
+ *   principal は任意。showPrincipalLine true かつ各点に数値があるとき元本線を描画。
+ *
+ * options:
+ *   showRetireLine     既定 true。false で取り崩し開始の縦線・ラベルを非表示（積立のみのグラフ向け）
+ *   showWithdrawLine   既定 true。false で取り崩し（実質）の線とツールチップ行を非表示
+ *   realLineVar        省略時は --accent-deep。実質残高線・ツールチップ（例: '--data-orange'）
+ *   showPrincipalLine  既定 false。true で years[].principal の折れ線（積立元本の推移）
+ *   principalLineVar   省略時は --accent-deep（グリーン系）
+ */
+
+(function(){ 'use strict';
+
+  const _clamp = typeof clamp === 'function' ? clamp : (v, min, max) => Math.min(max, Math.max(min, v));
+
+  function _yen(n) {
+    if (!isFinite(n)) return '-';
+    return Math.round(n).toLocaleString('ja-JP');
+  }
+
+  function _compactYen(v) {
+    if (!isFinite(v)) return '-';
+    const abs = Math.abs(v);
+    if (abs >= 1e8) return (v/1e8).toFixed(1) + '億';
+    if (abs >= 1e4) return (v/1e4).toFixed(0) + '万';
+    return Math.round(v).toString();
+  }
+
+  function _roundRect(ctx, x, y, w, h, r) {
+    const rr = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+rr, y);
+    ctx.arcTo(x+w, y, x+w, y+h, rr);
+    ctx.arcTo(x+w, y+h, x, y+h, rr);
+    ctx.arcTo(x, y+h, x, y, rr);
+    ctx.arcTo(x, y, x+w, y, rr);
+    ctx.closePath();
+  }
+
+  /** 実質残高線の描画色（既定: --accent-deep） */
+  function _colRealLine(style, opts) {
+    const name = opts.realLineVar;
+    if (name && typeof name === 'string') {
+      const c = style.getPropertyValue(name).trim();
+      if (c) return c;
+    }
+    return style.getPropertyValue('--accent-deep').trim() || '#4a8c6f';
+  }
+
+  function _principalArr(years) {
+    return years.map(d => (typeof d.principal === 'number' && isFinite(d.principal)) ? d.principal : NaN);
+  }
+
+  function _hasPrincipalSeries(years, opts) {
+    if (opts.showPrincipalLine !== true || !years.length) return false;
+    return years.every(d => typeof d.principal === 'number' && isFinite(d.principal));
+  }
+
+  /** 縦軸スケール用の最大値（取り崩し線を出さないときは wReal を除外） */
+  function _maxYForChart(years, opts) {
+    const nom = years.map(d=>d.end);
+    const real = years.map(d=>d.realEnd);
+    const wReal = years.map(d=>d.realWithdraw);
+    const showW = opts.showWithdrawLine !== false;
+    const showP = _hasPrincipalSeries(years, opts);
+    const principals = showP ? _principalArr(years) : [];
+    let max = Math.max(1, ...nom, ...real);
+    if (showW) max = Math.max(max, ...wReal.map(v=>v*3));
+    if (showP) max = Math.max(max, ...principals);
+    return max;
+  }
+
+  let _chartAnimId = null;
+  const CHART_ANIM_MS = 800;
+
+  /**
+   * グラフを progress (0〜1) まで描画
+   * @param {HTMLCanvasElement} canvas
+   * @param {Array} years [{ age, end, realEnd, realWithdraw }, ...]
+   * @param {{ startAge: number, retireAge: number, showRetireLine?: boolean, showWithdrawLine?: boolean }} opts
+   * @param {number} progress 0〜1
+   */
+  function drawChartFrame(canvas, years, opts, progress) {
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const cssW = canvas.clientWidth;
+    const cssH = canvas.clientHeight;
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    ctx.scale(dpr, dpr);
+
+    const W = cssW, H = cssH;
+    ctx.clearRect(0,0,W,H);
+
+    const pad = {l:52, r:16, t:16, b:34};
+    const plotW = W - pad.l - pad.r;
+    const plotH = H - pad.t - pad.b;
+
+    const ages = years.map(d=>d.age);
+    const nom = years.map(d=>d.end);
+    const real = years.map(d=>d.realEnd);
+    const wReal = years.map(d=>d.realWithdraw);
+    const principalArr = _principalArr(years);
+    const showPrincipal = _hasPrincipalSeries(years, opts);
+
+    const maxY = _maxYForChart(years, opts);
+    const minY = 0;
+
+    const x = (i)=> pad.l + (i/(years.length-1||1))*plotW;
+    const y = (v)=> pad.t + (1 - (v-minY)/(maxY-minY))*plotH;
+
+    const maxIdx = progress >= 1 ? years.length - 1 : Math.max(0, Math.floor(progress * (years.length - 1)));
+
+    // Grid
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = 'rgba(74,140,111,.2)';
+    ctx.lineWidth = 1;
+    const gridN = 5;
+    for (let g=0; g<=gridN; g++){
+      const yy = pad.t + (g/gridN)*plotH;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, yy);
+      ctx.lineTo(W - pad.r, yy);
+      ctx.stroke();
+      const val = maxY * (1 - g/gridN);
+      ctx.fillStyle = 'rgba(74,140,111,.8)';
+      ctx.font = '11px ' + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('¥' + _compactYen(val), pad.l - 8, yy);
+    }
+    ctx.restore();
+
+    // Age ticks
+    ctx.save();
+    ctx.fillStyle = 'rgba(74,140,111,.8)';
+    ctx.font = '11px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const tickEvery = Math.max(1, Math.round(years.length/8));
+    for (let i=0; i<years.length; i+=tickEvery){
+      ctx.fillText(String(ages[i]), x(i), pad.t + plotH + 8);
+    }
+    ctx.restore();
+
+    // Retirement marker
+    if (opts.showRetireLine !== false) {
+      const retireIdx = _clamp(opts.retireAge - opts.startAge, 0, years.length-1);
+      ctx.save();
+      ctx.strokeStyle = 'rgba(224,122,58,.65)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6,6]);
+      ctx.beginPath();
+      ctx.moveTo(x(retireIdx), pad.t);
+      ctx.lineTo(x(retireIdx), pad.t + plotH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(224,122,58,.9)';
+      ctx.font = '11px ' + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('取り崩し開始', x(retireIdx)+6, pad.t + 14);
+      ctx.restore();
+    }
+
+    function drawLine(arr, stroke, toIdx){
+      const n = (toIdx !== undefined ? toIdx : arr.length - 1) + 1;
+      ctx.save();
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i=0; i<n; i++){
+        const xx = x(i), yy = y(arr[i]);
+        if (i===0) ctx.moveTo(xx,yy);
+        else ctx.lineTo(xx,yy);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(122,168,232,.12)';
+    ctx.beginPath();
+    for (let i=0; i<=maxIdx; i++){
+      const xx = x(i), yy = y(years[i].end);
+      if (i===0) ctx.moveTo(xx, yy);
+      else ctx.lineTo(xx, yy);
+    }
+    ctx.lineTo(x(maxIdx), pad.t + plotH);
+    ctx.lineTo(x(0), pad.t + plotH);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    const style = getComputedStyle(document.documentElement);
+    const colNom = style.getPropertyValue('--data-blue-2').trim() || '#7aa8e8';
+    const colReal = _colRealLine(style, opts);
+    const colWithdraw = style.getPropertyValue('--data-orange').trim() || '#e07a3a';
+    const pVar = (opts.principalLineVar && String(opts.principalLineVar)) || '--accent-deep';
+    const colPrincipal = style.getPropertyValue(pVar).trim() || '#4a8c6f';
+
+    if (showPrincipal) {
+      drawLine(principalArr, colPrincipal, maxIdx);
+    }
+    drawLine(nom, colNom, maxIdx);
+    drawLine(real, colReal, maxIdx);
+
+    if (opts.showWithdrawLine !== false) {
+      ctx.save();
+      ctx.strokeStyle = colWithdraw;
+      ctx.lineWidth = 1.6;
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      for (let i=0; i<=maxIdx; i++){
+        const xx = x(i), yy = y(wReal[i]);
+        if (i===0) ctx.moveTo(xx,yy);
+        else ctx.lineTo(xx,yy);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function setupChartTooltip(canvas, years, opts) {
+    const canvasWrap = canvas.parentElement;
+    const ctx = canvas.getContext('2d');
+    const pad = {l:52, r:16, t:16, b:34};
+    const plotW = canvas.clientWidth - pad.l - pad.r;
+    const style = getComputedStyle(document.documentElement);
+    const colNom = style.getPropertyValue('--data-blue-2').trim() || '#7aa8e8';
+    const colReal = _colRealLine(style, opts);
+    const colWithdraw = style.getPropertyValue('--data-orange').trim() || '#e07a3a';
+    const pVar = (opts.principalLineVar && String(opts.principalLineVar)) || '--accent-deep';
+    const colPrincipal = style.getPropertyValue(pVar).trim() || '#4a8c6f';
+    const showPrincipal = _hasPrincipalSeries(years, opts);
+    const x = (i)=> pad.l + (i/(years.length-1||1))*plotW;
+    const maxY = _maxYForChart(years, opts);
+    const y = (v)=> {
+      return pad.t + (1 - v/maxY)*(canvas.clientHeight - pad.t - pad.b);
+    };
+
+    canvasWrap.onmousemove = (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = ev.clientX - rect.left;
+      const my = ev.clientY - rect.top;
+      if (mx < 0 || my < 0 || mx > rect.width || my > rect.height) {
+        drawChartFrame(canvas, years, opts, 1);
+        return;
+      }
+      const idx = Math.round(((mx - pad.l) / plotW) * (years.length-1));
+      const i = _clamp(idx, 0, years.length-1);
+      drawChartFrame(canvas, years, opts, 1);
+
+      const d = years[i];
+      const xx = x(i);
+      const W = canvas.clientWidth, H = canvas.clientHeight;
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(74,140,111,.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xx, pad.t);
+      ctx.lineTo(xx, pad.t + H - pad.t - pad.b);
+      ctx.stroke();
+
+      const pts = [];
+      if (showPrincipal) {
+        pts.push({v:d.principal, c:colPrincipal});
+      }
+      pts.push({v:d.end, c:colNom});
+      pts.push({v:d.realEnd, c:colReal});
+      if (opts.showWithdrawLine !== false) {
+        pts.push({v:d.realWithdraw, c:colWithdraw});
+      }
+      pts.forEach(p2=>{
+        ctx.fillStyle = p2.c;
+        ctx.beginPath();
+        ctx.arc(xx, y(p2.v), 3.5, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      const lines = [`年齢: ${d.age}`];
+      if (showPrincipal) {
+        lines.push(`元本: ¥${_yen(d.principal)}`);
+      }
+      lines.push(
+        `名目残高: ¥${_yen(d.end)}`,
+        `実質残高: ¥${_yen(d.realEnd)}`,
+      );
+      if (opts.showWithdrawLine !== false) {
+        lines.push(`取り崩し(実質): ¥${_yen(d.realWithdraw)}`);
+      }
+      const boxW = 220;
+      const boxH = 16 + lines.length * 16;
+      const bx = _clamp(xx + 10, pad.l, W - pad.r - boxW);
+      const by = pad.t + 10;
+
+      ctx.fillStyle = 'rgba(255,255,255,.98)';
+      ctx.strokeStyle = 'rgba(212,237,227,.9)';
+      ctx.lineWidth = 1;
+      _roundRect(ctx, bx, by, boxW, boxH, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(68,80,76,.95)';
+      ctx.font = '12px ' + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      lines.forEach((t, k)=>{
+        ctx.fillText(t, bx + 10, by + 10 + k*16);
+      });
+      ctx.restore();
+    };
+
+    canvasWrap.onmouseleave = () => {
+      drawChartFrame(canvas, years, opts, 1);
+    };
+  }
+
+  /**
+   * 資産推移ラインチャートを描画
+   * @param {HTMLCanvasElement|string} canvasOrId  canvas 要素または id
+   * @param {Array} years [{ age, end, realEnd, realWithdraw }, ...]
+   * @param {{ startAge: number, retireAge: number, animate?: boolean, showRetireLine?: boolean, showWithdrawLine?: boolean, realLineVar?: string, showPrincipalLine?: boolean, principalLineVar?: string }} options
+   */
+  function drawAssetLineChart(canvasOrId, years, options) {
+    const canvas = typeof canvasOrId === 'string'
+      ? document.getElementById(canvasOrId)
+      : canvasOrId;
+    if (!canvas || !canvas.getContext) return;
+
+    const o = options || {};
+    const opts = {
+      startAge: o.startAge ?? 35,
+      retireAge: o.retireAge ?? 60,
+      showRetireLine: o.showRetireLine !== false,
+      showWithdrawLine: o.showWithdrawLine !== false,
+      realLineVar: o.realLineVar || null,
+      showPrincipalLine: o.showPrincipalLine === true,
+      principalLineVar: o.principalLineVar || null,
+    };
+    const animate = o.animate === true;
+
+    if (animate) {
+      if (_chartAnimId) cancelAnimationFrame(_chartAnimId);
+      const t0 = performance.now();
+      function tick(now) {
+        const elapsed = now - t0;
+        const progress = Math.min(1, elapsed / CHART_ANIM_MS);
+        const ease = 1 - Math.pow(1 - progress, 2);
+        drawChartFrame(canvas, years, opts, ease);
+        if (progress < 1) {
+          _chartAnimId = requestAnimationFrame(tick);
+        } else {
+          _chartAnimId = null;
+          setupChartTooltip(canvas, years, opts);
+        }
+      }
+      _chartAnimId = requestAnimationFrame(tick);
+    } else {
+      drawChartFrame(canvas, years, opts, 1);
+      setupChartTooltip(canvas, years, opts);
+    }
+  }
+
+  window.drawAssetLineChart = drawAssetLineChart;
+
+})();
+
+
+/* === ツール固有JS === */
+const NISA_MAX = 18_000_000;
+let nisaFullInfo = null;
+
+/** 65 / 60 — 結果欄の表示切替（既定 65） */
+let resultViewAge = 65;
+/** simulate 直後の集計（renderSummary が参照） */
+let lastSimResult = null;
+
+let lastChartState = null;
+
+function drawChartFromState(animate) {
+  if (!lastChartState || !lastChartState.lineYears.length) return;
+  const canvas = document.getElementById('chart');
+  const { lineYears, startAge } = lastChartState;
+  drawAssetLineChart(canvas, lineYears, {
+    startAge,
+    retireAge: 65,
+    animate: animate !== false,
+    showRetireLine: false,
+    showWithdrawLine: false,
+    realLineVar: '--data-orange',
+    showPrincipalLine: true,
+    principalLineVar: '--accent-deep',
+  });
+}
+
+// ---- DOB ----
+const now = new Date();
+const currentYear  = now.getFullYear();
+const currentMonth = now.getMonth() + 1;
+
+const dobYearSel  = document.getElementById('dobYear');
+const dobMonthSel = document.getElementById('dobMonth');
+
+const minBirthYear = currentMonth < 12 ? currentYear - 65 : currentYear - 64;
+for (let y = currentYear - 18; y >= minBirthYear; y--) {
+  const o = document.createElement('option');
+  o.value = y; o.textContent = y;
+  dobYearSel.appendChild(o);
+}
+dobYearSel.value = 1992;
+
+for (let m = 1; m <= 12; m++) {
+  const o = document.createElement('option');
+  o.value = m; o.textContent = m;
+  dobMonthSel.appendChild(o);
+}
+dobMonthSel.value = 1;
+
+function updateMonthOptions() {
+  const y = parseInt(dobYearSel.value);
+  Array.from(dobMonthSel.options).forEach(o => {
+    const m = parseInt(o.value);
+    const ageMonths = (currentYear - y) * 12 + (currentMonth - m);
+    o.disabled = Math.floor(Math.max(0, ageMonths) / 12) >= 65;
+  });
+  const curOpt = Array.from(dobMonthSel.options).find(o => parseInt(o.value) === parseInt(dobMonthSel.value));
+  if (curOpt && curOpt.disabled) {
+    const first = Array.from(dobMonthSel.options).find(o => !o.disabled);
+    if (first) dobMonthSel.value = first.value;
+  }
+}
+
+function getAgeFromDOB() {
+  const by = parseInt(dobYearSel.value);
+  const bm = parseInt(dobMonthSel.value);
+  let ageMonths = (currentYear - by) * 12 + (currentMonth - bm);
+  if (ageMonths < 0) ageMonths = 0;
+  const rawAge = Math.floor(ageMonths / 12);
+  return { ageYears: clamp(rawAge, 18, 64), ageMon: ageMonths % 12, rawAge };
+}
+
+function updateAgeDisplay() {
+  const { ageYears, ageMon } = getAgeFromDOB();
+  const el = document.getElementById('ageDisplay');
+  const rc = document.getElementById('resultCard');
+  el.textContent = `（現在 ${ageYears}歳${ageMon > 0 ? ageMon + 'ヶ月' : ''}）`;
+  el.classList.remove('warn');
+  rc.style.display = '';
+}
+
+dobYearSel.addEventListener('change',  () => { updateMonthOptions(); updateAgeDisplay(); simulate(); });
+dobMonthSel.addEventListener('change', () => { updateAgeDisplay(); simulate(); });
+updateMonthOptions();
+updateAgeDisplay();
+
+
+linkInputs('inContrib', 'slContrib', 0, 1800, 1,   simulate);
+linkInputs('inEval',    'slEval',    0, 9999, 1,   simulate);
+linkInputs('inMonthly', 'slMonthly', 0,   30, 0.1, simulate);
+linkInputs('inRate',    'slRate',    0,   10, 0.1, simulate);
+linkInputs('inInflation', 'slInflation', -5, 20, 0.1, simulate);
+
+const numMap = { slContrib:'inContrib', slEval:'inEval', slMonthly:'inMonthly', slRate:'inRate', slInflation:'inInflation' };
+
+document.querySelectorAll('.ds-pm-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sl   = document.getElementById(btn.dataset.target);
+    const step = parseFloat(btn.dataset.step);
+    const next = clamp(parseFloat((parseFloat(sl.value) + step).toFixed(10)), parseFloat(sl.min), parseFloat(sl.max));
+    sl.value = next;
+    updateSliderBg(sl);
+    const numEl = document.getElementById(numMap[sl.id]);
+    if (numEl) numEl.value = next.toFixed(Math.abs(step) < 1 ? 1 : 0);
+    simulate();
+  });
+});
+
+function checkEvalWarn() {
+  const contrib = parseFloat(document.getElementById('inContrib').value) || 0;
+  const evalV   = parseFloat(document.getElementById('inEval').value)    || 0;
+  const warn = document.getElementById('evalWarn');
+  if (evalV > 0 && contrib > 0 && evalV < contrib) {
+    warn.classList.add('show');
+  } else {
+    warn.classList.remove('show');
+  }
+}
+
+function simulate() {
+  const { ageYears: age, ageMon: startMon } = getAgeFromDOB();
+  const contrib = (parseFloat(document.getElementById('inContrib').value) || 0) * 10_000;
+  const evalAmt = (parseFloat(document.getElementById('inEval').value)    || 0) * 10_000;
+  const monthly = (parseFloat(document.getElementById('inMonthly').value) || 0) * 10_000;
+  const annualR = (parseFloat(document.getElementById('inRate').value)    || 0) / 100;
+  let rawInfl = (parseFloat(document.getElementById('inInflation').value) || 0) / 100;
+  rawInfl = clamp(rawInfl, -0.05, 0.2);
+
+  const ageInMonths = age * 12 + startMon;
+  const monthsLeft  = Math.max(12, 65 * 12 - ageInMonths);
+  const mr = annualR / 12;
+
+  let balance     = evalAmt > 0 ? evalAmt : contrib;
+  let contributed = contrib;
+  let principal   = contrib;
+  nisaFullInfo    = null;
+
+  let priceIndex = 1;
+  const lineYears = [];
+  let snapshot60 = null;
+
+  for (let absMonth = 1; absMonth <= monthsLeft; absMonth++) {
+    balance *= (1 + mr);
+    if (contributed < NISA_MAX && monthly > 0) {
+      const add = Math.min(monthly, NISA_MAX - contributed);
+      balance += add; principal += add; contributed += add;
+      if (contributed >= NISA_MAX && nisaFullInfo === null) {
+        const tam = ageInMonths + absMonth;
+        nisaFullInfo = {
+          simYear:  Math.floor((absMonth - 1) / 12) + 1,
+          simMonth: ((absMonth - 1) % 12) + 1,
+          age: Math.floor(tam / 12), ageMon: tam % 12
+        };
+      }
+    }
+    if (absMonth % 12 === 0) {
+      priceIndex *= (1 + rawInfl);
+      const tam = ageInMonths + absMonth;
+      const ageY = Math.floor(tam / 12);
+      lineYears.push({
+        age: ageY,
+        end: balance,
+        realEnd: priceIndex === 0 ? balance : balance / priceIndex,
+        realWithdraw: 0,
+        principal,
+      });
+      if (ageY === 60 && snapshot60 === null) {
+        snapshot60 = {
+          balance,
+          principal,
+          contributed,
+          priceIndex,
+          nisaFullInfo: nisaFullInfo
+            ? {
+                simYear: nisaFullInfo.simYear,
+                simMonth: nisaFullInfo.simMonth,
+                age: nisaFullInfo.age,
+                ageMon: nisaFullInfo.ageMon,
+              }
+            : null,
+        };
+      }
+    }
+  }
+
+  const finalBalance   = balance;
+  const finalPrincipal = principal;
+  const finalReal = priceIndex === 0 ? finalBalance : finalBalance / priceIndex;
+
+  if (resultViewAge === 60 && !snapshot60) {
+    resultViewAge = 65;
+  }
+
+  lastSimResult = {
+    snapshot60,
+    at65: {
+      finalBalance,
+      finalPrincipal,
+      finalReal,
+      nisaFullInfo,
+    },
+    monthsLeft,
+    contrib,
+    monthly,
+    rawInfl,
+    ageInMonths,
+  };
+
+  checkEvalWarn();
+  renderSummary();
+
+  lastChartState = {
+    lineYears,
+    startAge: age,
+  };
+  drawChartFromState(true);
+  updatePresetChips();
+}
+
+function syncResultAgeSegmentUI() {
+  const seg = document.getElementById('resultAgeSeg');
+  const b60 = document.getElementById('resultAgeBtn60');
+  const b65 = document.getElementById('resultAgeBtn65');
+  if (!seg || !b60 || !b65) return;
+  const has60 = lastSimResult && lastSimResult.snapshot60;
+  b60.disabled = !has60;
+  b60.setAttribute('aria-disabled', has60 ? 'false' : 'true');
+  b60.title = has60
+    ? ''
+    : 'シミュレーション内に60歳の年次スナップショットがありません（現在60歳以上の場合など）';
+  seg.querySelectorAll('.ds-seg-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.resultAge, 10) === resultViewAge);
+    b.setAttribute('aria-selected', parseInt(b.dataset.resultAge, 10) === resultViewAge ? 'true' : 'false');
+  });
+}
+
+function renderSummary() {
+  if (!lastSimResult) return;
+
+  const {
+    snapshot60,
+    at65,
+    monthsLeft,
+    contrib,
+    monthly,
+    rawInfl,
+    ageInMonths,
+  } = lastSimResult;
+  const inflationRate = rawInfl;
+  const use60 = resultViewAge === 60 && snapshot60;
+  const fb = use60 ? snapshot60.balance : at65.finalBalance;
+  const fp = use60 ? snapshot60.principal : at65.finalPrincipal;
+  const fr = use60
+    ? (snapshot60.priceIndex === 0 ? snapshot60.balance : snapshot60.balance / snapshot60.priceIndex)
+    : at65.finalReal;
+  const ageLabel = use60 ? '60' : '65';
+  const nisaInfoView = use60 ? snapshot60.nisaFullInfo : at65.nisaFullInfo;
+
+  function svHtml(n, key, prefix = '') {
+    const { num, unit } = fmtYenParts(n);
+    return `${prefix ? `<span class="ds-stat-prefix">${prefix}</span>` : ''}<span class="ds-stat-num" data-key="${key}">${num}</span><span class="ds-stat-unit" data-key="${key}-unit">${unit}</span>`;
+  }
+  function heroHtml(n, key) {
+    const { num, unit } = fmtYenParts(n);
+    return `<span class="ds-stat-num" data-key="${key}">${num}</span><span class="ds-stat-unit hero-amount-unit" data-key="${key}-unit">${unit}</span>`;
+  }
+
+  const horizonMonths = use60
+    ? Math.max(0, 60 * 12 - ageInMonths)
+    : monthsLeft;
+
+  let nisaCell;
+  if (nisaInfoView) {
+    const { simYear, simMonth, age: fAge, ageMon: fAgeM } = nisaInfoView;
+    nisaCell = `
+      <div>
+        <span class="ds-stat-detail-num">${simYear}</span><span class="ds-stat-detail-unit">年</span><span class="ds-stat-detail-num">${simMonth}</span><span class="ds-stat-detail-unit">ヶ月目</span>
+      </div>
+      <div class="ds-stat-detail">${fAge}歳${fAgeM}ヶ月</div>
+    `;
+  } else {
+    const futureContrib = Math.min(monthly * horizonMonths, Math.max(0, NISA_MAX - contrib));
+    const totalIn = contrib + futureContrib;
+    const { num, unit } = fmtYenParts(totalIn);
+    nisaCell = `
+      <div><span class="ds-stat-detail-num" style="font-size:1.5rem">未到達</span></div>
+      <div class="ds-stat-detail">入金合計 <span style="color:var(--accent-deep);font-weight:600">${num}${unit}</span></div>
+    `;
+  }
+
+  const inflPct = (inflationRate * 100).toFixed(1);
+
+  document.getElementById('summary').innerHTML = `
+    <div class="ds-hero-result">
+      <div class="hero-eyebrow">${ageLabel}歳時の実質残高（今の物価感覚）</div>
+      <div class="hero-amount">${heroHtml(fr, 'real')}</div>
+      <div class="real-sub">インフレ年率 ${inflPct}% を年1回反映したときの現在価値換算です。</div>
+    </div>
+    <div class="ds-summary-grid">
+      <div class="ds-stat-card highlight">
+        <div class="ds-stat-label">${ageLabel}歳時の資産（名目）</div>
+        <div class="ds-stat-value">${svHtml(fb, 'total')}</div>
+      </div>
+      <div class="ds-stat-card">
+        <div class="ds-stat-label">うち運用収益(名目)</div>
+        <div class="ds-stat-value">${svHtml(fb - fp, 'gain', '+')}</div>
+      </div>
+      <div class="ds-stat-card">
+        <div class="ds-stat-label">新NISA枠使い切り</div>
+        <div class="ds-stat-value">${nisaCell}</div>
+      </div>
+    </div>
+  `;
+
+  syncResultAgeSegmentUI();
+
+  [['total', fb], ['real', fr], ['gain', fb - fp]].forEach(([key, val]) => {
+    const numEl = document.querySelector(`.ds-stat-num[data-key="${key}"]`);
+    const manEl = document.querySelector(`.ds-stat-unit[data-key="${key}-unit"]`);
+    if (numEl) animateCountUp(numEl, manEl, val);
+  });
+}
+
+document.getElementById('resultAgeSeg').addEventListener('click', (e) => {
+  const btn = e.target.closest('.ds-seg-btn');
+  if (!btn || btn.disabled) return;
+  const a = parseInt(btn.dataset.resultAge, 10);
+  if (a === 60 && lastSimResult && !lastSimResult.snapshot60) return;
+  resultViewAge = a;
+  syncResultAgeSegmentUI();
+  renderSummary();
+});
+
+const _cuPrev = {};
+const _cuRafs = {};
+
+function animateCountUp(numEl, manEl, toRaw, ms = 700) {
+  const key     = numEl.dataset.key;
+  const fromRaw = _cuPrev[key] ?? 0;
+  _cuPrev[key]  = toRaw;
+  if (_cuRafs[key]) cancelAnimationFrame(_cuRafs[key]);
+  const t0 = performance.now();
+  function step(now) {
+    const p    = Math.min((now - t0) / ms, 1);
+    const ease = 1 - Math.pow(1 - p, 4);
+    const { num, unit } = fmtYenParts(Math.round(fromRaw + (toRaw - fromRaw) * ease));
+    numEl.textContent = num;
+    if (manEl) manEl.textContent = unit;
+    if (p < 1) _cuRafs[key] = requestAnimationFrame(step);
+  }
+  _cuRafs[key] = requestAnimationFrame(step);
+}
+
+function updatePresetChips() {
+  document.querySelectorAll('.ds-chip').forEach(chip => {
+    const numEl = document.getElementById(chip.dataset.target);
+    if (!numEl) return;
+    chip.classList.toggle('active', parseFloat(numEl.value) === parseFloat(chip.dataset.value));
+  });
+}
+
+document.querySelectorAll('.ds-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const numEl = document.getElementById(chip.dataset.target);
+    const slEl  = document.getElementById(chip.dataset.sl);
+    if (!numEl || !slEl) return;
+    const val = parseFloat(chip.dataset.value);
+    const step = parseFloat(slEl.step);
+    numEl.value = val.toFixed(step < 1 ? 1 : 0);
+    slEl.value = val;
+    updateSliderBg(slEl);
+    updatePresetChips();
+    simulate();
+  });
+});
+
+
+document.getElementById('optionalToggle').addEventListener('click', () => {
+  document.getElementById('optionalBody').classList.toggle('open');
+  document.getElementById('optionalToggle').classList.toggle('open');
+});
+
+if (window.innerWidth >= 800) {
+  document.getElementById('optionalBody').classList.add('open');
+  document.getElementById('optionalToggle').classList.add('open');
+}
+
+simulate();
+updatePresetChips();
+['slMonthly', 'slRate', 'slInflation', 'slContrib', 'slEval'].forEach(id => {
+  const sl = document.getElementById(id);
+  if (sl) updateSliderBg(sl);
+});
+window.addEventListener('resize', () => {
+  ['slMonthly', 'slRate', 'slInflation', 'slContrib', 'slEval'].forEach(id => {
+    const sl = document.getElementById(id);
+    if (sl) updateSliderBg(sl);
+  });
+  drawChartFromState(false);
+});
+initChipScroll('.ds-chip-scroll');
+</script>
+</body>
+</html>

@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新NISA 積立シミュレーター — Money Tools</title>
+<title>新NISA 積立シミュレーター（インフレ考慮版） — Money Tools</title>
+<link rel="stylesheet" href="../../shared/tokens.css">
 <link rel="stylesheet" href="../../shared/components.css">
 <style>
 /* ══════════════════════════════════════════
@@ -28,19 +29,15 @@ body {
   body { padding: 36px 24px 60px; }
 }
 
-
-/* 入力項目間の余白を詰める（ds-form-rows / ds-divider オーバーライド） */
 .ds-form-rows { gap: clamp(10px, 2.5vw, 14px); }
 .ds-divider { margin: 10px 0; }
 .ds-form-row-right { gap: 6px; }
 .app-scope .ds-card-label { margin-bottom: clamp(12px, 2.5vw, 18px); }
 
-/* ds-val-row / ds-num-edit / ds-val-unit — NISA固有オーバーライド */
 .ds-val-row { align-items: center; margin-bottom: 0; }
 .ds-num-edit { font-size: clamp(1.6rem, 6vw, 2.1rem); width: 82px; letter-spacing: 0.02em; font-weight: 500; }
 .ds-val-unit { font-size: clamp(0.85rem, 2.5vw, 1rem); }
 
-/* ds-select-underline / ds-select-unit — NISA固有オーバーライド */
 .dob-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .ds-select-underline { font-size: clamp(1.5rem, 6vw, 2rem); font-weight: 500; }
 .ds-select-unit { font-size: clamp(0.85rem, 2.5vw, 1rem); }
@@ -60,13 +57,9 @@ body {
   padding: 6px 10px;
   background: rgba(224,122,58,0.08);
   border-radius: 8px;
-  /* border-left: 3px solid var(--warn-color); */
 }
 .eval-warn.show { display: block; }
 
-/* ══════════════════════════════════════════
-   SLIDER (ds-range style)
-══════════════════════════════════════════ */
 .slider-row {
   display: flex;
   align-items: center;
@@ -74,16 +67,12 @@ body {
   width: 100%;
 }
 
-/* ds-pm-btn — NISA固有オーバーライド（レスポンシブサイズ） */
 .ds-pm-btn {
   width: clamp(26px, 7vw, 28px);
   height: clamp(26px, 7vw, 28px);
   font-size: clamp(0.95rem, 3vw, 1rem);
 }
 
-/* ══════════════════════════════════════════
-   OPTIONAL SECTION
-══════════════════════════════════════════ */
 .optional-section {
   border-top: 1px solid var(--sys-border);
   padding-top: clamp(12px, 2.5vw, 16px);
@@ -95,7 +84,6 @@ body {
 @media (max-width: 559px) {
   .optional-header { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
-/* ds-badge スタイル適用 */
 .optional-badge {
   display: inline-flex; align-items: center; gap: 5px;
   background: var(--accent); color: #fff;
@@ -117,7 +105,6 @@ body {
 }
 .optional-badge.open::after { transform: rotate(180deg); }
 
-/* 折りたたみボディ */
 .optional-body {
   display: flex;
   flex-direction: column;
@@ -138,84 +125,26 @@ body {
 }
 .br-sp { display: none; }
 
-/* ══════════════════════════════════════════
-   SUMMARY (ds-result ベース)
-   1段目: 65歳時の資産（全幅）、2段目: それ以外（2カラム）
-══════════════════════════════════════════ */
-.summary {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+.summary-wrap {
   margin-bottom: clamp(16px, 3.5vw, 24px);
 }
-.summary .main-card { grid-column: 1 / -1; }
-@media (min-width: 480px) {
-  .summary { gap: 14px; }
-}
-/* モバイル時も2段：上段65歳時、下段は運用収益+NISA枠の2カラム（last-childの全幅を解除） */
-.summary .ds-hero-result .ds-stat-num,
-.summary .ds-hero-result .ds-stat-unit { color: inherit; }
-/* 65歳時の資産の数値フォントサイズを月間手取り（salary-calculator）と同じに */
-.summary .ds-hero-result .hero-amount .ds-stat-num {
+.summary-wrap .ds-hero-result .ds-stat-num,
+.summary-wrap .ds-hero-result .ds-stat-unit { color: inherit; }
+.summary-wrap .ds-hero-result .hero-amount .ds-stat-num {
   font-size: clamp(2.2rem, 7vw, 3rem);
 }
-.ds-stat-prefix { font-weight: 500; color: var(--accent-deep); margin-right: 2px; }
-
-
-/* ══════════════════════════════════════════
-   CHART
-══════════════════════════════════════════ */
-canvas { display: block; cursor: default; }
-
-/* ── ds-divider NISA固有オーバーライド ── */
-.ds-divider { margin: 16px 0; }
-.note-br { display: none; }
-@media (max-width: 559px) {
-  .note-br { display: block; }
-}
-
-/* ── tooltip — NISA固有オーバーライド（共通スタイルは shared/components.css .ds-chart-tooltip）── */
-#tooltip { border-radius: 16px; padding: 14px 18px; min-width: 200px; line-height: 1.9; font-size: clamp(0.72rem, 2.2vw, 0.84rem); }
-#tooltip .tt-year  { font-size: clamp(0.82rem, 2.5vw, 0.96rem); }
-#tooltip .tt-total { font-size: clamp(0.88rem, 2.8vw, 1.08rem); }
-
-/* ══════════════════════════════════════════
-   DISCLAIMER (note-box style)
-══════════════════════════════════════════ */
-.disclaimer {
+.summary-wrap .ds-hero-result .real-sub {
+  font-size: clamp(0.68rem, 2vw, 0.78rem);
+  color: rgba(255,255,255,0.9);
   margin-top: 12px;
-  padding: 14px 18px;
-  background: rgba(168,213,186,0.08);
-  border-left: 3px solid var(--accent);
-  border-radius: 12px;
-  font-size: clamp(0.58rem, 1.8vw, 0.65rem);
-  color: var(--sub-text);
-  line-height: 1.8;
-  letter-spacing: 0.04em;
+  line-height: 1.55;
+  text-align: center;
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
-@media (min-width: 600px) {
-  .disclaimer { padding: 16px 22px; }
+.summary-wrap .ds-summary-grid {
+  margin-top: 2px;
 }
-.disclaimer p + p { margin-top: 6px; }
-
-/* ══════════════════════════════════════════
-   2カラムページレイアウト（ds-page-cols オーバーライド）
-══════════════════════════════════════════ */
-@media (min-width: 800px) {
-  .app-scope .ds-page-cols {
-    grid-template-columns: 380px 1fr;
-    gap: 20px;
-  }
-  .app-scope .ds-input-col .ds-card { margin-bottom: 0; }
-
-  /* 数値入力・ボタンをコンパクトに */
-  .app-scope .ds-page-cols .ds-num-edit { font-size: 1.7rem; }
-  .app-scope .ds-page-cols .ds-select-underline { font-size: 1.6rem; }
-  .app-scope .ds-page-cols .ds-pm-btn { width: 26px; height: 26px; font-size: 0.95rem; }
-}
-/* app-scope オーバーライド（棒グラフ用に幅を広く） */
-.app-scope { max-width: 1200px; padding: 0; }
-
 .result-age-row {
   display: flex;
   flex-wrap: wrap;
@@ -234,24 +163,60 @@ canvas { display: block; cursor: default; }
   opacity: 0.45;
   cursor: not-allowed;
 }
+.ds-stat-prefix { font-weight: 500; color: var(--accent-deep); margin-right: 2px; }
+
+canvas { display: block; cursor: default; width: 100%; height: min(320px, 52vw); min-height: 220px; }
+
+.ds-divider { margin: 16px 0; }
+.note-br { display: none; }
+@media (max-width: 559px) {
+  .note-br { display: block; }
+}
+
+.disclaimer {
+  margin-top: 12px;
+  padding: 14px 18px;
+  background: rgba(168,213,186,0.08);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  font-size: clamp(0.58rem, 1.8vw, 0.65rem);
+  color: var(--sub-text);
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+}
+@media (min-width: 600px) {
+  .disclaimer { padding: 16px 22px; }
+}
+.disclaimer p + p { margin-top: 6px; }
+
+@media (min-width: 800px) {
+  .app-scope .ds-page-cols {
+    grid-template-columns: 380px 1fr;
+    gap: 20px;
+  }
+  .app-scope .ds-input-col .ds-card { margin-bottom: 0; }
+
+  .app-scope .ds-page-cols .ds-num-edit { font-size: 1.7rem; }
+  .app-scope .ds-page-cols .ds-select-underline { font-size: 1.6rem; }
+  .app-scope .ds-page-cols .ds-pm-btn { width: 26px; height: 26px; font-size: 0.95rem; }
+}
+.app-scope { max-width: 1200px; padding: 0; }
 </style>
 </head>
 <body>
 <main class="app-scope">
 
 <header class="ds-page-title">
-  <h1>新NISA 積立シミュレーター</h1>
-  <p>新NISA総枠 1,800万円を考慮した長期運用シミュレーション</p>
+  <h1>新NISA 積立シミュレーター（インフレ考慮版）</h1>
+  <p>新NISA総枠 1,800万円と年率インフレを考慮し、65歳時の名目・実質資産を試算します</p>
 </header>
 
 <div class="ds-page-cols">
 <div class="ds-input-col">
-<!-- ── 入力カード ── -->
 <div class="ds-card">
   <div class="ds-card-label">条件設定</div>
   <div class="ds-form-rows">
 
-    <!-- 生年月日 -->
     <div class="ds-form-row">
       <div class="ds-form-row-label">
         <span class="lname">生年月日</span>
@@ -268,7 +233,6 @@ canvas { display: block; cursor: default; }
 
     <hr class="ds-divider">
 
-    <!-- 毎月の積立額 -->
     <div class="ds-form-row">
       <div class="ds-form-row-label">
         <span class="lname">毎月の積立額</span>
@@ -298,7 +262,6 @@ canvas { display: block; cursor: default; }
 
     <hr class="ds-divider">
 
-    <!-- 利回り -->
     <div class="ds-form-row">
       <div class="ds-form-row-label">
         <span class="lname">想定利回り（年率）</span>
@@ -324,17 +287,43 @@ canvas { display: block; cursor: default; }
       </div>
     </div>
 
-    <!-- 任意入力セクション -->
+    <hr class="ds-divider">
+
+    <div class="ds-form-row">
+      <div class="ds-form-row-label">
+        <span class="lname">インフレ率（年率）</span>
+        <span class="ldesc">物価指数は年1回更新の単純モデル</span>
+      </div>
+      <div class="ds-form-row-right">
+        <div class="ds-val-row">
+          <input class="ds-num-edit" type="number" id="inInflation" min="-5" max="20" step="0.1" value="2">
+          <span class="ds-val-unit">%</span>
+          <div class="ds-chip-scroll">
+            <button class="ds-chip" data-target="inInflation" data-sl="slInflation" data-value="0">0%</button>
+            <button class="ds-chip" data-target="inInflation" data-sl="slInflation" data-value="1">1%</button>
+            <button class="ds-chip" data-target="inInflation" data-sl="slInflation" data-value="2">2%</button>
+            <button class="ds-chip" data-target="inInflation" data-sl="slInflation" data-value="3">3%</button>
+          </div>
+        </div>
+        <div class="slider-row">
+          <button class="ds-pm-btn" data-target="slInflation" data-step="-0.1">－</button>
+          <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+            <div class="ds-stepper-shimmer" id="slInflation-shimmer"></div>
+            <input type="range" class="ds-stepper-range" id="slInflation" min="-5" max="20" step="0.1" value="2">
+          </div>
+          <button class="ds-pm-btn" data-target="slInflation" data-step="0.1">＋</button>
+        </div>
+      </div>
+    </div>
+
     <div class="optional-section">
       <div class="optional-header">
         <button class="optional-badge" id="optionalToggle" type="button">任意入力</button>
-        
       </div>
 
       <div class="optional-body" id="optionalBody">
         <span class="optional-desc">新NISAですでに投資している方のみ入力してください。<br class="br-sp">まだ投資していない方は入力不要です。</span>
 
-      <!-- 新NISA投資累計額 -->
       <div class="ds-form-row">
         <div class="ds-form-row-label">
           <span class="lname">新NISA投資累計額</span>
@@ -356,7 +345,6 @@ canvas { display: block; cursor: default; }
         </div>
       </div>
 
-      <!-- 現在の評価額 -->
       <div class="ds-form-row">
         <div class="ds-form-row-label">
           <span class="lname">現在の評価額</span>
@@ -379,14 +367,13 @@ canvas { display: block; cursor: default; }
         </div>
       </div>
 
-      </div><!-- /optional-body -->
-    </div><!-- /optional-section -->
+      </div>
+    </div>
   </div>
 </div>
-</div><!-- /ds-input-col -->
+</div>
 
 <div class="ds-result-col">
-<!-- ── 結果カード ── -->
 <div class="ds-card" id="resultCard">
   <div class="result-age-row">
     <div class="ds-card-label">シミュレーション結果</div>
@@ -395,22 +382,40 @@ canvas { display: block; cursor: default; }
       <button type="button" class="ds-seg-btn" id="resultAgeBtn60" role="tab" aria-selected="false" data-result-age="60">60歳時点</button>
     </div>
   </div>
-  <div class="summary" id="summary"></div>
+  <div class="summary-wrap" id="summary"></div>
   <div class="ds-chart-legend">
-    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent)"></div>元本</div>
-    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent-deep)"></div>運用収益</div>
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--data-blue-2)"></div>名目残高</div>
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--accent-deep)"></div>元本</div>
+    <div class="ds-chart-li"><div class="ds-chart-ld" style="background:var(--data-orange)"></div>実質残高（今日の価値）</div>
   </div>
   <div class="ds-chart-wrap">
     <canvas id="chart"></canvas>
   </div>
-  <div class="ds-chart-note">※ 新NISA枠（1,800万円）到達後は<br class="note-br">新規積立停止・運用のみ継続</div>
+  <div class="ds-chart-note">※ グラフは年次のスナップショットです。インフレは年1回の単純モデルです。<br class="note-br">※ 新NISA枠（1,800万円）到達後は新規積立停止・運用のみ継続</div>
+
+  <div class="ds-explain-panel" aria-label="実質残高の説明">
+    <div class="ds-explain-head">
+      <span class="ds-explain-head-icon">💡</span>
+      <span class="ds-explain-head-title">実質残高（今日の価値）とは</span>
+      <span class="ds-explain-badge">参考</span>
+    </div>
+    <div class="ds-explain-body">
+      <p><strong>名目残高</strong>は、将来その時点で口座にある金額です。</p>
+      <p><strong>実質残高</strong>は、それを今の物価感覚に直した金額です。</p>
+      <p>たとえば65歳で4,000万円あっても、物価が上がれば、今の感覚では約3,000万円の価値になることがあります。</p>
+    </div>
+    <div class="ds-explain-note">
+      ※ 物価指数は年1回だけ更新する単純モデルです。実際の物価や制度とは異なる場合があります。
+    </div>
+  </div>
 </div>
-</div><!-- /ds-result-col -->
-</div><!-- /ds-page-cols -->
+</div>
+</div>
 
 <div class="disclaimer">
   <p>【免責事項】本シミュレーターは、一定の前提条件のもとで試算した参考値であり、将来の運用成果を保証するものではありません。実際の投資においては、元本割れのリスクを含む様々なリスクが存在します。</p>
   <p>表示される数値は税金・手数料等を考慮していません。新NISAの制度内容は今後変更される可能性があります。投資判断はご自身の責任において行ってください。具体的な投資については、金融機関や専門家にご相談ください。</p>
+  <p>インフレは年1回の単純な物価指数モデルです（年内の複利・デフレは簡略化しています）。実質額は「現在の価値」への換算です。</p>
   <p>本シミュレーターの情報の正確性・完全性について、一切の保証を行いません。</p>
 </div>
 
@@ -420,33 +425,34 @@ canvas { display: block; cursor: default; }
 
 </main>
 
-<div id="tooltip" class="ds-chart-tooltip"></div>
-
 <script src="../../shared/base.js"></script>
-<script src="../../shared/chart-stacked-bar.js"></script>
+<script src="../../shared/chart-asset-line.js"></script>
 <script>
 const NISA_MAX = 18_000_000;
 let nisaFullInfo = null;
 
+/** 65 / 60 — 結果欄の表示切替（既定 65） */
 let resultViewAge = 65;
+/** simulate 直後の集計（renderSummary が参照） */
 let lastSimResult = null;
 
-function nisaFormatTooltip(d, fmtYen) {
-  const { ageYears, ageMon: startMon } = getAgeFromDOB();
-  const tam = ageYears * 12 + startMon + d.absEndMonth;
-  const dispAge = Math.floor(tam / 12);
-  const dispAgeMon = tam % 12;
-  return `
-    <div class="tt-year">${d.year}年後（${dispAge}歳${dispAgeMon}ヶ月）</div>
-    <div class="tt-total">合計：${fmtYen(d.total)}</div>
-    <div class="tt-sep"></div>
-    <div class="tt-row"><div class="tt-dot" style="background:#a8d5ba"></div>元本：${fmtYen(d.principal)}</div>
-    <div class="tt-row"><div class="tt-dot" style="background:#4a8c6f"></div>運用収益：${fmtYen(d.gain)}</div>
-    <div class="tt-sep"></div>
-    <div class="tt-row"><div class="tt-dot" style="background:#d4ede3"></div>新NISA残枠：${fmtYen(d.nisaLeft)}</div>
-  `;
-}
+let lastChartState = null;
 
+function drawChartFromState(animate) {
+  if (!lastChartState || !lastChartState.lineYears.length) return;
+  const canvas = document.getElementById('chart');
+  const { lineYears, startAge } = lastChartState;
+  drawAssetLineChart(canvas, lineYears, {
+    startAge,
+    retireAge: 65,
+    animate: animate !== false,
+    showRetireLine: false,
+    showWithdrawLine: false,
+    realLineVar: '--data-orange',
+    showPrincipalLine: true,
+    principalLineVar: '--accent-deep',
+  });
+}
 
 // ---- DOB ----
 const now = new Date();
@@ -513,8 +519,9 @@ linkInputs('inContrib', 'slContrib', 0, 1800, 1,   simulate);
 linkInputs('inEval',    'slEval',    0, 9999, 1,   simulate);
 linkInputs('inMonthly', 'slMonthly', 0,   30, 0.1, simulate);
 linkInputs('inRate',    'slRate',    0,   10, 0.1, simulate);
+linkInputs('inInflation', 'slInflation', -5, 20, 0.1, simulate);
 
-const numMap = { slContrib:'inContrib', slEval:'inEval', slMonthly:'inMonthly', slRate:'inRate' };
+const numMap = { slContrib:'inContrib', slEval:'inEval', slMonthly:'inMonthly', slRate:'inRate', slInflation:'inInflation' };
 
 document.querySelectorAll('.ds-pm-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -529,7 +536,6 @@ document.querySelectorAll('.ds-pm-btn').forEach(btn => {
   });
 });
 
-// ---- Eval warning ----
 function checkEvalWarn() {
   const contrib = parseFloat(document.getElementById('inContrib').value) || 0;
   const evalV   = parseFloat(document.getElementById('inEval').value)    || 0;
@@ -541,13 +547,14 @@ function checkEvalWarn() {
   }
 }
 
-// ---- Simulate ----
 function simulate() {
   const { ageYears: age, ageMon: startMon } = getAgeFromDOB();
   const contrib = (parseFloat(document.getElementById('inContrib').value) || 0) * 10_000;
   const evalAmt = (parseFloat(document.getElementById('inEval').value)    || 0) * 10_000;
   const monthly = (parseFloat(document.getElementById('inMonthly').value) || 0) * 10_000;
   const annualR = (parseFloat(document.getElementById('inRate').value)    || 0) / 100;
+  let rawInfl = (parseFloat(document.getElementById('inInflation').value) || 0) / 100;
+  rawInfl = clamp(rawInfl, -0.05, 0.2);
 
   const ageInMonths = age * 12 + startMon;
   const monthsLeft  = Math.max(12, 65 * 12 - ageInMonths);
@@ -558,8 +565,10 @@ function simulate() {
   let principal   = contrib;
   nisaFullInfo    = null;
 
-  const data = [];
+  let priceIndex = 1;
+  const lineYears = [];
   let snapshot60 = null;
+
   for (let absMonth = 1; absMonth <= monthsLeft; absMonth++) {
     balance *= (1 + mr);
     if (contributed < NISA_MAX && monthly > 0) {
@@ -575,21 +584,22 @@ function simulate() {
       }
     }
     if (absMonth % 12 === 0) {
+      priceIndex *= (1 + rawInfl);
       const tam = ageInMonths + absMonth;
       const ageY = Math.floor(tam / 12);
-      data.push({
-        year: absMonth / 12,
+      lineYears.push({
         age: ageY,
-        absEndMonth: absMonth,
-        principal, gain: balance - principal,
-        total: balance,
-        nisaLeft: Math.max(0, NISA_MAX - contributed),
+        end: balance,
+        realEnd: priceIndex === 0 ? balance : balance / priceIndex,
+        realWithdraw: 0,
+        principal,
       });
       if (ageY === 60 && snapshot60 === null) {
         snapshot60 = {
           balance,
           principal,
           contributed,
+          priceIndex,
           nisaFullInfo: nisaFullInfo
             ? {
                 simYear: nisaFullInfo.simYear,
@@ -605,6 +615,7 @@ function simulate() {
 
   const finalBalance   = balance;
   const finalPrincipal = principal;
+  const finalReal = priceIndex === 0 ? finalBalance : finalBalance / priceIndex;
 
   if (resultViewAge === 60 && !snapshot60) {
     resultViewAge = 65;
@@ -612,27 +623,30 @@ function simulate() {
 
   lastSimResult = {
     snapshot60,
-    at65: { finalBalance, finalPrincipal, nisaFullInfo },
+    at65: {
+      finalBalance,
+      finalPrincipal,
+      finalReal,
+      nisaFullInfo,
+    },
     monthsLeft,
     contrib,
     monthly,
+    rawInfl,
     ageInMonths,
-    data,
   };
 
   checkEvalWarn();
   renderSummary();
-  drawStackedBarChart('chart', data, {
-    tooltipId: 'tooltip',
-    formatTooltip: nisaFormatTooltip,
-    animate: true,
-    duration: 700,
-    onResize: () => document.querySelectorAll('.ds-chip-scroll').forEach(updateChipsMask),
-  });
+
+  lastChartState = {
+    lineYears,
+    startAge: age,
+  };
+  drawChartFromState(true);
   updatePresetChips();
 }
 
-// ---- Summary ----
 function syncResultAgeSegmentUI() {
   const seg = document.getElementById('resultAgeSeg');
   const b60 = document.getElementById('resultAgeBtn60');
@@ -651,7 +665,7 @@ function syncResultAgeSegmentUI() {
 }
 
 function renderSummary() {
-  if (!lastSimResult || !lastSimResult.data.length) return;
+  if (!lastSimResult) return;
 
   const {
     snapshot60,
@@ -659,11 +673,16 @@ function renderSummary() {
     monthsLeft,
     contrib,
     monthly,
+    rawInfl,
     ageInMonths,
   } = lastSimResult;
+  const inflationRate = rawInfl;
   const use60 = resultViewAge === 60 && snapshot60;
   const fb = use60 ? snapshot60.balance : at65.finalBalance;
   const fp = use60 ? snapshot60.principal : at65.finalPrincipal;
+  const fr = use60
+    ? (snapshot60.priceIndex === 0 ? snapshot60.balance : snapshot60.balance / snapshot60.priceIndex)
+    : at65.finalReal;
   const ageLabel = use60 ? '60' : '65';
   const nisaInfoView = use60 ? snapshot60.nisaFullInfo : at65.nisaFullInfo;
 
@@ -699,24 +718,33 @@ function renderSummary() {
     `;
   }
 
+  const inflPct = (inflationRate * 100).toFixed(1);
+
   document.getElementById('summary').innerHTML = `
-    <div class="ds-hero-result main-card">
-      <div class="hero-eyebrow">${ageLabel}歳時の資産</div>
-      <div class="hero-amount">${heroHtml(fb, 'total')}</div>
+    <div class="ds-hero-result">
+      <div class="hero-eyebrow">${ageLabel}歳時の実質残高（今の物価感覚）</div>
+      <div class="hero-amount">${heroHtml(fr, 'real')}</div>
+      <div class="real-sub">インフレ年率 ${inflPct}% を年1回反映したときの現在価値換算です。</div>
     </div>
-    <div class="ds-stat-card">
-      <div class="ds-stat-label">うち運用収益</div>
-      <div class="ds-stat-value">${svHtml(fb - fp, 'gain', '+')}</div>
-    </div>
-    <div class="ds-stat-card">
-      <div class="ds-stat-label">新NISA枠使い切り</div>
-      <div class="ds-stat-value">${nisaCell}</div>
+    <div class="ds-summary-grid">
+      <div class="ds-stat-card highlight">
+        <div class="ds-stat-label">${ageLabel}歳時の資産（名目）</div>
+        <div class="ds-stat-value">${svHtml(fb, 'total')}</div>
+      </div>
+      <div class="ds-stat-card">
+        <div class="ds-stat-label">うち運用収益(名目)</div>
+        <div class="ds-stat-value">${svHtml(fb - fp, 'gain', '+')}</div>
+      </div>
+      <div class="ds-stat-card">
+        <div class="ds-stat-label">新NISA枠使い切り</div>
+        <div class="ds-stat-value">${nisaCell}</div>
+      </div>
     </div>
   `;
 
   syncResultAgeSegmentUI();
 
-  [['total', fb], ['gain', fb - fp]].forEach(([key, val]) => {
+  [['total', fb], ['real', fr], ['gain', fb - fp]].forEach(([key, val]) => {
     const numEl = document.querySelector(`.ds-stat-num[data-key="${key}"]`);
     const manEl = document.querySelector(`.ds-stat-unit[data-key="${key}-unit"]`);
     if (numEl) animateCountUp(numEl, manEl, val);
@@ -733,7 +761,6 @@ document.getElementById('resultAgeSeg').addEventListener('click', (e) => {
   renderSummary();
 });
 
-// ---- Count-up animation (easeOutQuart / 700ms — Mint Design System) ----
 const _cuPrev = {};
 const _cuRafs = {};
 
@@ -754,7 +781,6 @@ function animateCountUp(numEl, manEl, toRaw, ms = 700) {
   _cuRafs[key] = requestAnimationFrame(step);
 }
 
-// ---- Preset Chips ----
 function updatePresetChips() {
   document.querySelectorAll('.ds-chip').forEach(chip => {
     const numEl = document.getElementById(chip.dataset.target);
@@ -779,13 +805,11 @@ document.querySelectorAll('.ds-chip').forEach(chip => {
 });
 
 
-// ---- Optional section toggle ----
 document.getElementById('optionalToggle').addEventListener('click', () => {
   document.getElementById('optionalBody').classList.toggle('open');
   document.getElementById('optionalToggle').classList.toggle('open');
 });
 
-// PC時は任意入力欄を最初から開く
 if (window.innerWidth >= 800) {
   document.getElementById('optionalBody').classList.add('open');
   document.getElementById('optionalToggle').classList.add('open');
@@ -793,17 +817,16 @@ if (window.innerWidth >= 800) {
 
 simulate();
 updatePresetChips();
-// ピル・シマー初期位置を設定
-['slMonthly', 'slRate', 'slContrib', 'slEval'].forEach(id => {
+['slMonthly', 'slRate', 'slInflation', 'slContrib', 'slEval'].forEach(id => {
   const sl = document.getElementById(id);
   if (sl) updateSliderBg(sl);
 });
-// リサイズ時もピル位置を再計算
 window.addEventListener('resize', () => {
-  ['slMonthly', 'slRate', 'slContrib', 'slEval'].forEach(id => {
+  ['slMonthly', 'slRate', 'slInflation', 'slContrib', 'slEval'].forEach(id => {
     const sl = document.getElementById(id);
     if (sl) updateSliderBg(sl);
   });
+  drawChartFromState(false);
 });
 initChipScroll('.ds-chip-scroll');
 </script>

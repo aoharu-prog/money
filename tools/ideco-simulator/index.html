@@ -747,7 +747,11 @@ function simulate() {
     const fvy = fv(annualYen, r, y);
     data.push({ year: y, age: age + y, principal: annualYen * y, gain: Math.max(0, fvy - annualYen * y), total: fvy });
   }
-  drawStackedBarChart('chart', data, { tooltipId: 'tooltip' });
+  drawStackedBarChart('chart', data, {
+    tooltipId: 'tooltip',
+    animate: true,
+    duration: 700,
+  });
 }
 
 // ── サマリー描画 ──

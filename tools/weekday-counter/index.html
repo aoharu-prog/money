@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>平日日数カウンター — Money Tools</title>
+  <link rel="stylesheet" href="../../shared/tokens.css">
+  <link rel="stylesheet" href="../../shared/components.css">
+  <style>
+    /* ══════════════════════════════════════════
+       ページ基調（tools/nisa-simulator と揃える）
+    ══════════════════════════════════════════ */
+    :root {
+      --form-label-w: 210px;
+    }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', sans-serif;
+      background: var(--base-bg);
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(168,213,186,0.18) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(74,140,111,0.07) 0%, transparent 45%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 20px 16px 48px;
+      margin: 0 auto;
+    }
+    @media (min-width: 640px) {
+      body { padding: 36px 24px 60px; }
+    }
+
+    .app-scope { max-width: 1380px; padding: 0; }
+
+    @media (min-width: 800px) {
+      .app-scope .ds-page-cols {
+        grid-template-columns: 380px 1fr;
+        gap: 20px;
+      }
+      .app-scope .ds-input-col .ds-card { margin-bottom: 0; }
+    }
+
+    .ds-form-rows { gap: clamp(10px, 2.5vw, 14px); }
+    .app-scope .ds-card-label { margin-bottom: clamp(12px, 2.5vw, 18px); }
+
+    /* ── tool specific ── */
+    .wc-panel-title {
+      font-size: clamp(0.9rem, 2.4vw, 1rem);
+      color: var(--accent-deep);
+      font-weight: 700;
+      margin: 0 0 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .wc-subtle {
+      color: var(--sub-text);
+      font-size: 12px;
+      line-height: 1.8;
+      margin: -6px 0 14px;
+    }
+
+    /* 条件設定フッター（年間稼働・件数など）— 2段階ほど大きく */
+    .wc-stat-summary {
+      font-size: clamp(0.95rem, 2.8vw, 1.08rem);
+      line-height: 1.85;
+      letter-spacing: 0.02em;
+    }
+
+    .wc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* 条件設定をブロック分割 */
+    .wc-settings-section {
+      padding: 14px 14px 16px;
+      margin: 0 0 14px;
+      border-radius: 18px;
+      border: 1px solid var(--sys-border);
+      background: rgba(255, 255, 255, 0.45);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    }
+    .wc-settings-section:last-of-type { margin-bottom: 0; }
+    .wc-settings-section .wc-panel-title:first-child { margin-top: 0; }
+
+    .wc-add-holiday-btn {
+      width: 100%;
+      box-sizing: border-box;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    .wc-tabs {
+      display: inline-flex;
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--sys-border);
+      border-radius: 14px;
+      background: rgba(168,213,186,0.06);
+      margin: 10px 0 14px;
+    }
+    .wc-tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--sub-text);
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .wc-tab-btn.active {
+      background: rgba(168,213,186,0.20);
+      color: var(--text-main);
+    }
+
+    .wc-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 500px) {
+      .wc-form-row { grid-template-columns: 1fr; }
+    }
+
+    .wc-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+      max-height: 220px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .wc-list-item {
+      background: rgba(168,213,186,0.07);
+      border: 1px solid var(--sys-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    /* 年間サマリー「年間合計」行のみ（他行より少し濃いグリーン） */
+    .wc-summary-total-row {
+      background: rgba(74, 140, 111, 0.14) !important;
+      border-color: rgba(74, 140, 111, 0.32) !important;
+    }
+
+    /* 日付入力（角丸・左にカレンダーアイコン／色は既存トークン） */
+    .wc-date-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border: 2px solid var(--mint-light);
+      border-radius: 14px;
+      background: var(--card-bg);
+      box-shadow: 0 1px 4px var(--shadow);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .wc-date-field:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(168, 213, 186, 0.28);
+    }
+    .wc-date-field__icon {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-deep);
+      opacity: 0.92;
+    }
+    .wc-date-field__icon svg {
+      display: block;
+    }
+    .wc-date-input {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: clamp(0.92rem, 2.4vw, 1.05rem);
+      font-weight: 500;
+      color: var(--text-main);
+      outline: none;
+      padding: 0;
+      line-height: 1.45;
+    }
+    /* ブラウザ標準のカレンダーアイコンを非表示（左の自作アイコンのみ表示） */
+    .wc-date-input::-webkit-calendar-picker-indicator {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+      opacity: 0;
+    }
+    .wc-date-input::-webkit-clear-button {
+      display: none;
+    }
+    /* Firefox 等：ネイティブのカレンダー用インジケータを隠す（対応ブラウザのみ） */
+    .wc-date-input::-moz-calendar-picker-indicator {
+      opacity: 0;
+      width: 100%;
+      min-height: 100%;
+      cursor: pointer;
+    }
+    .app-scope .ds-form-row-right .wc-date-field {
+      max-width: 100%;
+    }
+
+    .wc-list-title { font-weight: 800; font-size: 13px; margin-bottom: 4px; color: var(--text-main); }
+    .wc-list-sub { color: var(--sub-text); font-size: 12px; line-height: 1.6; }
+    .wc-list-actions { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; align-items: flex-start; }
+
+    .wc-mini-btn {
+      border: 1px solid var(--mint-light);
+      background: rgba(168,213,186,0.10);
+      color: var(--sub-text);
+      padding: 8px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      flex: 0 0 auto;
+    }
+    .wc-mini-btn:hover { background: rgba(168,213,186,0.18); }
+
+    /* 年間サマリー（狭め） / 月カレンダー（広め） */
+    .wc-summary-calendar-row {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.95fr) minmax(560px, 2.1fr);
+      gap: clamp(14px, 2vw, 24px);
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .wc-summary-calendar-row { grid-template-columns: 1fr; }
+    }
+    .wc-summary-col { min-width: 0; }
+    .wc-calendar-col { min-width: 0; }
+
+    /* ── calendar ── */
+    .wc-calendar-shell { display: grid; gap: 14px; min-width: 0; }
+    .wc-calendar-toolbar { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .wc-calendar-title { font-weight: 900; font-size: clamp(1.05rem, 2.8vw, 1.25rem); letter-spacing: -0.02em; }
+    .wc-month-nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .wc-month-chip {
+      border: 1px solid var(--mint-light);
+      background: rgba(168,213,186,0.08);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .wc-weekday-head, .wc-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: clamp(8px, 1.2vw, 12px);
+    }
+    .wc-weekday-head div {
+      color: var(--sub-text);
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .wc-day-cell {
+      min-height: clamp(96px, 11vw, 118px);
+      border-radius: 18px;
+      padding: clamp(10px, 1.2vw, 14px);
+      border: 1px solid rgba(212,237,227,0.55);
+      background: rgba(168,213,186,0.05);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .wc-day-cell:hover { transform: translateY(-1px); border-color: rgba(168,213,186,0.9); }
+    .wc-day-cell.is-outside {
+      opacity: 0.35;
+      background: rgba(168,213,186,0.02);
+      cursor: default;
+      border-style: dashed;
+    }
+    .wc-day-cell.is-selected {
+      outline: 2px solid rgba(124,156,255,0.7);
+      outline-offset: 2px;
+    }
+    .wc-day-cell.is-today::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(168,213,186,0.9);
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    /* 土日・祝日休み：赤系 */
+    .wc-day-cell.rest-day {
+      background: rgba(255, 210, 210, 0.72);
+      border-color: rgba(200, 90, 90, 0.45);
+    }
+    .wc-day-cell.rest-day .wc-day-num,
+    .wc-day-cell.rest-day .wc-status-text {
+      color: #5c2020;
+    }
+    /* 追加休日：オレンジ系 */
+    .wc-day-cell.extra-holiday {
+      background: rgba(255, 200, 150, 0.65);
+      border-color: rgba(220, 130, 50, 0.5);
+    }
+    .wc-day-cell.extra-holiday .wc-day-num,
+    .wc-day-cell.extra-holiday .wc-status-text {
+      color: #6a3010;
+    }
+    .wc-day-cell.extra-workday {
+      background: rgba(75,181,67,0.18);
+      border-color: rgba(75,181,67,0.30);
+    }
+    .wc-day-cell.extra-workday .wc-day-num,
+    .wc-day-cell.extra-workday .wc-status-text {
+      color: var(--text-main);
+    }
+
+    .wc-day-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .wc-day-num { font-weight: 900; font-size: clamp(14px, 1.5vw, 17px); }
+    .wc-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .wc-badge {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.16);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.92);
+      letter-spacing: 0.02em;
+      font-weight: 800;
+    }
+    .wc-day-cell.rest-day .wc-badge {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(180, 70, 70, 0.45);
+      color: #8b2020;
+    }
+    .wc-day-cell.extra-holiday .wc-badge {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(200, 110, 40, 0.5);
+      color: #a05010;
+    }
+
+    .wc-day-bottom { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .wc-status-text { font-size: 11px; color: rgba(255,255,255,0.88); font-weight: 800; }
+    .wc-day-cell:not(.rest-day):not(.is-outside) .wc-status-text,
+    .wc-day-cell:not(.rest-day):not(.is-outside) .wc-day-num {
+      color: var(--text-main);
+    }
+    .wc-day-cell:not(.rest-day):not(.extra-holiday):not(.is-outside) .wc-badge {
+      background: rgba(74, 140, 111, 0.14);
+      border-color: rgba(74, 140, 111, 0.28);
+      color: var(--accent-deep);
+    }
+    .wc-day-cell.extra-workday .wc-badge {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(50, 140, 50, 0.4);
+      color: #1d5a1d;
+    }
+    /* 凡例（色付きスウォッチ） */
+    .wc-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: center;
+      margin-top: 10px;
+      font-size: clamp(0.68rem, 1.9vw, 0.78rem);
+      color: var(--sub-text);
+      line-height: 1.5;
+    }
+    .wc-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .wc-legend-swatch {
+      width: 18px;
+      height: 14px;
+      border-radius: 5px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      flex-shrink: 0;
+    }
+    .wc-legend-swatch.wc-swatch-work {
+      background: rgba(168, 213, 186, 0.12);
+      border-color: rgba(212, 237, 227, 0.75);
+    }
+    .wc-legend-swatch.wc-swatch-rest {
+      background: rgba(255, 210, 210, 0.85);
+      border-color: rgba(200, 90, 90, 0.45);
+    }
+    .wc-legend-swatch.wc-swatch-extra-h {
+      background: rgba(255, 200, 150, 0.85);
+      border-color: rgba(220, 130, 50, 0.5);
+    }
+    .wc-legend-swatch.wc-swatch-extra-w {
+      background: rgba(75, 181, 67, 0.22);
+      border-color: rgba(75, 181, 67, 0.35);
+    }
+
+    /* 対象年セレクト（2段階ほど小さく） */
+    select#yearSelect.ds-select-underline {
+      font-size: clamp(1rem, 3.2vw, 1.15rem);
+    }
+
+    .wc-actions--reg { align-items: center; }
+
+    /* ── details（日付詳細 + 月概要） ── */
+    .wc-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 860px) {
+      .wc-details-grid { grid-template-columns: 1fr; }
+    }
+    .wc-detail-card {
+      background: rgba(168,213,186,0.06);
+      border: 1px solid var(--sys-border);
+      border-radius: 18px;
+      padding: 16px 16px;
+      min-height: 170px;
+    }
+    .wc-detail-date { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .wc-pill-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 900;
+      background: rgba(168,213,186,0.08);
+      border: 1px solid var(--sys-border);
+      margin-bottom: 14px;
+    }
+    .wc-detail-list { color: var(--sub-text); font-size: 13px; line-height: 1.8; display: grid; gap: 8px; }
+    .wc-detail-list strong { color: var(--text-main); font-weight: 900; }
+
+    /* ── toast ── */
+    .wc-toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      padding: 14px 16px;
+      background: rgba(15,22,43,0.92);
+      color: var(--text-main);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.30);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+      max-width: 340px;
+      z-index: 30;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .wc-toast.show { opacity: 1; transform: translateY(0); }
+
+    /* helper buttons */
+    .wc-primary-btn {
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      color: #fff;
+      font-weight: 900;
+      padding: 12px 16px;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(74,140,111,0.25);
+    }
+    .wc-ghost-btn {
+      border: 1px solid var(--mint-light);
+      background: rgba(168,213,186,0.10);
+      cursor: pointer;
+      color: var(--sub-text);
+      font-weight: 900;
+      padding: 12px 16px;
+      border-radius: 14px;
+    }
+  </style>
+</head>
+<body>
+<main class="app-scope">
+
+  <header class="ds-page-title">
+    <h1>平日日数カウンター</h1>
+    <p>土日・祝日・追加休日・追加出勤を反映して、月ごとの稼働日数と年間合計を見える化します。</p>
+  </header>
+
+  <div class="ds-page-cols">
+    <div class="ds-input-col">
+      <div class="ds-card">
+        <div class="ds-card-label">条件設定</div>
+
+        <div class="ds-card-inner" style="padding: 0 18px 18px;">
+          <section class="wc-settings-section" aria-labelledby="wc-sec-basic">
+            <div class="wc-panel-title" id="wc-sec-basic">基本設定</div>
+
+            <div class="ds-form-row">
+              <div class="ds-form-row-label">対象年</div>
+              <div class="ds-form-row-right">
+                <select id="yearSelect" class="ds-select-underline wc-year-select"></select>
+              </div>
+            </div>
+
+            <div style="height: 10px;"></div>
+            <div class="ds-form-row">
+              <div class="ds-form-row-label">祝日の扱い</div>
+              <div class="ds-form-row-right">
+                <div class="ds-segment" id="holidayModeSegmented">
+                  <button type="button" class="ds-seg-btn active" data-mode="holiday">祝日は休日</button>
+                  <button type="button" class="ds-seg-btn" data-mode="workday">祝日は出勤</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="wc-actions" style="margin-top: 16px;">
+              <button class="wc-ghost-btn" id="recalculateBtn" type="button">再計算</button>
+              <button class="wc-ghost-btn" id="resetBtn" type="button">初期化</button>
+            </div>
+          </section>
+
+          <section class="wc-settings-section" aria-labelledby="wc-sec-holiday">
+          <div class="wc-panel-title" id="wc-sec-holiday">追加休日</div>
+          <div class="wc-subtle">平日だけど休みにしたい日を追加します（単発／期間）。</div>
+
+          <div class="wc-tabs" id="holidayTabs">
+            <button type="button" class="wc-tab-btn active" data-tab="single">単発</button>
+            <button type="button" class="wc-tab-btn" data-tab="range">期間</button>
+          </div>
+
+          <div id="holidaySingleFields">
+            <div class="ds-form-row">
+              <div class="ds-form-row-label">日付</div>
+              <div class="ds-form-row-right">
+                <div class="wc-date-field">
+                  <span class="wc-date-field__icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                  <input id="holidaySingleDate" type="date" class="wc-date-input" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="holidayRangeFields" hidden>
+            <div class="wc-form-row">
+              <div class="ds-form-row" style="margin-bottom:0;">
+                <div class="ds-form-row-label">開始日</div>
+                <div class="ds-form-row-right">
+                  <div class="wc-date-field">
+                    <span class="wc-date-field__icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                    <input id="holidayRangeStart" type="date" class="wc-date-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="ds-form-row" style="margin-bottom:0;">
+                <div class="ds-form-row-label">終了日</div>
+                <div class="ds-form-row-right">
+                  <div class="wc-date-field">
+                    <span class="wc-date-field__icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                    <input id="holidayRangeEnd" type="date" class="wc-date-input" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wc-actions wc-actions--reg" style="margin-top: 12px;">
+            <button type="button" class="ds-btn-secondary wc-add-holiday-btn" id="addHolidayBtn">追加休日を登録</button>
+            <button type="button" class="wc-ghost-btn" id="cancelHolidayEditBtn" hidden>編集をやめる</button>
+          </div>
+
+          <div id="extraHolidayList" class="wc-list"></div>
+          </section>
+
+          <section class="wc-settings-section" aria-labelledby="wc-sec-workday">
+          <div class="wc-panel-title" id="wc-sec-workday">追加出勤日</div>
+          <div class="wc-subtle">本来の休日を、その日だけ出勤扱いにします。</div>
+
+          <div class="ds-form-row">
+            <div class="ds-form-row-label">日付</div>
+            <div class="ds-form-row-right">
+              <div class="wc-date-field">
+                <span class="wc-date-field__icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                <input id="workdayDate" type="date" class="wc-date-input" />
+              </div>
+            </div>
+          </div>
+
+          <div class="wc-actions wc-actions--reg" style="margin-top: 12px;">
+            <button type="button" class="ds-btn-secondary wc-add-holiday-btn" id="addWorkdayBtn">追加出勤日を登録</button>
+            <button type="button" class="wc-ghost-btn" id="cancelWorkdayEditBtn" hidden>編集をやめる</button>
+          </div>
+
+          <div id="extraWorkdayList" class="wc-list"></div>
+          </section>
+
+          <div style="height: 8px;"></div>
+          <div class="ds-divider"></div>
+          <div class="wc-subtle wc-stat-summary" style="margin: 12px 0 0;">
+            年間稼働日数：<span id="statYearWorking">-</span>
+            <br>対象年：<span id="statYear">-</span>
+            <br>追加休日：<span id="statExtraHolidayCount">0</span>件
+            <br>追加出勤日：<span id="statExtraWorkdayCount">0</span>件
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-result-col">
+      <div class="ds-card">
+        <div class="ds-card-label">結果</div>
+        <div class="ds-card-inner" style="padding: 18px;">
+
+          <div class="wc-summary-calendar-row">
+            <div class="wc-summary-col wc-detail-card">
+              <div class="wc-panel-title" style="margin-bottom: 8px;">年間サマリー</div>
+              <div class="wc-subtle" style="margin-top:-2px;">月をクリックすると、右側のカレンダーが切り替わります。</div>
+              <div id="summaryTable" style="display:grid; gap:10px;"></div>
+            </div>
+
+            <div class="wc-calendar-col wc-calendar-shell">
+              <div class="wc-calendar-toolbar">
+                <div>
+                  <div class="wc-panel-title" style="margin:0 0 6px;">月カレンダー</div>
+                  <div class="wc-calendar-title" id="calendarTitle">-</div>
+                </div>
+                <div class="wc-month-nav">
+                  <button class="wc-month-chip" type="button" id="prevMonthBtn">← 前月</button>
+                  <button class="wc-month-chip" type="button" id="nextMonthBtn">次月 →</button>
+                </div>
+              </div>
+              <div class="wc-weekday-head">
+                <div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div><div>日</div>
+              </div>
+              <div class="wc-calendar-grid" id="calendarGrid"></div>
+              <div class="wc-legend" aria-label="カレンダー凡例">
+                <span class="wc-legend-item"><span class="wc-legend-swatch wc-swatch-work" aria-hidden="true"></span>通常出勤</span>
+                <span class="wc-legend-item"><span class="wc-legend-swatch wc-swatch-rest" aria-hidden="true"></span>土日・祝日（休）</span>
+                <span class="wc-legend-item"><span class="wc-legend-swatch wc-swatch-extra-h" aria-hidden="true"></span>追加休日</span>
+                <span class="wc-legend-item"><span class="wc-legend-swatch wc-swatch-extra-w" aria-hidden="true"></span>追加出勤</span>
+              </div>
+              <p class="ds-note" style="margin-top: 8px;">祝日で「出勤」設定の日は、通常出勤の色に [祝] バッジが付きます。</p>
+            </div>
+          </div>
+
+          <div style="height: 16px;"></div>
+          <div class="wc-details-grid">
+            <div class="wc-detail-card">
+              <div class="wc-detail-date" id="detailDate">日付を選択してください</div>
+              <div class="wc-pill-status" id="detailStatus">-</div>
+              <div class="wc-detail-list" id="detailList"></div>
+            </div>
+            <div class="wc-detail-card">
+              <div class="wc-panel-title" style="margin-bottom: 8px; font-size: 15px;">この月の概要</div>
+              <div class="wc-detail-list" id="monthOverview"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="ds-confetti" style="position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;"></div>
+<div id="wc-toast" class="wc-toast" role="status" aria-live="polite"></div>
+
+<script src="../../shared/base.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  // -----------------------------
+  // State
+  // -----------------------------
+  const STORAGE_KEY = 'weekday-counter-state-v1';
+  const state = {
+    year: new Date().getFullYear(),
+    holidayMode: 'holiday', // holiday|workday
+    holidayTab: 'single',   // single|range
+    extraHolidays: [],
+    extraWorkdays: [],
+    selectedMonth: new Date().getMonth(),
+    selectedDate: null, // ISO string
+    computed: null,
+    editingHolidayId: null,
+    editingWorkdayId: null
+  };
+
+  // -----------------------------
+  // holiday fallback (from attached)
+  // -----------------------------
+  const fallbackHolidayMap = {
+    2024: {
+      "2024-01-01": "元日",
+      "2024-01-08": "成人の日",
+      "2024-02-11": "建国記念の日",
+      "2024-02-12": "振替休日",
+      "2024-02-23": "天皇誕生日",
+      "2024-03-20": "春分の日",
+      "2024-04-29": "昭和の日",
+      "2024-05-03": "憲法記念日",
+      "2024-05-04": "みどりの日",
+      "2024-05-05": "こどもの日",
+      "2024-05-06": "振替休日",
+      "2024-07-15": "海の日",
+      "2024-08-11": "山の日",
+      "2024-08-12": "振替休日",
+      "2024-09-16": "敬老の日",
+      "2024-09-22": "秋分の日",
+      "2024-09-23": "振替休日",
+      "2024-10-14": "スポーツの日",
+      "2024-11-03": "文化の日",
+      "2024-11-04": "振替休日",
+      "2024-11-23": "勤労感謝の日"
+    },
+    2025: {
+      "2025-01-01": "元日",
+      "2025-01-13": "成人の日",
+      "2025-02-11": "建国記念の日",
+      "2025-02-23": "天皇誕生日",
+      "2025-02-24": "振替休日",
+      "2025-03-20": "春分の日",
+      "2025-04-29": "昭和の日",
+      "2025-05-03": "憲法記念日",
+      "2025-05-04": "みどりの日",
+      "2025-05-05": "こどもの日",
+      "2025-05-06": "振替休日",
+      "2025-07-21": "海の日",
+      "2025-08-11": "山の日",
+      "2025-09-15": "敬老の日",
+      "2025-09-23": "秋分の日",
+      "2025-10-13": "スポーツの日",
+      "2025-11-03": "文化の日",
+      "2025-11-23": "勤労感謝の日",
+      "2025-11-24": "振替休日"
+    },
+    2026: {
+      "2026-01-01": "元日",
+      "2026-01-12": "成人の日",
+      "2026-02-11": "建国記念の日",
+      "2026-02-23": "天皇誕生日",
+      "2026-03-20": "春分の日",
+      "2026-04-29": "昭和の日",
+      "2026-05-03": "憲法記念日",
+      "2026-05-04": "みどりの日",
+      "2026-05-05": "こどもの日",
+      "2026-05-06": "振替休日",
+      "2026-07-20": "海の日",
+      "2026-08-11": "山の日",
+      "2026-09-21": "敬老の日",
+      "2026-09-22": "国民の休日",
+      "2026-09-23": "秋分の日",
+      "2026-10-12": "スポーツの日",
+      "2026-11-03": "文化の日",
+      "2026-11-23": "勤労感謝の日"
+    },
+    2027: {
+      "2027-01-01": "元日",
+      "2027-01-11": "成人の日",
+      "2027-02-11": "建国記念の日",
+      "2027-02-23": "天皇誕生日",
+      "2027-03-21": "春分の日",
+      "2027-03-22": "振替休日",
+      "2027-04-29": "昭和の日",
+      "2027-05-03": "憲法記念日",
+      "2027-05-04": "みどりの日",
+      "2027-05-05": "こどもの日",
+      "2027-07-19": "海の日",
+      "2027-08-11": "山の日",
+      "2027-09-20": "敬老の日",
+      "2027-09-23": "秋分の日",
+      "2027-10-11": "スポーツの日",
+      "2027-11-03": "文化の日",
+      "2027-11-23": "勤労感謝の日"
+    },
+    2028: {
+      "2028-01-01": "元日",
+      "2028-01-10": "成人の日",
+      "2028-02-11": "建国記念の日",
+      "2028-02-23": "天皇誕生日",
+      "2028-03-20": "春分の日",
+      "2028-04-29": "昭和の日",
+      "2028-05-03": "憲法記念日",
+      "2028-05-04": "みどりの日",
+      "2028-05-05": "こどもの日",
+      "2028-07-17": "海の日",
+      "2028-08-11": "山の日",
+      "2028-09-18": "敬老の日",
+      "2028-09-22": "秋分の日",
+      "2028-10-09": "スポーツの日",
+      "2028-11-03": "文化の日",
+      "2028-11-23": "勤労感謝の日"
+    },
+    2029: {
+      "2029-01-01": "元日",
+      "2029-01-08": "成人の日",
+      "2029-02-11": "建国記念の日",
+      "2029-02-12": "振替休日",
+      "2029-02-23": "天皇誕生日",
+      "2029-03-20": "春分の日",
+      "2029-04-29": "昭和の日",
+      "2029-04-30": "振替休日",
+      "2029-05-03": "憲法記念日",
+      "2029-05-04": "みどりの日",
+      "2029-05-05": "こどもの日",
+      "2029-07-16": "海の日",
+      "2029-08-11": "山の日",
+      "2029-09-17": "敬老の日",
+      "2029-09-23": "秋分の日",
+      "2029-09-24": "振替休日",
+      "2029-10-08": "スポーツの日",
+      "2029-11-03": "文化の日",
+      "2029-11-23": "勤労感謝の日"
+    },
+    2030: {
+      "2030-01-01": "元日",
+      "2030-01-14": "成人の日",
+      "2030-02-11": "建国記念の日",
+      "2030-02-23": "天皇誕生日",
+      "2030-03-20": "春分の日",
+      "2030-04-29": "昭和の日",
+      "2030-05-03": "憲法記念日",
+      "2030-05-04": "みどりの日",
+      "2030-05-05": "こどもの日",
+      "2030-05-06": "振替休日",
+      "2030-07-15": "海の日",
+      "2030-08-11": "山の日",
+      "2030-08-12": "振替休日",
+      "2030-09-16": "敬老の日",
+      "2030-09-23": "秋分の日",
+      "2030-10-14": "スポーツの日",
+      "2030-11-03": "文化の日",
+      "2030-11-04": "振替休日",
+      "2030-11-23": "勤労感謝の日"
+    }
+  };
+
+  // -----------------------------
+  // Elements
+  // -----------------------------
+  const el = {
+    yearSelect: document.getElementById('yearSelect'),
+    holidayModeSegmented: document.getElementById('holidayModeSegmented'),
+    holidayTabs: document.getElementById('holidayTabs'),
+    holidaySingleFields: document.getElementById('holidaySingleFields'),
+    holidayRangeFields: document.getElementById('holidayRangeFields'),
+    holidaySingleDate: document.getElementById('holidaySingleDate'),
+    holidayRangeStart: document.getElementById('holidayRangeStart'),
+    holidayRangeEnd: document.getElementById('holidayRangeEnd'),
+    addHolidayBtn: document.getElementById('addHolidayBtn'),
+    cancelHolidayEditBtn: document.getElementById('cancelHolidayEditBtn'),
+    extraHolidayList: document.getElementById('extraHolidayList'),
+
+    workdayDate: document.getElementById('workdayDate'),
+    addWorkdayBtn: document.getElementById('addWorkdayBtn'),
+    cancelWorkdayEditBtn: document.getElementById('cancelWorkdayEditBtn'),
+    extraWorkdayList: document.getElementById('extraWorkdayList'),
+
+    summaryTable: document.getElementById('summaryTable'),
+    calendarTitle: document.getElementById('calendarTitle'),
+    calendarGrid: document.getElementById('calendarGrid'),
+    detailDate: document.getElementById('detailDate'),
+    detailStatus: document.getElementById('detailStatus'),
+    detailList: document.getElementById('detailList'),
+    monthOverview: document.getElementById('monthOverview'),
+
+    prevMonthBtn: document.getElementById('prevMonthBtn'),
+    nextMonthBtn: document.getElementById('nextMonthBtn'),
+    recalculateBtn: document.getElementById('recalculateBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+
+    statYearWorking: document.getElementById('statYearWorking'),
+    statYear: document.getElementById('statYear'),
+    statExtraHolidayCount: document.getElementById('statExtraHolidayCount'),
+    statExtraWorkdayCount: document.getElementById('statExtraWorkdayCount'),
+
+    toast: document.getElementById('wc-toast'),
+  };
+
+  // -----------------------------
+  // utils
+  // -----------------------------
+  function formatDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function parseDate(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  /** 年なし：1/1(木) 形式（一覧・詳細の登録日表示用） */
+  function displayDateShortJP(iso) {
+    const date = parseDate(iso);
+    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+    return `${date.getMonth() + 1}/${date.getDate()}(${weekdays[date.getDay()]})`;
+  }
+
+  function formatRegisteredHolidayLine(item) {
+    if (item.type === 'single') return displayDateShortJP(item.startDate);
+    return `${displayDateShortJP(item.startDate)}〜${displayDateShortJP(item.endDate)}`;
+  }
+
+  function expandDateRange(startISO, endISO) {
+    const result = [];
+    const start = parseDate(startISO);
+    const end = parseDate(endISO);
+    let cur = new Date(start);
+    while (cur <= end) {
+      result.push(formatDate(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return result;
+  }
+
+  function showToast(message) {
+    if (!el.toast) return;
+    el.toast.textContent = message;
+    el.toast.classList.add('show');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => el.toast.classList.remove('show'), 2200);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      year: state.year,
+      holidayMode: state.holidayMode,
+      holidayTab: state.holidayTab,
+      extraHolidays: state.extraHolidays,
+      extraWorkdays: state.extraWorkdays,
+      selectedMonth: state.selectedMonth,
+      selectedDate: state.selectedDate,
+    }));
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      Object.assign(state, parsed);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  function setDefaultSampleData(year) {
+    state.year = year;
+    state.holidayMode = 'holiday';
+    state.holidayTab = 'single';
+    state.extraHolidays = [
+      {
+        id: crypto.randomUUID(),
+        type: 'range',
+        startDate: `${year}-01-01`,
+        endDate: `${year}-01-04`,
+        label: ''
+      },
+      {
+        id: crypto.randomUUID(),
+        type: 'range',
+        startDate: `${year}-08-13`,
+        endDate: `${year}-08-15`,
+        label: ''
+      },
+      {
+        id: crypto.randomUUID(),
+        type: 'range',
+        startDate: `${year}-12-29`,
+        endDate: `${year}-12-31`,
+        label: ''
+      }
+    ];
+    state.extraWorkdays = [];
+    state.selectedMonth = (new Date().getFullYear() === year) ? new Date().getMonth() : 0;
+    state.selectedDate = null;
+  }
+
+  // -----------------------------
+  // holiday module (TODO 2/3)
+  // -----------------------------
+  async function fetchHolidayMap(year) {
+    // MVP: date-holidays を CDN で読み込み → 失敗時はフォールバック
+    try {
+      // date-holidaysを動的に読み込む
+      if (!window.Holidays) {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/date-holidays@2.0.1/dist/umd/index.min.js';
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      const HolidaysCtor = window.Holidays?.default || window.Holidays;
+      const hd = new HolidaysCtor('JP');
+      const list = hd.getHolidays(year);
+      const map = {};
+      (list || []).forEach(h => {
+        const iso = typeof h.date === 'string' ? h.date.slice(0, 10) : null;
+        if (!iso) return;
+        if (!map[iso]) map[iso] = h.name || '祝日';
+      });
+      return map;
+    } catch (e) {
+      return fallbackHolidayMap[year] || {};
+    }
+  }
+
+  // -----------------------------
+  // compute-logic (TODO 3/3)
+  // -----------------------------
+  function computeYearData(holidayMap) {
+    const extraHolidayMap = new Map();
+    const extraWorkdayMap = new Map();
+
+    // extra holidays
+    state.extraHolidays.forEach(item => {
+      const dates = item.type === 'single'
+        ? [item.startDate]
+        : expandDateRange(item.startDate, item.endDate);
+      dates.forEach(date => {
+        if (!extraHolidayMap.has(date)) extraHolidayMap.set(date, []);
+        extraHolidayMap.get(date).push(item);
+      });
+    });
+
+    // extra workdays
+    state.extraWorkdays.forEach(item => {
+      if (!extraWorkdayMap.has(item.date)) extraWorkdayMap.set(item.date, []);
+      extraWorkdayMap.get(item.date).push(item);
+    });
+
+    const days = [];
+    const monthly = Array.from({ length: 12 }, (_, monthIndex) => ({
+      monthIndex,
+      monthLabel: `${monthIndex + 1}月`,
+      workingDays: 0,
+      totalDays: 0,
+      weekendDays: 0,
+      holidayOffDays: 0,
+      extraHolidayDays: 0,
+      extraWorkdayDays: 0,
+    }));
+
+    const current = new Date(state.year, 0, 1);
+    const end = new Date(state.year, 11, 31);
+
+    while (current <= end) {
+      const iso = formatDate(current);
+      const monthIndex = current.getMonth();
+      const dayOfWeek = current.getDay();
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const holidayName = holidayMap[iso] || null;
+      const isHoliday = Boolean(holidayName);
+      const extraHolidaysForDay = extraHolidayMap.get(iso) || [];
+      const extraWorkdaysForDay = extraWorkdayMap.get(iso) || [];
+      const hasExtraHoliday = extraHolidaysForDay.length > 0;
+      const hasExtraWorkday = extraWorkdaysForDay.length > 0;
+
+      // priorities
+      let isWorkingDay = true;
+      let reason = '通常出勤日';
+      let statusType = 'workday'; // workday|weekend|holiday-off|extra-holiday|extra-workday|holiday-workday|outside
+
+      if (hasExtraWorkday) {
+        isWorkingDay = true;
+        reason = '追加出勤日';
+        statusType = 'extra-workday';
+      } else if (hasExtraHoliday) {
+        // 追加休日が土日・祝日（休）と重なる場合は「通常の休日」としてカウント（土日／祝日休み）
+        if (isWeekend) {
+          isWorkingDay = false;
+          reason = '土日';
+          statusType = 'weekend';
+        } else if (isHoliday && state.holidayMode === 'holiday') {
+          isWorkingDay = false;
+          reason = '祝日休み';
+          statusType = 'holiday-off';
+        } else {
+          isWorkingDay = false;
+          reason = '追加休日';
+          statusType = 'extra-holiday';
+        }
+      } else if (isWeekend) {
+        isWorkingDay = false;
+        reason = '土日';
+        statusType = 'weekend';
+      } else if (isHoliday && state.holidayMode === 'holiday') {
+        isWorkingDay = false;
+        reason = '祝日休み';
+        statusType = 'holiday-off';
+      } else if (isHoliday && state.holidayMode === 'workday') {
+        isWorkingDay = true;
+        reason = '祝日出勤設定';
+        statusType = 'holiday-workday';
+      }
+
+      const item = {
+        iso,
+        year: current.getFullYear(),
+        monthIndex,
+        day: current.getDate(),
+        dayOfWeek,
+        isWeekend,
+        isHoliday,
+        holidayName,
+        hasExtraHoliday,
+        hasExtraWorkday,
+        extraHolidays: extraHolidaysForDay,
+        extraWorkdays: extraWorkdaysForDay,
+        isWorkingDay,
+        reason,
+        statusType,
+        isToday: iso === formatDate(new Date()),
+      };
+
+      monthly[monthIndex].totalDays += 1;
+      if (item.isWorkingDay) monthly[monthIndex].workingDays += 1;
+      if (isWeekend) monthly[monthIndex].weekendDays += 1;
+      if (statusType === 'holiday-off') monthly[monthIndex].holidayOffDays += 1;
+      if (statusType === 'extra-holiday') monthly[monthIndex].extraHolidayDays += 1;
+      if (statusType === 'extra-workday') monthly[monthIndex].extraWorkdayDays += 1;
+
+      days.push(item);
+      current.setDate(current.getDate() + 1);
+    }
+
+    return { days, monthly };
+  }
+
+  // -----------------------------
+  // Edit UI helpers
+  // -----------------------------
+  function updateHolidayEditUI() {
+    const ed = state.editingHolidayId;
+    el.addHolidayBtn.textContent = ed ? '変更を保存' : '追加休日を登録';
+    el.cancelHolidayEditBtn.hidden = !ed;
+  }
+
+  function updateWorkdayEditUI() {
+    const ed = state.editingWorkdayId;
+    el.addWorkdayBtn.textContent = ed ? '変更を保存' : '追加出勤日を登録';
+    el.cancelWorkdayEditBtn.hidden = !ed;
+  }
+
+  function clearHolidayEdit() {
+    state.editingHolidayId = null;
+    el.holidaySingleDate.value = '';
+    el.holidayRangeStart.value = '';
+    el.holidayRangeEnd.value = '';
+    updateHolidayEditUI();
+  }
+
+  function clearWorkdayEdit() {
+    state.editingWorkdayId = null;
+    el.workdayDate.value = '';
+    updateWorkdayEditUI();
+  }
+
+  function startEditHoliday(id) {
+    const item = state.extraHolidays.find(h => h.id === id);
+    if (!item) return;
+    state.editingHolidayId = id;
+    state.editingWorkdayId = null;
+    el.workdayDate.value = '';
+    updateWorkdayEditUI();
+    state.holidayTab = item.type === 'single' ? 'single' : 'range';
+    if (item.type === 'single') {
+      el.holidaySingleDate.value = item.startDate;
+      el.holidayRangeStart.value = '';
+      el.holidayRangeEnd.value = '';
+    } else {
+      el.holidaySingleDate.value = '';
+      el.holidayRangeStart.value = item.startDate;
+      el.holidayRangeEnd.value = item.endDate;
+    }
+    renderModeButtons();
+    updateHolidayEditUI();
+  }
+
+  function startEditWorkday(id) {
+    const item = state.extraWorkdays.find(w => w.id === id);
+    if (!item) return;
+    state.editingWorkdayId = id;
+    state.editingHolidayId = null;
+    el.holidaySingleDate.value = '';
+    el.holidayRangeStart.value = '';
+    el.holidayRangeEnd.value = '';
+    updateHolidayEditUI();
+    el.workdayDate.value = item.date;
+    updateWorkdayEditUI();
+  }
+
+  // -----------------------------
+  // render
+  // -----------------------------
+  function renderModeButtons() {
+    [...el.holidayModeSegmented.querySelectorAll('button')].forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === state.holidayMode);
+    });
+    [...el.holidayTabs.querySelectorAll('button[data-tab]')].forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === state.holidayTab);
+    });
+    el.holidaySingleFields.hidden = state.holidayTab !== 'single';
+    el.holidayRangeFields.hidden = state.holidayTab !== 'range';
+    updateHolidayEditUI();
+    updateWorkdayEditUI();
+  }
+
+  function populateYearOptions() {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let y = currentYear - 2; y <= currentYear + 5; y++) years.push(y);
+    el.yearSelect.innerHTML = years.map(y => `<option value="${y}">${y}年</option>`).join('');
+    if (!years.includes(state.year)) state.year = currentYear;
+    el.yearSelect.value = String(state.year);
+  }
+
+  function renderLists() {
+    if (!state.extraHolidays.length) {
+      el.extraHolidayList.innerHTML = `<div class="wc-list-item" style="justify-content:center;align-items:center;"><div class="wc-list-sub">追加休日はまだありません。</div></div>`;
+    } else {
+      el.extraHolidayList.innerHTML = state.extraHolidays.map(item => {
+        const rangeText = formatRegisteredHolidayLine(item);
+        return `
+          <div class="wc-list-item">
+            <div>
+              <div class="wc-list-title">${escapeHtml(rangeText)}</div>
+            </div>
+            <div class="wc-list-actions">
+              <button class="wc-mini-btn" type="button" data-edit-holiday="${item.id}">編集</button>
+              <button class="wc-mini-btn" type="button" data-remove-holiday="${item.id}">削除</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    if (!state.extraWorkdays.length) {
+      el.extraWorkdayList.innerHTML = `<div class="wc-list-item" style="justify-content:center;align-items:center;"><div class="wc-list-sub">追加出勤日はまだありません。</div></div>`;
+    } else {
+      el.extraWorkdayList.innerHTML = state.extraWorkdays.map(item => {
+        const dateStr = displayDateShortJP(item.date);
+        return `
+        <div class="wc-list-item">
+          <div>
+            <div class="wc-list-title">${escapeHtml(dateStr)}</div>
+          </div>
+          <div class="wc-list-actions">
+            <button class="wc-mini-btn" type="button" data-edit-workday="${item.id}">編集</button>
+            <button class="wc-mini-btn" type="button" data-remove-workday="${item.id}">削除</button>
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+
+    el.statExtraHolidayCount.textContent = String(state.extraHolidays.length);
+    el.statExtraWorkdayCount.textContent = String(state.extraWorkdays.length);
+  }
+
+  function renderSummary() {
+    const monthly = state.computed.monthly;
+    const totalWorking = monthly.reduce((sum, item) => sum + item.workingDays, 0);
+    el.statYearWorking.textContent = `${totalWorking}日`;
+    el.statYear.textContent = `${state.year}`;
+
+    // list buttons
+    el.summaryTable.innerHTML = `
+      <div style="display:grid;gap:10px;">
+        <div style="display:flex;justify-content:space-between;gap:10px;color:var(--sub-text);font-weight:800;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;">
+          <span>月</span><span>稼働日数</span>
+        </div>
+        ${monthly.map(item => `
+          <button type="button" class="wc-list-item" data-month-index="${item.monthIndex}" style="cursor:pointer;${item.monthIndex === state.selectedMonth ? 'border-color: var(--accent-deep); background: rgba(124,156,255,0.14);' : ''}">
+            <div>
+              <div class="wc-list-title" style="margin-bottom:0;">${item.monthLabel}</div>
+              <div class="wc-list-sub"> </div>
+            </div>
+            <div class="wc-list-title" style="font-size:18px; margin-top: 2px;">${item.workingDays}日</div>
+          </button>
+        `).join('')}
+        <div class="wc-list-item wc-summary-total-row">
+          <div>
+            <div class="wc-list-title" style="margin-bottom:0;">年間合計</div>
+            <div class="wc-list-sub"> </div>
+          </div>
+          <div class="wc-list-title" style="font-size:18px;">${totalWorking}日</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function getMonthDays(monthIndex) {
+    return state.computed.days.filter(day => day.monthIndex === monthIndex);
+  }
+
+  function renderCalendar() {
+    const year = state.year;
+    const month = state.selectedMonth;
+    el.calendarTitle.textContent = `${year}年 ${month + 1}月`;
+
+    const first = new Date(year, month, 1);
+    const firstDaySun = first.getDay();
+    const monCol = (firstDaySun + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevMonthLastDate = new Date(year, month, 0).getDate();
+    const monthMap = new Map(getMonthDays(month).map(day => [day.iso, day]));
+
+    const cells = [];
+    for (let i = 0; i < 42; i++) {
+      let date;
+      let outside = false;
+      if (i < monCol) {
+        date = new Date(year, month - 1, prevMonthLastDate - monCol + i + 1);
+        outside = true;
+      } else if (i >= monCol + daysInMonth) {
+        date = new Date(year, month + 1, i - (monCol + daysInMonth) + 1);
+        outside = true;
+      } else {
+        date = new Date(year, month, i - monCol + 1);
+      }
+
+      const iso = formatDate(date);
+      let dayData = monthMap.get(iso);
+      if (!dayData) {
+        // month外のセルや計算対象外日のデータ
+        const holidayMap = state.computed.holidayMap;
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        const isHoliday = Boolean(holidayMap[iso]);
+        const holidayName = holidayMap[iso] || null;
+        dayData = {
+          iso,
+          day: date.getDate(),
+          dayOfWeek: date.getDay(),
+          isWeekend,
+          isHoliday,
+          holidayName,
+          hasExtraHoliday: false,
+          hasExtraWorkday: false,
+          extraHolidays: [],
+          extraWorkdays: [],
+          isWorkingDay: true,
+          reason: '月外日',
+          statusType: 'outside',
+          isToday: iso === formatDate(new Date()),
+        };
+      }
+
+      const classes = ['wc-day-cell'];
+      if (outside) classes.push('is-outside');
+      if (dayData.iso === state.selectedDate) classes.push('is-selected');
+      if (dayData.isToday) classes.push('is-today');
+
+      if (!outside) {
+        if (dayData.statusType === 'weekend' || dayData.statusType === 'holiday-off') {
+          classes.push('rest-day');
+        }
+        if (dayData.statusType === 'extra-holiday') classes.push('extra-holiday');
+        if (dayData.statusType === 'extra-workday') classes.push('extra-workday');
+        // holiday-workday shows normal but badge [祝]
+      }
+
+      const badges = [];
+      if (!outside && dayData.isHoliday) badges.push(`<span class="wc-badge">祝</span>`);
+      if (!outside && dayData.hasExtraHoliday && dayData.statusType === 'extra-holiday') {
+        badges.push(`<span class="wc-badge">休</span>`);
+      }
+      if (!outside && dayData.hasExtraWorkday) badges.push(`<span class="wc-badge">勤</span>`);
+
+      let statusText = outside ? '' : (dayData.isWorkingDay ? '出勤' : '休日');
+      if (!outside && dayData.statusType === 'holiday-workday') statusText = '出勤';
+
+      const disabled = outside ? 'disabled' : '';
+      cells.push(`
+        <button type="button" class="${classes.join(' ')}" data-date="${iso}" ${disabled}>
+          <div class="wc-day-top">
+            <div class="wc-day-num">${date.getDate()}</div>
+            <div class="wc-badges">${badges.join('')}</div>
+          </div>
+          <div class="wc-day-bottom">
+            <span class="wc-status-text">${statusText}</span>
+          </div>
+        </button>
+      `);
+    }
+
+    el.calendarGrid.innerHTML = cells.join('');
+  }
+
+  function renderDetails() {
+    const item = state.computed.days.find(day => day.iso === state.selectedDate);
+    const month = state.computed.monthly[state.selectedMonth];
+
+    if (!item) {
+      el.detailDate.textContent = '日付を選択してください';
+      el.detailStatus.textContent = '-';
+      el.detailList.innerHTML = '';
+      return;
+    }
+
+    el.detailDate.textContent = displayDateShortJP(item.iso);
+    el.detailStatus.textContent = item.isWorkingDay ? '出勤日' : '休日';
+    el.detailStatus.style.background = item.isWorkingDay ? 'rgba(115,224,193,0.14)' : 'rgba(255,143,143,0.14)';
+
+    const lines = [
+      `<div><strong>最終判定：</strong>${escapeHtml(item.reason)}</div>`,
+      `<div><strong>曜日：</strong>${['日','月','火','水','木','金','土'][item.dayOfWeek]}曜日</div>`,
+      `<div><strong>祝日：</strong>${item.isHoliday ? `${escapeHtml(item.holidayName || '')}${state.holidayMode === 'workday' && !item.hasExtraHoliday && !item.hasExtraWorkday && !item.isWeekend ? '（出勤設定）' : ''}` : '該当なし'}</div>`,
+      `<div><strong>追加休日：</strong>${item.extraHolidays.length ? item.extraHolidays.map(h => formatRegisteredHolidayLine(h)).join(' / ') : 'なし'}</div>`,
+      `<div><strong>追加出勤日：</strong>${item.extraWorkdays.length ? item.extraWorkdays.map(w => displayDateShortJP(w.date)).join(' / ') : 'なし'}</div>`,
+    ];
+    el.detailList.innerHTML = lines.join('');
+
+    const monthDays = getMonthDays(state.selectedMonth);
+    const holidayOff = monthDays.filter(d => d.statusType === 'holiday-off').length;
+    const extraHoliday = monthDays.filter(d => d.statusType === 'extra-holiday').length;
+    const extraWork = monthDays.filter(d => d.statusType === 'extra-workday').length;
+    const weekends = monthDays.filter(d => d.statusType === 'weekend').length;
+
+    el.monthOverview.innerHTML = `
+      <div><strong>${state.selectedMonth + 1}月の稼働日数：</strong>${month.workingDays}日</div>
+      <div><strong>土日休み：</strong>${weekends}日</div>
+      <div><strong>祝日休み：</strong>${holidayOff}日</div>
+      <div><strong>追加休日：</strong>${extraHoliday}日</div>
+      <div><strong>追加出勤日：</strong>${extraWork}日</div>
+      <div><strong>祝日設定：</strong>${state.holidayMode === 'holiday' ? '祝日は休日' : '祝日は出勤'}</div>
+    `;
+  }
+
+  function renderAll() {
+    // async for holiday fetching
+  }
+
+  // -----------------------------
+  // actions
+  // -----------------------------
+  function attachEvents() {
+    el.yearSelect.addEventListener('change', e => {
+      clearHolidayEdit();
+      clearWorkdayEdit();
+      state.year = Number(e.target.value);
+      state.selectedMonth = 0;
+      state.selectedDate = null;
+      renderAll();
+    });
+
+    el.holidayModeSegmented.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-mode]');
+      if (!btn) return;
+      state.holidayMode = btn.dataset.mode;
+      renderAll();
+    });
+
+    el.holidayTabs.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-tab]');
+      if (!btn) return;
+      if (state.editingHolidayId) clearHolidayEdit();
+      state.holidayTab = btn.dataset.tab;
+      renderModeButtons();
+      saveState();
+    });
+
+    el.cancelHolidayEditBtn.addEventListener('click', () => {
+      clearHolidayEdit();
+      renderModeButtons();
+      saveState();
+    });
+
+    el.cancelWorkdayEditBtn.addEventListener('click', () => {
+      clearWorkdayEdit();
+      saveState();
+    });
+
+    el.addHolidayBtn.addEventListener('click', () => {
+      const label = '';
+      const eid = state.editingHolidayId;
+      if (state.holidayTab === 'single') {
+        const date = el.holidaySingleDate.value;
+        if (!date) return showToast('追加休日の日付を選んでください。');
+        if (!date.startsWith(String(state.year))) return showToast('対象年と同じ年の日付を選んでください。');
+        if (eid) {
+          const idx = state.extraHolidays.findIndex(h => h.id === eid);
+          if (idx >= 0) {
+            state.extraHolidays[idx] = {
+              ...state.extraHolidays[idx],
+              type: 'single',
+              startDate: date,
+              endDate: date,
+              label
+            };
+          }
+        } else {
+          state.extraHolidays.unshift({ id: crypto.randomUUID(), type: 'single', startDate: date, endDate: date, label });
+        }
+      } else {
+        const start = el.holidayRangeStart.value;
+        const end = el.holidayRangeEnd.value;
+        if (!start || !end) return showToast('開始日と終了日を入力してください。');
+        if (start > end) return showToast('終了日は開始日以降にしてください。');
+        if (!start.startsWith(String(state.year)) || !end.startsWith(String(state.year))) return showToast('対象年と同じ年の期間を指定してください。');
+        if (eid) {
+          const idx = state.extraHolidays.findIndex(h => h.id === eid);
+          if (idx >= 0) {
+            state.extraHolidays[idx] = {
+              ...state.extraHolidays[idx],
+              type: 'range',
+              startDate: start,
+              endDate: end,
+              label
+            };
+          }
+        } else {
+          state.extraHolidays.unshift({ id: crypto.randomUUID(), type: 'range', startDate: start, endDate: end, label });
+        }
+      }
+
+      clearHolidayEdit();
+      renderAll();
+      showToast(eid ? '追加休日を更新しました。' : '追加休日を登録しました。');
+    });
+
+    el.addWorkdayBtn.addEventListener('click', () => {
+      const date = el.workdayDate.value;
+      if (!date) return showToast('追加出勤日の日付を選んでください。');
+      if (!date.startsWith(String(state.year))) return showToast('対象年と同じ年の日付を選んでください。');
+      const wid = state.editingWorkdayId;
+      if (wid) {
+        const idx = state.extraWorkdays.findIndex(w => w.id === wid);
+        if (idx >= 0) {
+          state.extraWorkdays[idx] = { id: wid, date };
+        }
+        clearWorkdayEdit();
+        showToast('追加出勤日を更新しました。');
+      } else {
+        state.extraWorkdays.unshift({ id: crypto.randomUUID(), date });
+        el.workdayDate.value = '';
+        showToast('追加出勤日を登録しました。');
+      }
+      renderAll();
+    });
+
+    el.recalculateBtn.addEventListener('click', () => {
+      renderAll();
+      showToast('再計算しました。');
+    });
+
+    el.resetBtn.addEventListener('click', () => {
+      clearHolidayEdit();
+      clearWorkdayEdit();
+      setDefaultSampleData(state.year);
+      renderAll();
+      showToast('初期化しました。');
+    });
+
+    el.extraHolidayList.addEventListener('click', e => {
+      const editBtn = e.target.closest('[data-edit-holiday]');
+      if (editBtn) {
+        startEditHoliday(editBtn.dataset.editHoliday);
+        saveState();
+        return;
+      }
+      const btn = e.target.closest('[data-remove-holiday]');
+      if (!btn) return;
+      const id = btn.dataset.removeHoliday;
+      if (state.editingHolidayId === id) clearHolidayEdit();
+      state.extraHolidays = state.extraHolidays.filter(item => item.id !== id);
+      renderAll();
+    });
+
+    el.extraWorkdayList.addEventListener('click', e => {
+      const editBtn = e.target.closest('[data-edit-workday]');
+      if (editBtn) {
+        startEditWorkday(editBtn.dataset.editWorkday);
+        saveState();
+        return;
+      }
+      const btn = e.target.closest('[data-remove-workday]');
+      if (!btn) return;
+      const id = btn.dataset.removeWorkday;
+      if (state.editingWorkdayId === id) clearWorkdayEdit();
+      state.extraWorkdays = state.extraWorkdays.filter(item => item.id !== id);
+      renderAll();
+    });
+
+    el.summaryTable.addEventListener('click', e => {
+      const row = e.target.closest('[data-month-index]');
+      if (!row) return;
+      state.selectedMonth = Number(row.dataset.monthIndex);
+      const monthDays = getMonthDays(state.selectedMonth);
+      state.selectedDate = monthDays[0]?.iso || null;
+      renderAll();
+    });
+
+    el.calendarGrid.addEventListener('click', e => {
+      const cell = e.target.closest('[data-date]');
+      if (!cell) return;
+      if (cell.disabled) return;
+      const iso = cell.dataset.date;
+      const date = parseDate(iso);
+      if (date.getFullYear() !== state.year) return;
+      if (date.getMonth() !== state.selectedMonth) state.selectedMonth = date.getMonth();
+      state.selectedDate = iso;
+      renderAll(false);
+    });
+
+    el.prevMonthBtn.addEventListener('click', () => {
+      state.selectedMonth = (state.selectedMonth + 11) % 12;
+      const monthDays = getMonthDays(state.selectedMonth);
+      state.selectedDate = monthDays[0]?.iso || null;
+      renderAll(false);
+    });
+
+    el.nextMonthBtn.addEventListener('click', () => {
+      state.selectedMonth = (state.selectedMonth + 1) % 12;
+      const monthDays = getMonthDays(state.selectedMonth);
+      state.selectedDate = monthDays[0]?.iso || null;
+      renderAll(false);
+    });
+  }
+
+  // renderAll: compute if needed; allow lightweight rerender
+  async function renderAll(recompute = true) {
+    if (!recompute && state.computed) {
+      renderModeButtons();
+      renderLists();
+      renderSummary();
+      renderCalendar();
+      renderDetails();
+      saveState();
+      return;
+    }
+
+    renderModeButtons();
+    renderLists();
+
+    const holidayMap = await fetchHolidayMap(state.year);
+    const computed = computeYearData(holidayMap);
+    state.computed = { ...computed, holidayMap };
+
+    if (!state.selectedDate) {
+      const firstWorking = state.computed.days.find(d => d.monthIndex === state.selectedMonth);
+      state.selectedDate = firstWorking ? firstWorking.iso : state.computed.days[0]?.iso || null;
+    }
+
+    renderSummary();
+    renderCalendar();
+    renderDetails();
+    saveState();
+  }
+
+  function init() {
+    loadState();
+    populateYearOptions();
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      setDefaultSampleData(state.year);
+    }
+    renderModeButtons();
+    attachEvents();
+    renderAll();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
+

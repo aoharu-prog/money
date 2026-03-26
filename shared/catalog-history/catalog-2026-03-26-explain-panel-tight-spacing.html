@@ -1,0 +1,2856 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<!-- snapshot: 2026-03-26 ds-explain-panel tighter line spacing -->
+<style>
+/* === tokens.css === */
+/* ══════════════════════════════════════════
+   DESIGN TOKENS — Mint Design System
+   このファイルは base-design-system.html の
+   :root {} から抽出したCSS変数定義のみを含む
+══════════════════════════════════════════ */
+:root {
+  /* ── ブランドカラー ── */
+  --base-bg:     #e8f5f1;   /* ベース背景（淡いミント）*/
+  --accent:      #a8d5ba;   /* アクセント（若葉ミント）*/
+  --accent-deep: #4a8c6f;   /* アクセント深（深みミント）*/
+
+  /* ── テキスト ── */
+  --text-main:   #44504c;   /* メイン文字（チャコールグレー）*/
+  --text-sub:    #ccd6d1;   /* サブ文字（極薄グレー）*/
+  --sub-text:    #7a9a8e;   /* セカンダリテキスト */
+  --placeholder: #b8d4cc;   /* プレースホルダー */
+  --label-color: #5a7a70;   /* ラベル */
+
+  /* ── 面・背景 ── */
+  --card-bg:     #ffffff;   /* カード背景（純白）*/
+  --mint-light:  #d4ede3;   /* ボーダー・バー背景 */
+  --mint-pale:   #f0faf5;   /* 入力・ホバー背景 */
+
+  /* ── エフェクト ── */
+  --shadow:         rgba(74, 140, 111, 0.12);  /* グリーン系シャドウ */
+  --accent-border:  rgba(168,213,186,0.5);      /* アクセントの半透明ボーダー */
+
+  /* ── セマンティック ── */
+  --warn-color:  #e07a3a;   /* 警告・注意（オレンジ）*/
+
+  /* Data Colors（データ識別用） */
+  --data-blue-1:  #4a7fd4;
+  --data-blue-2:  #7aa8e8;
+  --data-blue-3:  #aac8f4;
+  --data-orange:  #e07a3a;
+  --data-amber:   #f0c060;
+
+  /* ── システムUI専用（デザインシステム閲覧画面用）── */
+  --sys-sidebar: #f8fcfa;
+  --sys-border:  #e2f0e9;
+  --sys-code-bg: #1e2d28;
+  --sys-code-fg: #a8d5ba;
+}
+
+
+/* === components.css === */
+/* ══════════════════════════════════════════
+   COMPONENTS — Mint Design System
+   base-design-system.html のスタイル定義を抽出
+══════════════════════════════════════════ */
+@import './tokens.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+/* ── Reset ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--mint-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ══════════════════════════════════════════
+   site-header
+   共通ヘッダー（base.js で挿入・トップへ戻るリンク）
+   padding-top はヘッダー挿入前のレイアウトシフト防止のため共通化
+══════════════════════════════════════════ */
+body {
+  padding-top: 52px !important; /* ページの padding 指定より優先（レイアウトシフト防止） */
+}
+#site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 52px;
+  z-index: 1000;
+  background: var(--card-bg, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px var(--shadow, rgba(74, 140, 111, 0.12));
+  border-bottom: 1px solid var(--mint-light, #d4ede3);
+}
+.site-header-logo {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 600;
+  color: var(--accent-deep, #4a8c6f);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s ease;
+}
+.site-header-logo:hover {
+  color: var(--accent, #a8d5ba);
+}
+
+/* ══════════════════════════════════════════
+   ds-page-title
+   ツールページタイトル（統一コンポーネント）
+   <header class="ds-page-title"><h1>…</h1><p>…</p></header>
+══════════════════════════════════════════ */
+.ds-page-title {
+  margin-top: clamp(20px, 4vw, 36px);
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+.ds-page-title h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+.ds-page-title p {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* 後方互換：app-scope 直下 h1+p（ds-page-title 未使用時） */
+.app-scope > h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin-top: clamp(20px, 4vw, 36px);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.app-scope > h1 + p {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.65;
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+#site-header + h1,
+body > h1:first-of-type,
+.wrapper > h1:first-of-type {
+  margin-top: clamp(20px, 4vw, 32px);
+}
+#site-header + h1 + p,
+body > h1:first-of-type + p,
+.wrapper > h1:first-of-type + p {
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+
+/* ══════════════════════════════════════════
+   app-scope — ページ基本レイアウト
+   すべてのアプリの <main class="app-scope"> に適用
+══════════════════════════════════════════ */
+.app-scope {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 40px) 80px;
+}
+
+/* ══════════════════════════════════════════
+   2カラムページレイアウト
+   PC: 入力(左固定幅) + 結果(右可変)
+   SP: 縦1カラム
+══════════════════════════════════════════ */
+.ds-page-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 800px) {
+  .ds-page-cols {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .ds-input-col {
+    position: sticky;
+    top: 72px; /* site-header(52px) + 余白20px */
+  }
+  .ds-result-col {
+    position: sticky;
+    top: 72px;
+  }
+  /* 2カラム時の左右フェードイン（トップページの .tool-card に合わせ 0.45s） */
+  .ds-input-col .ds-card {
+    animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .ds-input-col .ds-card:nth-child(1) { animation-delay: 0.04s; }
+  .ds-result-col .ds-card {
+    animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+    animation-delay: 0.1s;
+  }
+  /* ds-input-col は 340px 幅のため、フォームを縦並びに（はみ出し防止） */
+  .ds-input-col .ds-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-result-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0; /* grid内でのはみ出し防止 */
+}
+
+/* ══════════════════════════════════════════
+   KEYFRAMES
+══════════════════════════════════════════ */
+@keyframes shimmerBar    { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+@keyframes secFadeIn     { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulseBadge    { 0%,100%{box-shadow:0 2px 12px var(--accent-border)} 50%{box-shadow:0 4px 22px rgba(74,140,111,0.45)} }
+@keyframes barShimmer    { 0%{left:-100%} 100%{left:200%} }
+@keyframes dsConfettiFall{ 0%{transform:translateY(-20px) rotate(0deg) scale(0);opacity:1} 100%{transform:translateY(100vh) rotate(720deg) scale(0.4);opacity:0} }
+@keyframes fadeInDown    { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInUp      { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes floatLeaf     { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-8px) rotate(3deg)} }
+
+/* ══════════════════════════════════════════
+   ds-badge
+   インラインバッジ（ステータス・ラベル表示）
+══════════════════════════════════════════ */
+.ds-badge {
+  display: inline-block;
+  background: var(--accent); color: #fff;
+  font-size: 11px; letter-spacing: 0.14em;
+  padding: 4px 16px; border-radius: 20px; font-weight: 500;
+  box-shadow: 0 2px 12px var(--accent-border);
+  animation: pulseBadge 3s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+   ds-card
+   ホワイトカード（グリーンシマーバー付き）
+══════════════════════════════════════════ */
+.ds-card {
+  background: var(--card-bg); border-radius: 28px; padding: 28px;
+  box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
+  position: relative; overflow: hidden;
+}
+.ds-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
+  background-size: 200%; animation: shimmerBar 3s linear infinite;
+  border-radius: 28px 28px 0 0;
+}
+
+/* ds-card 内ラベル（●条件設定 / ●シミュレーション結果 等） */
+.ds-card-label {
+  font-size: clamp(0.65rem, 1.9vw, 0.75rem); font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--sub-text); margin-bottom: clamp(16px, 3vw, 22px);
+  display: flex; align-items: center; gap: 8px;
+}
+.ds-card-label::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-deep); flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   ds-input
+   ボーダー付きテキスト入力（フルワイド）
+══════════════════════════════════════════ */
+.ds-input-wrap { position: relative; }
+.ds-input {
+  width: 100%; padding: 16px 56px 16px 20px;
+  font-size: 20px; font-family: 'Roboto', sans-serif; font-weight: 500;
+  color: var(--text-main); border: 2px solid var(--mint-light);
+  border-radius: 16px; outline: none; background: var(--mint-pale);
+  transition: all 0.3s ease; letter-spacing: 0.04em;
+}
+.ds-input::placeholder { color: var(--placeholder); font-weight: 500; font-size: 16px; }
+.ds-input:focus { border-color: var(--accent); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(168,213,186,0.25); }
+.ds-input-unit {
+  position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; color: var(--sub-text); pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   Buttons
+══════════════════════════════════════════ */
+.ds-btn-primary {
+  background: var(--accent-deep); color: #fff;
+  border: none; border-radius: 20px; padding: 10px 24px;
+  font-size: 13px; font-family: inherit; font-weight: 500; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 2px 12px rgba(74,140,111,0.35);
+}
+.ds-btn-primary:hover { transform: scale(1.05); box-shadow: 0 4px 18px rgba(74,140,111,0.45); }
+.ds-btn-primary:active { transform: scale(0.96); }
+
+.ds-btn-secondary {
+  background: transparent; color: var(--sub-text);
+  border: 1.5px solid var(--mint-light); border-radius: 20px; padding: 9px 22px;
+  font-size: 13px; font-family: inherit; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ds-btn-secondary:hover { border-color: var(--accent-deep); color: var(--accent-deep); background: var(--mint-pale); transform: scale(1.05); }
+.ds-btn-secondary:active { transform: scale(0.96); }
+
+.ds-btn-ghost {
+  background: transparent; color: var(--sub-text);
+  border: none; border-radius: 8px; padding: 8px 16px;
+  font-size: 13px; font-family: inherit; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ds-btn-ghost:hover { background: var(--mint-pale); color: var(--text-main); }
+
+/* ══════════════════════════════════════════
+   ds-segment
+   セグメントコントロール（タブ切り替え）
+══════════════════════════════════════════ */
+.ds-segment {
+  display: flex; gap: 6px; background: var(--mint-pale);
+  padding: 5px; border-radius: 14px; width: fit-content;
+}
+.ds-seg-btn {
+  padding: 9px 20px; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  color: var(--sub-text); background: transparent; letter-spacing: 0.04em;
+  font-family: inherit;
+}
+.ds-seg-btn.active {
+  background: var(--card-bg); color: var(--accent-deep);
+  box-shadow: 0 2px 10px var(--shadow); transform: scale(1.02);
+}
+.ds-seg-btn:hover:not(.active) { background: rgba(168,213,186,0.2); }
+
+/* ══════════════════════════════════════════
+   ds-result
+   結果カード（KPI単体表示）
+══════════════════════════════════════════ */
+.ds-result {
+  background: var(--mint-pale); border-radius: 16px; padding: 18px 20px;
+  border: 1.5px solid var(--mint-light); margin-bottom: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ds-result:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.ds-result.highlight {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  border-color: var(--accent); box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-result-label { font-size: 11px; color: var(--sub-text); margin-bottom: 5px; letter-spacing: 0.08em; }
+.ds-result-value {
+  font-family: 'Roboto', sans-serif; font-size: 26px; font-weight: 500;
+  color: var(--text-main); display: flex; align-items: baseline; gap: 4px;
+}
+.ds-result-unit { font-family: 'Hiragino Kaku Gothic ProN', sans-serif; font-size: 13px; color: var(--sub-text); font-weight: 400; }
+.ds-result-sub { font-size: 11px; color: var(--sub-text); margin-top: 6px; line-height: 1.4; }
+
+/* ══════════════════════════════════════════
+   ds-progress
+   進捗バー（グラデーション＋シマー）
+══════════════════════════════════════════ */
+.ds-progress-bg { height: 6px; background: var(--mint-light); border-radius: 3px; overflow: hidden; }
+.ds-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: 3px; transition: width 1s cubic-bezier(0.22,0.61,0.36,1);
+  position: relative; overflow: hidden;
+}
+.ds-progress-fill::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+   ds-divider
+   区切り線（フェードグラデーション）
+══════════════════════════════════════════ */
+.ds-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--mint-light), transparent); margin: 20px 0; }
+
+/* ══════════════════════════════════════════
+   ds-form-row
+   ラベル＋インプットの横並びレイアウト
+   --form-label-w でラベル幅をカスタマイズ可能（デフォルト 200px）
+══════════════════════════════════════════ */
+.ds-form-rows { display: flex; flex-direction: column; gap: clamp(18px, 3.5vw, 26px); }
+.ds-form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 560px) {
+  .ds-form-row {
+    grid-template-columns: var(--form-label-w, 200px) 1fr;
+    align-items: center;
+    gap: 20px;
+  }
+}
+.ds-form-row-label { display: flex; flex-direction: column; gap: 4px; }
+.ds-form-row-label .lname {
+  font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+.ds-form-row-label .ldesc {
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
+  color: var(--sub-text);
+  line-height: 1.5;
+}
+.ds-form-row-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ══════════════════════════════════════════
+   ds-toast
+   フローティングトースト通知
+══════════════════════════════════════════ */
+.ds-toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--accent-deep); color: #fff; padding: 12px 28px;
+  border-radius: 40px; font-size: 13px; letter-spacing: 0.08em;
+  box-shadow: 0 6px 24px rgba(74,140,111,0.4);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+  opacity: 0; z-index: 9999; white-space: nowrap; pointer-events: none;
+}
+.ds-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ══════════════════════════════════════════
+   ds-confetti
+   コンフェッティエフェクト用コンテナ
+══════════════════════════════════════════ */
+#ds-confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998; overflow: hidden; }
+.ds-confetti-piece { position: absolute; animation: dsConfettiFall linear forwards; opacity: 0; }
+
+/* ══════════════════════════════════════════
+   ds-range
+   シンプルスライダー（ds-progress と同じ fill＋シマーアニメーション）
+══════════════════════════════════════════ */
+.ds-range-wrap {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mint-light);
+  overflow: visible;
+}
+.ds-range-wrap .ds-range {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+}
+.ds-range-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--pct, 0%);
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: 3px;
+  overflow: hidden;
+  /* transition なし：thumb と fill を完全同期させるため */
+  pointer-events: none;
+}
+.ds-range-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+.ds-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  z-index: 1;
+  /* 単体使用時のフォールバック（wrap 内では transparent で上書き） */
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent-deep) var(--pct, 0%),
+    var(--mint-light) var(--pct, 0%),
+    var(--mint-light) 100%
+  );
+}
+.ds-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: grab;
+}
+.ds-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.ds-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  cursor: grab;
+}
+
+/* ══════════════════════════════════════════
+   note-box / dashed-box
+   注釈・補足ボックス
+══════════════════════════════════════════ */
+.note-box {
+  background: rgba(168,213,186,0.1); border-left: 3px solid var(--accent);
+  border-radius: 12px; padding: 14px 18px; font-size: 12px;
+  color: var(--sub-text); line-height: 1.8; letter-spacing: 0.05em;
+}
+.dashed-box {
+  border: 1px dashed var(--mint-light); border-radius: 12px;
+  padding: 14px 18px; background: var(--mint-pale); font-size: 12px;
+  color: var(--sub-text); line-height: 1.8; font-family: 'Roboto Mono', monospace;
+}
+
+/* ══════════════════════════════════════════
+   ① ds-input-stepper
+   数値入力 + スライダー + ±ボタン セット
+══════════════════════════════════════════ */
+.ds-val-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.ds-val-row-stack { display: flex; flex-direction: column; gap: 10px; }
+.ds-val-row-stack .ds-chip-scroll { margin-left: 0; flex: none; }
+.ds-val-row .ds-input-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  background: transparent;
+  padding: 4px 0 6px;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s ease;
+  -moz-appearance: textfield;
+}
+.ds-val-row .ds-input-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-val-row .ds-input-underline::-webkit-outer-spin-button,
+.ds-val-row .ds-input-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ds-num-edit {
+  font-size: clamp(1.5rem, 5.5vw, 2rem); font-weight: 500;
+  color: var(--text-main); font-family: 'Roboto', sans-serif;
+  border: none; border-bottom: 2px solid var(--mint-light); outline: none;
+  background: transparent; width: 100px; -moz-appearance: textfield;
+  padding: 0 4px 4px; transition: border-color .25s ease; line-height: 1.1;
+}
+.ds-num-edit:focus { border-bottom-color: var(--accent-deep); }
+.ds-num-edit::-webkit-outer-spin-button,
+.ds-num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
+.ds-val-unit { font-size: 0.95rem; color: var(--sub-text); font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   ds-input-num-underline
+   数値入力（アンダーラインのみ・単位付き）
+   ds-val-row 内で使用: <input class="ds-input-num-underline"> + <span class="ds-val-unit">万円</span>
+══════════════════════════════════════════ */
+.ds-input-num-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.5rem, 5.5vw, 2rem);
+  font-weight: 500;
+  color: var(--text-main);
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  outline: none;
+  background: transparent;
+  width: 100px;
+  padding: 0 4px 4px;
+  transition: border-color 0.25s ease;
+  line-height: 1.1;
+  -moz-appearance: textfield;
+}
+.ds-input-num-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-input-num-underline::placeholder {
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+}
+.ds-input-num-underline::-webkit-outer-spin-button,
+.ds-input-num-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ds-input-stepper { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ds-pm-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: transparent;
+  color: var(--accent-deep);
+  border: 1.5px solid var(--accent);
+  cursor: pointer; font-size: 1rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(74,140,111,0.12);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  user-select: none; line-height: 1;
+}
+.ds-pm-btn:hover {
+  background: var(--mint-pale);
+  border-color: var(--accent-deep);
+  box-shadow: 0 1px 4px rgba(74,140,111,0.12);
+  transform: none;
+}
+.ds-pm-btn:active { transform: scale(0.9); }
+
+/* ピル+縦線のラッパー */
+.ds-stepper-wrap {
+  flex: 1; min-width: 0;
+  position: relative;
+}
+/* ピルの高さ分の余白。padding-bottom でスライダーバーと±ボタンの上下中央揃え */
+.ds-stepper-wrap-inner {
+  position: relative;
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+/* B1フローティングピル */
+.ds-stepper-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ds-stepper-pill-label {
+  background: #fff;
+  color: var(--accent-deep);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  border: 1.5px solid var(--mint-light);
+  line-height: 1.4;
+}
+.ds-stepper-pill-line {
+  width: 1.5px;
+  height: 4px;
+  background: var(--mint-light);
+  flex-shrink: 0;
+}
+/* シマーオーバーレイ（ds-progressと同じ） */
+.ds-stepper-shimmer {
+  pointer-events: none;
+  position: absolute;
+  top: 38px;
+  left: 0;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  overflow: hidden;
+  /* transition なし：thumb と fill を完全同期させるため */
+}
+.ds-stepper-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+
+/* ピル無しバージョン（.ds-stepper-wrap--no-pill を付与） */
+.ds-stepper-wrap--no-pill .ds-stepper-shimmer {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* サム：白抜き＋深緑リング */
+.ds-stepper-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent var(--pct, 0%),
+    var(--mint-light) var(--pct, 0%),
+    var(--mint-light) 100%
+  );
+}
+.ds-stepper-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: grab;
+}
+.ds-stepper-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.ds-stepper-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  cursor: grab;
+}
+
+/* ══════════════════════════════════════════
+   ② ds-warning-inline
+   オレンジ系インライン警告ボックス
+══════════════════════════════════════════ */
+.ds-warning-inline {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 14px;
+  background: rgba(224,122,58,0.08);
+  border-radius: 10px;
+  font-size: 12px; color: var(--warn-color);
+  line-height: 1.7; letter-spacing: 0.04em;
+}
+.ds-warning-inline .wi-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+/* ══════════════════════════════════════════
+   ③ ds-select-underline
+   アンダーラインスタイルのセレクトボックス
+══════════════════════════════════════════ */
+.ds-select-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.ds-select-underline {
+  font-size: clamp(1.4rem, 5vw, 1.8rem); font-weight: 500;
+  color: var(--text-main);
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  border: none; border-bottom: 2px solid var(--mint-light);
+  background: transparent; outline: none; cursor: pointer;
+  padding: 0 4px 4px; -webkit-appearance: none; appearance: none;
+  transition: border-color .25s ease; line-height: 1.1;
+}
+.ds-select-underline:focus { border-bottom-color: var(--accent-deep); }
+.ds-select-unit { font-size: 0.95rem; color: var(--sub-text); font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   ④ ds-summary-grid / ds-stat-card
+   KPI・サマリーグリッドレイアウト
+══════════════════════════════════════════ */
+.ds-summary-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+@media (min-width: 480px) {
+  .ds-summary-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+@media (max-width: 479px) {
+  .ds-summary-grid .ds-stat-card:last-child { grid-column: 1 / -1; }
+}
+.ds-stat-card {
+  background: var(--mint-pale); border-radius: 16px;
+  padding: clamp(14px, 3vw, 20px) clamp(10px, 2vw, 16px) clamp(12px, 2.5vw, 18px);
+  text-align: center; border: 1.5px solid var(--mint-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ds-stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.ds-stat-card.highlight {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  border-color: var(--accent); box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-stat-label {
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem); color: var(--sub-text);
+  font-weight: 600; margin-bottom: clamp(6px, 1.8vw, 10px); line-height: 1.4; letter-spacing: 0.04em;
+}
+.ds-stat-value { font-family: 'Roboto', sans-serif; line-height: 1.1; }
+.ds-stat-num {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 500; color: var(--accent-deep);
+}
+.ds-stat-unit { font-size: clamp(0.85rem, 2.8vw, 1.1rem); font-weight: 400; color: var(--accent-deep); margin-left: 3px; }
+.ds-stat-detail { font-size: clamp(0.72rem, 2.3vw, 0.88rem); color: var(--sub-text); font-weight: 500; margin-top: 8px; }
+.ds-stat-detail-num {
+  font-family: 'Roboto', sans-serif; font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 500; color: var(--accent-deep);
+}
+.ds-stat-detail-unit {
+  font-size: clamp(0.75rem, 2.5vw, 0.95rem); font-weight: 400;
+  color: var(--accent-deep); margin-left: 1px; margin-right: 2px;
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif; vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════
+   ⑤ ds-chip-scroll / ds-chip
+   横スクロール可能なプリセットチップ群
+══════════════════════════════════════════ */
+.ds-chip-scroll {
+  display: flex; gap: 6px; flex-wrap: nowrap;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; min-width: 0; padding: 4px;
+}
+/* ds-val-row 内では残スペースを埋めて右端に寄せる */
+.ds-val-row .ds-chip-scroll { flex: 1 1 0; margin-left: auto; }
+.ds-chip-scroll::-webkit-scrollbar { display: none; }
+.ds-chip {
+  padding: 5px 14px;
+  border: 1.5px solid var(--mint-light); border-radius: 20px;
+  font-size: clamp(0.7rem, 2.2vw, 0.78rem); font-weight: 500;
+  font-family: inherit; color: var(--sub-text); background: transparent;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  letter-spacing: 0.04em; line-height: 1.4; white-space: nowrap; flex-shrink: 0;
+}
+.ds-chip:hover {
+  border-color: var(--accent-deep); color: var(--accent-deep);
+  background: var(--mint-pale); transform: scale(1.05);
+}
+.ds-chip:active { transform: scale(0.95); }
+.ds-chip.active {
+  background: var(--accent-deep); border-color: var(--accent-deep);
+  color: #fff; box-shadow: 0 2px 10px rgba(74,140,111,0.35);
+}
+
+/* ══════════════════════════════════════════
+   ⑥ ds-sim-chart
+   積立シミュレーション棒グラフ
+══════════════════════════════════════════ */
+.ds-chart-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+.ds-chart-li { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--sub-text); font-weight: 500; }
+.ds-chart-ld { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.ds-chart-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+.ds-chart-note { font-size: 11px; color: var(--sub-text); text-align: right; margin-top: 8px; letter-spacing: 0.04em; }
+.ds-chart-tooltip {
+  position: fixed; background: #2c3a35; color: #fff;
+  border-radius: 14px; padding: 12px 16px;
+  font-size: 12px; pointer-events: none;
+  opacity: 0; transition: opacity .15s; z-index: 9999;
+  min-width: 190px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(74,140,111,0.2);
+  line-height: 1.8; border: 1px solid rgba(168,213,186,0.2);
+}
+.ds-chart-tooltip.show { opacity: 1; }
+.ds-chart-tooltip .tt-year  { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 3px; }
+.ds-chart-tooltip .tt-total { font-size: 14px; font-weight: 500; font-family: 'Roboto', sans-serif; margin-bottom: 2px; }
+.ds-chart-tooltip .tt-row   { display: flex; align-items: center; gap: 8px; }
+.ds-chart-tooltip .tt-dot   { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.ds-chart-tooltip .tt-sep   { border-top: 1px solid rgba(255,255,255,0.12); margin: 4px 0; }
+
+/* ══════════════════════════════════════════
+   back-to-index
+   マネーツール一覧へ戻るボタン（各シミュレーター下部）
+══════════════════════════════════════════ */
+.back-to-index { margin-top: 24px; text-align: center; }
+.back-to-index a {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  background: var(--mint-pale); border: 1px solid var(--mint-light);
+  border-radius: 12px; color: var(--accent-deep);
+  text-decoration: none; font-size: 14px; font-weight: 500;
+  transition: background 0.2s, border-color 0.2s;
+}
+.back-to-index a:hover { background: #fff; border-color: var(--accent); }
+
+/* ══════════════════════════════════════════
+   ds-hero-result
+   手取りヒーローカード（グラデーション背景）
+══════════════════════════════════════════ */
+.ds-hero-result {
+  background: linear-gradient(135deg, #5aaa8e 0%, #6ec4a8 100%);
+  border-radius: 20px;
+  padding: 24px 24px 20px;
+  color: #fff;
+  box-shadow: 0 4px 22px rgba(74,140,111,0.22);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.ds-hero-result .hero-eyebrow {
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+.ds-hero-result .hero-amount {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(2.2rem, 7vw, 3rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+.ds-hero-result .hero-amount-unit {
+  font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  font-weight: 400;
+}
+.ds-hero-result .hero-sub {
+  margin-top: 14px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ds-hero-result .hero-sub-value {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════
+   ds-calc-basis
+   計算の根拠（番号付きステップ＋要約式）
+══════════════════════════════════════════ */
+.ds-calc-basis {
+  background: var(--mint-pale);
+  border: 1.5px dashed var(--mint-light);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 4px;
+}
+.ds-calc-basis-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-deep);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ds-calc-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+.ds-calc-step-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.ds-calc-step .val {
+  font-weight: 500;
+  color: var(--accent-deep);
+}
+.ds-calc-eq {
+  font-size: 13px;
+  color: var(--text-main);
+  background: var(--card-bg);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  line-height: 1.8;
+}
+.ds-calc-eq .em {
+  color: var(--accent-deep);
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════
+   ds-breakdown-accordion
+   社会保険料・税金の内訳アコーディオン
+══════════════════════════════════════════ */
+.ds-breakdown-block {
+  background: var(--card-bg);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.ds-breakdown-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--card-bg);
+  font-size: clamp(0.82rem, 2.4vw, 0.92rem);
+  font-weight: 700;
+  color: var(--text-main);
+  border-bottom: 1.5px solid var(--mint-light);
+}
+.ds-accordion-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 18px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--mint-light);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.ds-accordion-trigger:hover {
+  background: var(--mint-pale);
+}
+.ds-accordion-trigger .acc-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--sub-text);
+  text-transform: uppercase;
+}
+.ds-accordion-trigger .acc-toggle-label {
+  font-size: 10px;
+  background: var(--mint-pale);
+  border: 1px solid var(--mint-light);
+  color: var(--accent-deep);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: background 0.2s;
+}
+.ds-accordion-trigger[aria-expanded="true"] .acc-toggle-label {
+  background: var(--mint-light);
+}
+.ds-accordion-trigger .acc-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  font-weight: 500;
+  color: var(--sub-text);
+  text-align: right;
+}
+.acc-resident-hint {
+  font-size: 10px;
+  color: var(--warn-color);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+.ds-accordion-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+  background: #fafcfb;
+}
+.ds-accordion-body.open {
+  max-height: 400px;
+}
+.ds-accordion-body .breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 18px;
+  font-size: clamp(0.78rem, 2.3vw, 0.88rem);
+  border-bottom: 1px solid var(--mint-light);
+}
+.ds-accordion-body .breakdown-row .breakdown-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sub-text);
+}
+.ds-accordion-body .breakdown-row .breakdown-label::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.ds-accordion-body .breakdown-row.color-health .breakdown-label::before { background: var(--data-blue-2); }
+.ds-accordion-body .breakdown-row.color-care .breakdown-label::before { background: var(--data-blue-2); }
+.ds-accordion-body .breakdown-row.color-pension .breakdown-label::before { background: var(--data-blue-1); }
+.ds-accordion-body .breakdown-row.color-employ .breakdown-label::before { background: var(--data-blue-3); }
+.ds-accordion-body .breakdown-row.color-income .breakdown-label::before { background: var(--data-orange); }
+.ds-accordion-body .breakdown-row.color-resident .breakdown-label::before { background: var(--data-amber); }
+.ds-accordion-body .breakdown-row .breakdown-value {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: var(--sub-text);
+  text-align: right;
+}
+.ds-accordion-body .breakdown-row:last-child {
+  border-bottom: none;
+}
+.ds-breakdown-subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 18px;
+  font-size: clamp(0.8rem, 2.3vw, 0.9rem);
+  font-weight: 600;
+  color: var(--sub-text);
+  border-top: 1px solid var(--mint-light);
+}
+.ds-breakdown-takehome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  font-size: clamp(0.88rem, 2.5vw, 1rem);
+  font-weight: 700;
+  color: var(--text-main);
+}
+.ds-breakdown-takehome .takehome-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 500;
+  color: var(--accent-deep);
+}
+
+/* ══════════════════════════════════════════
+   ds-donut-summary
+   ドーナツグラフ＋内訳を横並びにしたカード
+══════════════════════════════════════════ */
+.ds-donut-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  background: var(--mint-pale);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 16px;
+}
+.ds-donut-summary .donut-canvas-wrap,
+.ds-donut-summary .donut-svg-wrap {
+  flex-shrink: 0;
+  width: clamp(90px, 22vw, 120px);
+  aspect-ratio: 1;
+  position: relative;
+}
+.ds-donut-summary .donut-svg-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ds-donut-summary .donut-legend {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ds-donut-summary .donut-legend-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--placeholder);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.ds-donut-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(0.72rem, 2vw, 0.82rem);
+}
+.ds-donut-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.ds-donut-legend-name {
+  flex: 1;
+  color: var(--sub-text);
+}
+.ds-donut-legend-val {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: var(--text-main);
+  text-align: right;
+}
+.ds-donut-legend-pct {
+  font-size: 10px;
+  color: var(--placeholder);
+  margin-left: 3px;
+}
+
+/* ══════════════════════════════════════════
+   ds-resident-savings
+   住民税取り置きブロック（翌年払い注意）
+   住民税を計算から外すON時に表示
+══════════════════════════════════════════ */
+.ds-resident-savings {
+  display: none;                          /* JSでshow/hide */
+  background: rgba(224,122,58,0.07);
+  border: 1.5px solid rgba(224,122,58,0.25);
+  border-radius: 16px;
+  padding: 16px 18px;
+  animation: fadeInUp 0.3s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+.ds-resident-savings.visible {
+  display: block;
+}
+
+/* ヘッダー行 */
+.drs-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.drs-header-icon { font-size: 16px; }
+.drs-header-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--warn-color);
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+.drs-badge {
+  font-size: 10px;
+  background: rgba(224,122,58,0.12);
+  color: var(--warn-color);
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* 月額→年額カード行 */
+.drs-amounts {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 14px;
+}
+.drs-amount-card {
+  flex: 1;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  padding: 11px 13px;
+  border: 1px solid rgba(224,122,58,0.22);
+}
+.drs-amount-card.annual {
+  background: rgba(224,122,58,0.1);
+  border-color: rgba(224,122,58,0.3);
+  border-width: 1.5px;
+}
+.drs-amount-label {
+  font-size: 10px;
+  color: var(--warn-color);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.drs-amount-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 500;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+.drs-amount-card.annual .drs-amount-value {
+  font-weight: 500;
+  color: var(--warn-color);
+}
+.drs-amount-unit {
+  font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: 12px;
+  color: var(--sub-text);
+  margin-left: 2px;
+}
+.drs-amount-card.annual .drs-amount-unit {
+  color: var(--warn-color);
+  opacity: 0.8;
+}
+.drs-arrow {
+  padding: 0 10px;
+  font-size: 16px;
+  color: rgba(224,122,58,0.35);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* プログレスバー */
+.drs-bar-wrap {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.drs-bar-track {
+  flex: 1;
+  min-width: 0;
+}
+.drs-bar-bg {
+  height: 14px;
+  background: rgba(224,122,58,0.12);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.drs-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(224,122,58,0.55), var(--warn-color));
+  border-radius: 7px;
+  transition: width 0.7s cubic-bezier(0.22,0.61,0.36,1);
+  position: relative;
+  overflow: hidden;
+}
+.drs-bar-fill::after {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+.drs-bar-pct {
+  font-size: 11px;
+  color: var(--warn-color);
+  font-weight: 600;
+  opacity: 0.9;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 注記 */
+.drs-note {
+  font-size: 11px;
+  color: var(--sub-text);
+  line-height: 1.75;
+  border-top: 1px dashed rgba(224,122,58,0.25);
+  padding-top: 10px;
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════
+   ds-explain-panel
+   用語・考え方の短い説明（ds-resident-savings と同系の枠・Mint系）
+   インフレ実質額の説明などに使用
+══════════════════════════════════════════ */
+.ds-explain-panel {
+  display: block;
+  background: rgba(168,213,186,0.12);
+  border: 1.5px solid rgba(74,140,111,0.22);
+  border-radius: 16px;
+  padding: 18px 20px 20px;
+  margin-top: 16px;
+  animation: fadeInUp 0.35s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+.ds-explain-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ds-explain-head-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.ds-explain-head-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-deep);
+  letter-spacing: 0.04em;
+  flex: 1;
+  line-height: 1.35;
+}
+.ds-explain-badge {
+  font-size: 10px;
+  background: rgba(74,140,111,0.12);
+  color: var(--accent-deep);
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ds-explain-body {
+  font-size: clamp(0.78rem, 2.2vw, 0.88rem);
+  color: var(--text-main);
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+}
+.ds-explain-body p {
+  margin: 0;
+}
+.ds-explain-body p + p {
+  margin-top: 7px;
+}
+.ds-explain-body strong {
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+.ds-explain-note {
+  font-size: 11px;
+  color: var(--sub-text);
+  line-height: 1.65;
+  border-top: 1px dashed rgba(74,140,111,0.3);
+  padding-top: 9px;
+  margin-top: 10px;
+  letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════
+   ds-period-strip
+   内訳ブロック上部 月間／年間 切り替えストリップ
+══════════════════════════════════════════ */
+.ds-period-strip {
+  display: flex;
+  border-bottom: 1.5px solid var(--mint-light);
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  background: var(--mint-pale);
+}
+.ds-period-strip-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  position: relative;
+  background: transparent;
+  color: var(--sub-text);
+  transition: color 0.2s ease;
+}
+.ds-period-strip-btn.active {
+  color: var(--accent-deep);
+}
+/* アクティブのアンダーライン */
+.ds-period-strip-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--accent-deep);
+  transition: width 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ds-period-strip-btn.active::after {
+  width: 40px;
+}
+/* ボタン間の区切り線 */
+.ds-period-strip-btn:not(:last-child) {
+  border-right: 1px solid var(--mint-light);
+}
+
+/* 金額切り替えアニメーション */
+.bd-amount {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  display: inline-block;
+}
+.ds-breakdown-block.period-switching .bd-amount {
+  opacity: 0;
+  transform: translateY(3px);
+}
+
+/* タブ切り替え: まとめてフェードイン */
+@keyframes breakdownFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ds-breakdown-block.period-switching .ds-breakdown-single > *,
+.ds-breakdown-block.period-switching .ds-breakdown-stack-item > * {
+  opacity: 0;
+  animation: breakdownFadeIn 0.4s ease forwards;
+}
+.ds-breakdown-block.period-switching > *:not(.ds-period-strip):not(.ds-breakdown-single):not(.ds-breakdown-monthly-stack) {
+  opacity: 0;
+  animation: breakdownFadeIn 0.4s ease forwards;
+}
+.ds-breakdown-block.period-switching .ds-breakdown-single .bd-amount,
+.ds-breakdown-block.period-switching .ds-breakdown-stack-item .bd-amount,
+.ds-breakdown-block.period-switching .bd-amount {
+  opacity: inherit;
+  transform: inherit;
+  transition: none;
+}
+
+/* ══════════════════════════════════════════
+   ds-work-fields
+   稼働条件（時間/日・日数/月・交通費）横並びグリッド
+══════════════════════════════════════════ */
+.ds-work-fields {
+  display: grid;
+  grid-template-columns: 1fr 0.4fr 1fr 0.4fr 1.8fr 0.4fr;
+  align-items: end;
+  column-gap: 12px;
+  row-gap: 8px;
+}
+.ds-work-fields .ds-input-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  font-weight: 500;
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  background: transparent;
+  padding: 4px 0 6px;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s ease;
+  -moz-appearance: textfield;
+}
+.ds-work-fields .ds-input-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-work-fields .ds-input-underline::-webkit-outer-spin-button,
+.ds-work-fields .ds-input-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ds-work-fields .field-label {
+  font-size: clamp(0.68rem, 2vw, 0.76rem);
+  font-weight: 600;
+  color: var(--sub-text);
+  white-space: nowrap;
+}
+.ds-work-fields .field-unit {
+  font-size: clamp(0.82rem, 2.4vw, 0.95rem);
+  color: var(--sub-text);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  /* ── 稼働条件グリッド：幅を絞り交通費のみ広く ── */
+  .ds-work-fields {
+    grid-template-columns: 44px auto 44px auto 80px auto;
+    align-items: end;
+    column-gap: 6px;
+    row-gap: 0;
+  }
+
+  /* ── 稼働条件の入力欄フォントサイズを1段階アップ ── */
+  .ds-work-fields .ds-input-underline {
+    font-size: 22px;
+  }
+}
+
+</style>
+</head>
+<body>
+<div id="ds-toast"    class="ds-toast"></div>
+<div id="ds-confetti"></div>
+
+<!-- ════════════════════════
+     SIDEBAR
+════════════════════════ -->
+<nav class="cat-sidebar">
+  <div class="cat-logo">
+    <div class="cat-logo-title">🌿 Mint Design System</div>
+    <div class="cat-logo-sub">Style Guide &amp; Catalog</div>
+  </div>
+
+  <div class="cat-nav-group">基礎</div>
+  <a class="cat-nav-link" href="#colors">カラーパレット</a>
+  <a class="cat-nav-link" href="#typography">タイポグラフィ</a>
+
+  <div class="cat-nav-group">入力</div>
+  <a class="cat-nav-link" href="#input">ds-input</a>
+  <a class="cat-nav-link" href="#input-num-underline">ds-input-num-underline</a>
+  <a class="cat-nav-link" href="#stepper">ds-input-stepper</a>
+  <a class="cat-nav-link" href="#select">ds-select-underline</a>
+  <a class="cat-nav-link" href="#chips">ds-chip-scroll</a>
+  <a class="cat-nav-link" href="#segment">ds-segment</a>
+
+  <div class="cat-nav-group">結果表示</div>
+  <a class="cat-nav-link" href="#result">ds-result</a>
+  <a class="cat-nav-link" href="#summary-grid">ds-summary-grid</a>
+  <a class="cat-nav-link" href="#hero-result">ds-hero-result</a>
+  <a class="cat-nav-link" href="#progress">ds-progress</a>
+
+  <div class="cat-nav-group">データ可視化</div>
+  <a class="cat-nav-link" href="#donut-summary">ds-donut-summary</a>
+  <a class="cat-nav-link" href="#breakdown-accordion">ds-breakdown-accordion</a>
+  <a class="cat-nav-link" href="#resident-savings">ds-resident-savings</a>
+  <a class="cat-nav-link" href="#explain-panel">ds-explain-panel</a>
+  <a class="cat-nav-link" href="#asset-line-chart">ds-asset-line-chart</a>
+  <a class="cat-nav-link" href="#stacked-bar-chart">ds-stacked-bar-chart</a>
+  <a class="cat-nav-link" href="#calc-basis">ds-calc-basis</a>
+
+  <div class="cat-nav-group">注釈・フィードバック</div>
+  <a class="cat-nav-link" href="#annotations">note-box / warning-inline</a>
+  <a class="cat-nav-link" href="#divider">ds-divider</a>
+  <a class="cat-nav-link" href="#badge">ds-badge</a>
+  <a class="cat-nav-link" href="#card">ds-card</a>
+  <a class="cat-nav-link" href="#buttons">ボタン</a>
+  <a class="cat-nav-link" href="#back-to-index">back-to-index</a>
+
+  <div class="cat-nav-group">ユーティリティ</div>
+  <a class="cat-nav-link" href="#fmt">数値フォーマット</a>
+  <a class="cat-nav-link" href="#animate">animateNum</a>
+  <a class="cat-nav-link" href="#toast-demo">showToast</a>
+  <a class="cat-nav-link" href="#confetti-demo">fireConfetti</a>
+</nav>
+
+
+<!-- ════════════════════════
+     MAIN
+════════════════════════ -->
+<main class="cat-main">
+
+  <!-- ════════════════════════════════
+       GROUP: 基礎
+  ════════════════════════════════ -->
+  <div class="cat-group-heading" id="group-base">
+    <span class="cat-group-heading-label">基礎</span>
+    <div class="cat-group-heading-line"></div>
+  </div>
+
+  <!-- カラーパレット -->
+  <section class="cat-section" id="colors">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">カラーパレット</h2>
+      <span class="cat-section-tag">tokens.css</span>
+    </div>
+
+    <div class="cat-subsection">
+      <div class="cat-subsection-title">ブランドカラー</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#e8f5f1"></div><div class="swatch-info"><div class="swatch-name">--base-bg</div><div class="swatch-hex">#e8f5f1</div><div class="swatch-desc">ベース背景（淡いミント）</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#a8d5ba"></div><div class="swatch-info"><div class="swatch-name">--accent</div><div class="swatch-hex">#a8d5ba</div><div class="swatch-desc">アクセント（若葉ミント）</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#4a8c6f"></div><div class="swatch-info"><div class="swatch-name">--accent-deep</div><div class="swatch-hex">#4a8c6f</div><div class="swatch-desc">アクセント深（深みミント）</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat-subsection">
+      <div class="cat-subsection-title">テキスト</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#44504c"></div><div class="swatch-info"><div class="swatch-name">--text-main</div><div class="swatch-hex">#44504c</div><div class="swatch-desc">メイン文字</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#ccd6d1"></div><div class="swatch-info"><div class="swatch-name">--text-sub</div><div class="swatch-hex">#ccd6d1</div><div class="swatch-desc">サブ文字（極薄グレー）</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#7a9a8e"></div><div class="swatch-info"><div class="swatch-name">--sub-text</div><div class="swatch-hex">#7a9a8e</div><div class="swatch-desc">セカンダリテキスト</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#b8d4cc"></div><div class="swatch-info"><div class="swatch-name">--placeholder</div><div class="swatch-hex">#b8d4cc</div><div class="swatch-desc">プレースホルダー</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#5a7a70"></div><div class="swatch-info"><div class="swatch-name">--label-color</div><div class="swatch-hex">#5a7a70</div><div class="swatch-desc">ラベル</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat-subsection">
+      <div class="cat-subsection-title">面・背景</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#ffffff;border-bottom:1px solid var(--sys-border)"></div><div class="swatch-info"><div class="swatch-name">--card-bg</div><div class="swatch-hex">#ffffff</div><div class="swatch-desc">カード背景（純白）</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#d4ede3"></div><div class="swatch-info"><div class="swatch-name">--mint-light</div><div class="swatch-hex">#d4ede3</div><div class="swatch-desc">ボーダー・バー背景</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f0faf5"></div><div class="swatch-info"><div class="swatch-name">--mint-pale</div><div class="swatch-hex">#f0faf5</div><div class="swatch-desc">入力・ホバー背景</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat-subsection">
+      <div class="cat-subsection-title">Data Colors（データ識別用）</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#4a7fd4"></div><div class="swatch-info"><div class="swatch-name">--data-blue-1</div><div class="swatch-hex">#4a7fd4</div><div class="swatch-desc">データ識別用ブルー（濃）</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#7aa8e8"></div><div class="swatch-info"><div class="swatch-name">--data-blue-2</div><div class="swatch-hex">#7aa8e8</div><div class="swatch-desc">データ識別用ブルー（中）</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#aac8f4"></div><div class="swatch-info"><div class="swatch-name">--data-blue-3</div><div class="swatch-hex">#aac8f4</div><div class="swatch-desc">データ識別用ブルー（薄）</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#e07a3a"></div><div class="swatch-info"><div class="swatch-name">--data-orange</div><div class="swatch-hex">#e07a3a</div><div class="swatch-desc">データ識別用オレンジ</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f0c060"></div><div class="swatch-info"><div class="swatch-name">--data-amber</div><div class="swatch-hex">#f0c060</div><div class="swatch-desc">データ識別用アンバー</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat-subsection">
+      <div class="cat-subsection-title">セマンティック / システム</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#e07a3a"></div><div class="swatch-info"><div class="swatch-name">--warn-color</div><div class="swatch-hex">#e07a3a</div><div class="swatch-desc">警告・注意（オレンジ）</div></div></div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:var(--base-bg);display:flex;align-items:center;justify-content:center;">
+            <div style="width:56px;height:34px;background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(74,140,111,0.25)"></div>
+          </div>
+          <div class="swatch-info"><div class="swatch-name">--shadow</div><div class="swatch-hex">rgba(74,140,111,0.12)</div><div class="swatch-desc">グリーン系シャドウ</div></div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:var(--accent-border);border:1px solid var(--mint-light);"></div>
+          <div class="swatch-info"><div class="swatch-name">--accent-border</div><div class="swatch-hex">rgba(168,213,186,0.5)</div><div class="swatch-desc">アクセントの半透明ボーダー</div></div>
+        </div>
+        <div class="swatch"><div class="swatch-color" style="background:#f8fcfa"></div><div class="swatch-info"><div class="swatch-name">--sys-sidebar</div><div class="swatch-hex">#f8fcfa</div><div class="swatch-desc">サイドバー背景</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#e2f0e9"></div><div class="swatch-info"><div class="swatch-name">--sys-border</div><div class="swatch-hex">#e2f0e9</div><div class="swatch-desc">システムUIボーダー</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#1e2d28"></div><div class="swatch-info"><div class="swatch-name">--sys-code-bg</div><div class="swatch-hex">#1e2d28</div><div class="swatch-desc">コードブロック背景</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#a8d5ba"></div><div class="swatch-info"><div class="swatch-name">--sys-code-fg</div><div class="swatch-hex">#a8d5ba</div><div class="swatch-desc">コードブロック文字色</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- タイポグラフィ -->
+  <section class="cat-section" id="typography">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">タイポグラフィ</h2>
+    </div>
+
+    <div class="cat-subsection">
+      <div class="cat-subsection-title">フォントファミリー</div>
+      <div class="preview col" style="gap:22px;">
+        <div>
+          <div style="font-size:10px;font-family:'Roboto Mono',monospace;color:var(--sub-text);margin-bottom:7px;">'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif — 和文 / UI</div>
+          <div style="font-size:21px;font-weight:500;">あいうえお　カキクケコ　ABCDEF　１２３４５６</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-family:'Roboto Mono',monospace;color:var(--sub-text);margin-bottom:7px;">'Roboto', sans-serif — 数値 / 英文 (wt 300 / 400 / 500 / 700)</div>
+          <div style="font-family:'Roboto',sans-serif;font-size:21px;color:var(--text-main);">
+            <span style="font-weight:300">1,234,567</span>&ensp;
+            <span style="font-weight:400">¥ 0.05%</span>&ensp;
+            <span style="font-weight:500">億円</span>&ensp;
+            <span style="font-weight:700">ABCDEF</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-family:'Roboto Mono',monospace;color:var(--sub-text);margin-bottom:7px;">'Roboto Mono', monospace — コード / ラベル (wt 400 / 500)</div>
+          <div style="font-family:'Roboto Mono',monospace;font-size:15px;color:var(--accent-deep);">--accent: #a8d5ba;&nbsp;&nbsp;function clamp(v, min, max) { … }</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat-subsection">
+      <div class="cat-subsection-title">サイズスケール</div>
+      <div class="preview col" style="padding:20px 28px;gap:0;">
+        <table class="typo-table">
+          <tbody>
+            <tr><td class="typo-meta"><div class="typo-label">2xl</div><div class="typo-val">2rem / 32px</div></td><td style="font-size:2rem;font-weight:700;color:var(--text-main);">資産運用シミュレーション</td></tr>
+            <tr><td class="typo-meta"><div class="typo-label">xl</div><div class="typo-val">1.5rem / 24px</div></td><td style="font-size:1.5rem;font-weight:600;color:var(--text-main);">新NISA積立シミュレーター</td></tr>
+            <tr><td class="typo-meta"><div class="typo-label">lg</div><div class="typo-val">1.1rem / 17.6px</div></td><td style="font-size:1.1rem;font-weight:500;color:var(--text-main);">毎月の積立額</td></tr>
+            <tr><td class="typo-meta"><div class="typo-label">base</div><div class="typo-val">1rem / 16px</div></td><td style="font-size:1rem;color:var(--text-main);">65歳時の資産合計をシミュレーションします</td></tr>
+            <tr><td class="typo-meta"><div class="typo-label">sm</div><div class="typo-val">0.875rem / 14px</div></td><td style="font-size:0.875rem;color:var(--sub-text);">想定利回り（年率）のご入力をお願いします</td></tr>
+            <tr><td class="typo-meta"><div class="typo-label">xs</div><div class="typo-val">0.75rem / 12px</div></td><td style="font-size:0.75rem;color:var(--sub-text);">免責事項・補足テキスト・ラベル</td></tr>
+            <tr><td class="typo-meta"><div class="typo-label">2xs</div><div class="typo-val">0.625rem / 10px</div></td><td style="font-size:0.625rem;color:var(--sub-text);letter-spacing:.12em;text-transform:uppercase;">BADGE LABEL — SMALL CAPS</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════
+       GROUP: 入力
+  ════════════════════════════════ -->
+  <div class="cat-group-heading" id="group-input">
+    <span class="cat-group-heading-label">入力</span>
+    <div class="cat-group-heading-line"></div>
+  </div>
+
+  <!-- ds-input -->
+  <section class="cat-section" id="input">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-input</h2>
+      <span class="cat-section-tag">.ds-input / .ds-input-wrap</span>
+    </div>
+    <p class="cat-desc">フルワイドのボーダー付きテキスト入力。フォーカス時にグリーンのフォーカスリング表示。単位テキストは <code>.ds-input-unit</code> で付与。</p>
+    <div class="preview col" style="gap:16px;">
+      <div class="ds-input-wrap" style="max-width:380px;">
+        <input class="ds-input" type="text" placeholder="金額を入力してください">
+        <span class="ds-input-unit">万円</span>
+      </div>
+      <div class="ds-input-wrap" style="max-width:380px;">
+        <input class="ds-input" type="number" value="5.0" placeholder="0.0">
+        <span class="ds-input-unit">%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-input-num-underline -->
+  <section class="cat-section" id="input-num-underline">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-input-num-underline</h2>
+      <span class="cat-section-tag">.ds-val-row / .ds-val-unit</span>
+    </div>
+    <p class="cat-desc">数値入力（アンダーラインのみ）。3桁ごとにカンマ区切り。<code>ds-val-row</code> 内で <code>ds-input-num-underline</code> と <code>ds-val-unit</code> を組み合わせて使用。<code>type="text"</code> + <code>inputmode="numeric"</code> でカンマ表示。</p>
+    <div class="preview col" style="gap:12px;">
+      <div class="ds-val-row">
+        <input class="ds-input-num-underline" type="text" id="inputNumUnderlineDemo" value="1,000" placeholder="0" inputmode="numeric">
+        <span class="ds-val-unit">万円</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-input-stepper -->
+  <section class="cat-section" id="stepper">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-input-stepper</h2>
+      <span class="cat-section-tag">.ds-pm-btn / .ds-stepper-range / base.js</span>
+    </div>
+    <p class="cat-desc">数値入力 + スライダー + ±ボタンのセット。<code>updateSliderBg(sl)</code> でトラック塗りとシマーオーバーレイを同期。<code>linkInputs(numId, slId, min, max, step, onChange?)</code> で number input とスライダーを双方向同期。<code>.ds-stepper-wrap--no-pill</code> でピル無し版に切り替え。</p>
+    <div class="preview col" style="gap:12px;">
+      <div style="font-size:11px;color:var(--sub-text);">ピル有り（フローティングピル） <code>.ds-input-stepper</code> <code>.ds-stepper-wrap</code></div>
+      <div class="ds-val-row">
+        <input class="ds-num-edit" id="stepperNum" type="number" min="0" max="30" step="1" value="10">
+        <span class="ds-val-unit">万円</span>
+      </div>
+      <div class="ds-input-stepper">
+        <button class="ds-pm-btn" id="stepperMinus">－</button>
+        <div class="ds-stepper-wrap">
+          <div class="ds-stepper-wrap-inner">
+            <div class="ds-stepper-pill" id="stepperSl-pill">
+              <div class="ds-stepper-pill-label" id="stepperSl-pill-label">10万円</div>
+              <div class="ds-stepper-pill-line"></div>
+            </div>
+            <div class="ds-stepper-shimmer" id="stepperSl-shimmer"></div>
+            <input class="ds-stepper-range" id="stepperSl" type="range" min="0" max="30" step="1" value="10" data-unit="万円">
+          </div>
+        </div>
+        <button class="ds-pm-btn" id="stepperPlus">＋</button>
+      </div>
+      <hr class="ds-divider" style="margin:8px 0;">
+      <div style="font-size:11px;color:var(--sub-text);">ピル無し <code>.ds-input-stepper</code> <code>.ds-stepper-wrap--no-pill</code></div>
+      <div class="ds-val-row">
+        <input class="ds-num-edit" id="stepperNumNoPill" type="number" min="0" max="30" step="1" value="10">
+        <span class="ds-val-unit">万円</span>
+      </div>
+      <div class="ds-input-stepper">
+        <button class="ds-pm-btn" id="stepperMinusNoPill">－</button>
+        <div class="ds-stepper-wrap ds-stepper-wrap--no-pill">
+          <div class="ds-stepper-shimmer" id="stepperSlNoPill-shimmer"></div>
+          <input class="ds-stepper-range" id="stepperSlNoPill" type="range" min="0" max="30" step="1" value="10">
+        </div>
+        <button class="ds-pm-btn" id="stepperPlusNoPill">＋</button>
+      </div>
+      <hr class="ds-divider" style="margin:8px 0;">
+      <div style="font-size:11px;color:var(--sub-text);">ds-range（シンプルスライダー） <code>.ds-range-wrap</code> <code>.ds-range</code></div>
+      <div class="ds-range-wrap" style="max-width:400px;">
+        <div class="ds-range-fill"></div>
+        <input class="ds-range" id="simpleRange" type="range" min="0" max="100" value="40">
+      </div>
+      <hr class="ds-divider" style="margin:8px 0;">
+      <div style="font-size:11px;color:var(--sub-text);">ピル有り（±ボタン無し） <code>.ds-stepper-wrap</code></div>
+      <div class="ds-val-row">
+        <input class="ds-num-edit" id="rangePillNum" type="number" min="0" max="30" step="1" value="10">
+        <span class="ds-val-unit">万円</span>
+      </div>
+      <div class="ds-stepper-wrap" style="max-width:400px;">
+        <div class="ds-stepper-wrap-inner">
+          <div class="ds-stepper-pill" id="rangePillSl-pill">
+            <div class="ds-stepper-pill-label" id="rangePillSl-pill-label">10万円</div>
+            <div class="ds-stepper-pill-line"></div>
+          </div>
+          <div class="ds-stepper-shimmer" id="rangePillSl-shimmer"></div>
+          <input class="ds-stepper-range" id="rangePillSl" type="range" min="0" max="30" step="1" value="10" data-unit="万円">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-select-underline -->
+  <section class="cat-section" id="select">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-select-underline</h2>
+      <span class="cat-section-tag">.ds-select-underline / .ds-select-unit</span>
+    </div>
+    <p class="cat-desc">アンダーラインスタイルのセレクトボックス。数値として読めるよう大きなフォントで表示。</p>
+    <div class="preview" style="align-items:baseline;gap:8px;">
+      <div class="ds-select-row">
+        <select class="ds-select-underline">
+          <option>1990</option><option>1992</option><option selected>1995</option><option>2000</option>
+        </select>
+        <span class="ds-select-unit">年</span>
+        <select class="ds-select-underline">
+          <option>1</option><option selected>6</option><option>12</option>
+        </select>
+        <span class="ds-select-unit">月</span>
+        <span style="font-size:13px;color:var(--sub-text);margin-left:4px;">（現在 29歳）</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-chip-scroll -->
+  <section class="cat-section" id="chips">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-chip-scroll</h2>
+      <span class="cat-section-tag">.ds-chip-scroll / .ds-chip</span>
+    </div>
+    <p class="cat-desc">横スクロール可能なプリセットチップ群。<code>initChipScroll()</code> で右端フェードマスクを初期化。<code>.active</code> で選択状態。入力値のクイック選択に使用。</p>
+    <div class="preview col" style="gap:16px;">
+      <div style="font-size:11px;color:var(--sub-text);">毎月の積立額</div>
+      <div class="ds-chip-scroll" id="chipDemo" style="max-width:320px;">
+        <button class="ds-chip active">3万円</button>
+        <button class="ds-chip">5万円</button>
+        <button class="ds-chip">10万円</button>
+        <button class="ds-chip">15万円</button>
+        <button class="ds-chip">20万円</button>
+        <button class="ds-chip">25万円</button>
+        <button class="ds-chip">30万円</button>
+      </div>
+      <div style="font-size:11px;color:var(--sub-text);">想定利回り</div>
+      <div class="ds-chip-scroll">
+        <button class="ds-chip">3%</button>
+        <button class="ds-chip active">5%</button>
+        <button class="ds-chip">7%</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-segment -->
+  <section class="cat-section" id="segment">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-segment</h2>
+      <span class="cat-section-tag">.ds-segment / .ds-seg-btn</span>
+    </div>
+    <p class="cat-desc">タブ切り替えコントロール。<code>.active</code> クラスで選択状態。クリックで切り替え可能。表示モードの切り替えに使用（月次 / 年次 / 累計など）。</p>
+    <div class="preview center">
+      <div class="ds-segment" id="seg-demo">
+        <button class="ds-seg-btn active">月次</button>
+        <button class="ds-seg-btn">年次</button>
+        <button class="ds-seg-btn">累計</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-form-row -->
+  <section class="cat-section" id="form-row">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-form-row</h2>
+      <span class="cat-section-tag">.ds-form-rows / .ds-form-row</span>
+    </div>
+    <p class="cat-desc">ラベル＋インプットの横並びグリッドレイアウト。<code>--form-label-w</code>（デフォルト 200px）でラベル幅をカスタマイズ可能。560px 以上で2カラム表示。</p>
+    <div class="preview col">
+      <div class="ds-form-rows">
+        <div class="ds-form-row">
+          <div class="ds-form-row-label">
+            <span class="lname">毎月の積立額</span>
+          </div>
+          <div class="ds-form-row-right">
+            <div class="ds-val-row" style="margin-bottom:0;">
+              <span style="font-size:1.8rem;font-family:'Roboto',sans-serif;font-weight:500;color:var(--text-main);">5</span>
+              <span class="ds-val-unit">万円</span>
+            </div>
+          </div>
+        </div>
+        <div class="ds-form-row">
+          <div class="ds-form-row-label">
+            <span class="lname">想定利回り（年率）</span>
+            <span class="ldesc">運用の平均リターン率</span>
+          </div>
+          <div class="ds-form-row-right">
+            <div class="ds-val-row" style="margin-bottom:0;">
+              <span style="font-size:1.8rem;font-family:'Roboto',sans-serif;font-weight:500;color:var(--text-main);">5.0</span>
+              <span class="ds-val-unit">%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════
+       GROUP: 結果表示
+  ════════════════════════════════ -->
+  <div class="cat-group-heading" id="group-result">
+    <span class="cat-group-heading-label">結果表示</span>
+    <div class="cat-group-heading-line"></div>
+  </div>
+
+  <!-- ds-result -->
+  <section class="cat-section" id="result">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-result</h2>
+      <span class="cat-section-tag">.ds-result / .highlight</span>
+    </div>
+    <p class="cat-desc">KPI単体表示カード。<code>.highlight</code> でグリーン強調表示。ホバーで浮き上がり。少数の指標を横並びで示す場面に使用。</p>
+    <div class="preview" style="gap:12px;">
+      <div class="ds-result" style="flex:1;min-width:160px;">
+        <div class="ds-result-label">うち運用収益</div>
+        <div class="ds-result-value"><span>1,200</span><span class="ds-result-unit">万円</span></div>
+      </div>
+      <div class="ds-result highlight" style="flex:1;min-width:160px;">
+        <div class="ds-result-label">65歳時の資産</div>
+        <div class="ds-result-value"><span>2,346</span><span class="ds-result-unit">万円</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-summary-grid -->
+  <section class="cat-section" id="summary-grid">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-summary-grid</h2>
+      <span class="cat-section-tag">.ds-stat-card / .ds-stat-*</span>
+    </div>
+    <p class="cat-desc">KPI・サマリーグリッドレイアウト。<code>.highlight</code> で強調。<code>ds-stat-num / unit / detail / detail-num / detail-unit</code> の5要素で構成。複数指標を整列して表示する場合は <strong>ds-result</strong> よりこちらを使用。</p>
+    <div class="preview col">
+      <div class="ds-summary-grid">
+        <div class="ds-stat-card highlight">
+          <div class="ds-stat-label">65歳時の資産</div>
+          <div class="ds-stat-value">
+            <span class="ds-stat-num">2,346</span><span class="ds-stat-unit">万円</span>
+          </div>
+        </div>
+        <div class="ds-stat-card">
+          <div class="ds-stat-label">うち運用収益</div>
+          <div class="ds-stat-value">
+            <span class="ds-stat-num">1,200</span><span class="ds-stat-unit">万円</span>
+          </div>
+        </div>
+        <div class="ds-stat-card">
+          <div class="ds-stat-label">新NISA枠使い切り</div>
+          <div class="ds-stat-value">
+            <div><span class="ds-stat-detail-num">12</span><span class="ds-stat-detail-unit">年</span><span class="ds-stat-detail-num">3</span><span class="ds-stat-detail-unit">ヶ月目</span></div>
+            <div class="ds-stat-detail">37歳3ヶ月</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-hero-result -->
+  <section class="cat-section" id="hero-result">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-hero-result</h2>
+      <span class="cat-section-tag">.ds-hero-result</span>
+    </div>
+    <p class="cat-desc">手取りヒーローカード。グラデーション背景（#5aaa8e → #6ec4a8）でメイン数値を強調。ページ最上部の1番目立つ結果値に使用。</p>
+    <div class="ds-hero-result" style="max-width:400px;">
+      <div class="hero-eyebrow">推定月間手取り</div>
+      <div class="hero-amount">
+        <span>211,317</span>
+        <span class="hero-amount-unit">円</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-progress -->
+  <section class="cat-section" id="progress">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-progress</h2>
+      <span class="cat-section-tag">.ds-progress-bg / .ds-progress-fill</span>
+    </div>
+    <p class="cat-desc">グラデーション＋シマーアニメーション付きの進捗バー。<code>width</code> で進捗率を指定。NISA枠充足率などの達成度表示に使用。</p>
+    <div class="preview col" style="gap:18px;">
+      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">30%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:30%"></div></div></div>
+      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">65%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:65%"></div></div></div>
+      <div><div style="font-size:11px;color:var(--sub-text);margin-bottom:7px;">100%</div><div class="ds-progress-bg"><div class="ds-progress-fill" style="width:100%"></div></div></div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════
+       GROUP: データ可視化
+  ════════════════════════════════ -->
+  <div class="cat-group-heading" id="group-dataviz">
+    <span class="cat-group-heading-label">データ可視化</span>
+    <div class="cat-group-heading-line"></div>
+  </div>
+
+  <!-- ds-donut-summary -->
+  <section class="cat-section" id="donut-summary">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-donut-summary</h2>
+      <span class="cat-section-tag">.ds-donut-summary</span>
+    </div>
+    <p class="cat-desc">ドーナツグラフ＋内訳凡例を横並びにしたカード。給与シミュレーターの結果表示に使用。</p>
+    <div class="ds-donut-summary" style="max-width:400px;">
+      <div class="donut-canvas-wrap">
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#a8d5ba 0%,#4a7fd4 50%,#e07a3a 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+          <div style="width:68%;height:68%;background:var(--mint-pale);border-radius:50%;"></div>
+        </div>
+      </div>
+      <div class="donut-legend">
+        <div class="donut-legend-label">給与の内訳</div>
+        <div class="ds-donut-legend-row">
+          <div class="ds-donut-legend-dot" style="background:#a8d5ba;"></div>
+          <span class="ds-donut-legend-name">手取り</span>
+          <span class="ds-donut-legend-val">¥ 211,317</span>
+          <span class="ds-donut-legend-pct">83%</span>
+        </div>
+        <div class="ds-donut-legend-row">
+          <div class="ds-donut-legend-dot" style="background:#4a7fd4;"></div>
+          <span class="ds-donut-legend-name">社会保険料</span>
+          <span class="ds-donut-legend-val">¥ 38,079</span>
+          <span class="ds-donut-legend-pct">15%</span>
+        </div>
+        <div class="ds-donut-legend-row">
+          <div class="ds-donut-legend-dot" style="background:#e07a3a;"></div>
+          <span class="ds-donut-legend-name">税金</span>
+          <span class="ds-donut-legend-val">¥ 6,604</span>
+          <span class="ds-donut-legend-pct">3%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-breakdown-accordion -->
+  <section class="cat-section" id="breakdown-accordion">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-breakdown-accordion</h2>
+      <span class="cat-section-tag">.ds-breakdown-block / .ds-accordion-trigger</span>
+    </div>
+    <p class="cat-desc">社会保険料・税金の内訳をアコーディオンで表示。クリックで展開・折りたたみ。</p>
+    <div style="max-width:480px;">
+    <div class="ds-breakdown-block" id="catBreakdownBlock">
+      <div class="ds-breakdown-header-row">
+        <span>月間総支給（額面）</span>
+        <span>¥ 256,000</span>
+      </div>
+      <button type="button" class="ds-accordion-trigger" aria-expanded="false"
+        onclick="var b=this.nextElementSibling;b.classList.toggle('open');this.setAttribute('aria-expanded',b.classList.contains('open'));this.querySelector('.acc-toggle-label').textContent=b.classList.contains('open')?'▲ 閉じる':'▼ 内訳を見る';">
+        <span class="acc-left">社会保険料<span class="acc-toggle-label">▼ 内訳を見る</span></span>
+        <span class="acc-right">¥ 38,079</span>
+      </button>
+      <div class="ds-accordion-body">
+        <div class="breakdown-row color-health">
+          <span class="breakdown-label">健康保険料（協会けんぽ東京）</span>
+          <span class="breakdown-value">¥ 12,558</span>
+        </div>
+        <div class="breakdown-row color-pension">
+          <span class="breakdown-label">厚生年金保険料</span>
+          <span class="breakdown-value">¥ 23,985</span>
+        </div>
+      </div>
+      <div class="ds-breakdown-takehome">
+        <span>振込額</span>
+        <span class="takehome-value">¥ 211,317</span>
+      </div>
+    </div>
+    <button type="button" class="cat-demo-btn" onclick="var b=document.getElementById('catBreakdownBlock');b.classList.add('period-switching');setTimeout(function(){b.classList.remove('period-switching');},500);" style="margin-top:10px;font-size:11px;padding:6px 12px;background:var(--mint-pale);border:1px solid var(--mint-light);border-radius:8px;color:var(--accent-deep);cursor:pointer;">フェードインを試す</button>
+    </div>
+  </section>
+
+  <!-- ds-resident-savings -->
+  <section class="cat-section" id="resident-savings">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-resident-savings</h2>
+      <span class="cat-section-tag">.ds-resident-savings</span>
+    </div>
+    <p class="cat-desc">住民税を計算から外すON時、振込額直下に表示。月額・年間・手取り比率バーを表示。</p>
+    <div class="ds-resident-savings visible" style="max-width:440px;">
+      <div class="drs-header">
+        <span class="drs-header-icon">🍃</span>
+        <span class="drs-header-title">住民税の取り置き目安</span>
+        <span class="drs-badge">翌年払い</span>
+      </div>
+      <div class="drs-amounts">
+        <div class="drs-amount-card">
+          <div class="drs-amount-label">毎月の取り置き</div>
+          <div>
+            <span class="drs-amount-value">13,208</span>
+            <span class="drs-amount-unit">円/月</span>
+          </div>
+        </div>
+        <div class="drs-arrow">→</div>
+        <div class="drs-amount-card annual">
+          <div class="drs-amount-label">年間合計</div>
+          <div>
+            <span class="drs-amount-value">158,496</span>
+            <span class="drs-amount-unit">円</span>
+          </div>
+        </div>
+      </div>
+      <div class="drs-bar-wrap">
+        <div class="drs-bar-track">
+          <div class="drs-bar-bg">
+            <div class="drs-bar-fill" style="width:6%;"></div>
+          </div>
+        </div>
+        <div class="drs-bar-pct">6.2%</div>
+      </div>
+      <div class="drs-note">
+        ※ 住民税は前年所得をもとに計算され、翌年6月〜翌々年5月に徴収されます（普通徴収の場合）
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-explain-panel -->
+  <section class="cat-section" id="explain-panel">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-explain-panel</h2>
+      <span class="cat-section-tag">.ds-explain-panel</span>
+    </div>
+    <p class="cat-desc">用語・考え方の短い説明（ds-resident-savings と同系の枠・Mint）。インフレ実質の説明などに使用。</p>
+    <div class="ds-explain-panel" style="max-width:440px;">
+      <div class="ds-explain-head">
+        <span class="ds-explain-head-icon">💡</span>
+        <span class="ds-explain-head-title">実質残高（今日の価値）とは</span>
+        <span class="ds-explain-badge">参考</span>
+      </div>
+      <div class="ds-explain-body">
+        <p><strong>名目残高</strong>は、将来その時点で口座にある金額です。</p>
+        <p><strong>実質残高</strong>は、それを今の物価感覚に直した金額です。</p>
+        <p>たとえば65歳で4,000万円あっても、物価が上がれば、今の感覚では約3,000万円の価値になることがあります。</p>
+      </div>
+      <div class="ds-explain-note">
+        ※ 物価指数は年1回だけ更新する単純モデルです。実際の物価や制度とは異なる場合があります。
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-asset-line-chart -->
+  <section class="cat-section" id="asset-line-chart">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-asset-line-chart</h2>
+      <span class="cat-section-tag">.canvasWrap / chart-asset-line.js</span>
+    </div>
+    <p class="cat-desc">名目残高・実質残高・取り崩し額の折れ線グラフ。データに <code>principal</code> を入れ <code>showPrincipalLine: true</code> で元本線（既定色 <code>--accent-deep</code>）を追加可能。ホバーでツールチップ。左から右へアニメーション付き。</p>
+    <div class="preview col" style="max-width:640px;">
+      <div class="canvasWrap" style="padding:12px 0;">
+        <canvas id="cat-chart-demo" width="600" height="280" aria-label="資産推移デモ" style="width:100%;height:280px;background:var(--mint-pale);border:1px solid var(--sys-border);border-radius:14px;display:block;"></canvas>
+        <div class="legend" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;color:var(--sub-text);font-size:12px;">
+          <span><span class="dot" style="width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;background:var(--data-blue-2);border:1px solid var(--mint-light)"></span>名目残高</span>
+          <span><span class="dot" style="width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;background:var(--accent-deep);border:1px solid var(--mint-light)"></span>実質残高</span>
+          <span><span class="dot" style="width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;background:var(--data-orange);border:1px solid var(--mint-light)"></span>取り崩し（実質）</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-stacked-bar-chart -->
+  <section class="cat-section" id="stacked-bar-chart">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-stacked-bar-chart</h2>
+      <span class="cat-section-tag">chart-stacked-bar.js</span>
+    </div>
+    <p class="cat-desc">元本＋運用収益の積み上げ棒グラフ。ホバーでツールチップ表示。<code>drawStackedBarChart</code> のオプション <code>animate: true</code> で左から右へ棒が伸びるアニメーション（<code>duration</code> はミリ秒、既定 700）。NISA・iDeCo シミュレーター等で使用。</p>
+    <div class="preview col" style="max-width:640px;">
+      <div class="canvasWrap" style="padding:12px 0;">
+        <canvas id="cat-stacked-bar-demo" width="600" height="280" aria-label="積み上げ棒グラフデモ" style="width:100%;height:280px;background:var(--mint-pale);border:1px solid var(--sys-border);border-radius:14px;display:block;"></canvas>
+        <div class="legend" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;color:var(--sub-text);font-size:12px;">
+          <span><span class="dot" style="width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;background:#a8d5ba;border:1px solid var(--mint-light)"></span>元本</span>
+          <span><span class="dot" style="width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;background:#4a8c6f;border:1px solid var(--mint-light)"></span>運用収益</span>
+        </div>
+      </div>
+      <div id="cat-stacked-bar-tooltip" class="ds-chart-tooltip"></div>
+    </div>
+  </section>
+
+  <!-- ds-calc-basis -->
+  <section class="cat-section" id="calc-basis">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-calc-basis</h2>
+      <span class="cat-section-tag">.ds-calc-basis / .ds-calc-step / .ds-calc-eq</span>
+    </div>
+    <p class="cat-desc">計算の根拠を番号付きステップで表示。数値は <code>.val</code> でアクセント色にハイライト。要約式は <code>.ds-calc-eq</code> で白背景ボックスに表示。退職金シミュレーター等の計算根拠表示に使用。</p>
+    <div class="preview col" style="gap:0;">
+      <div class="ds-calc-basis" style="max-width:480px;">
+        <div class="ds-calc-basis-title">📋 計算の根拠（国税庁 No.1420 に基づく）</div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">1</div>
+          <div>退職金受取額：<span class="val">20,000,000円</span>（一般退職）</div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">2</div>
+          <div>勤続年数：<span class="val">30年</span></div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">3</div>
+          <div>退職所得控除額 ＝ 800万円 ＋ 70万円 × (30年 － 20年) ＝ <span class="val">15,000,000円</span></div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">4</div>
+          <div>課税前金額 ＝ 20,000,000円 － 控除額 15,000,000円 ＝ <span class="val">5,000,000円</span></div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">5</div>
+          <div>課税退職所得 ＝ 5,000,000円 ÷ 2 ＝ <span class="val">2,500,000円</span></div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">6</div>
+          <div>所得税：超過累進税率（速算表）を適用 → 復興特別所得税（×<span class="val">1.021</span>）を加算</div>
+        </div>
+        <div class="ds-calc-step">
+          <div class="ds-calc-step-num">7</div>
+          <div>住民税（目安）＝ 課税退職所得 × <span class="val">10%</span>（標準税率）</div>
+        </div>
+        <div class="ds-calc-eq">
+          <strong>手取り額</strong> ＝ 受取額 <span class="em">20,000,000</span>円 － 所得税等 － 住民税<br>
+          <small style="color:var(--sub-text);">根拠：国税庁 No.1420 退職金を受け取ったとき（退職所得）</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════
+       GROUP: 注釈・フィードバック
+  ════════════════════════════════ -->
+  <div class="cat-group-heading" id="group-annotation">
+    <span class="cat-group-heading-label">注釈・フィードバック</span>
+    <div class="cat-group-heading-line"></div>
+  </div>
+
+  <!-- note-box / warning-inline — 統合 -->
+  <section class="cat-section" id="annotations">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">注釈・警告ボックス</h2>
+      <span class="cat-section-tag">.note-box / .dashed-box / .ds-warning-inline</span>
+    </div>
+    <p class="cat-desc">補足情報・警告のインライン表示コンポーネント群。<code>.note-box</code> は補足・免責（ボーダーレフト付き）、<code>.dashed-box</code> はコード・変数の表示（破線枠・等幅フォント）、<code>.ds-warning-inline</code> は計算上の注意事項（オレンジ系）。</p>
+    <div class="preview col" style="gap:14px;">
+      <div style="font-size:11px;color:var(--sub-text);">.note-box — 補足・免責</div>
+      <div class="note-box">※ 新NISA総枠（1,800万円）到達後は新規積立が停止されます。投資判断はご自身の責任でお願いします。</div>
+
+      <div style="font-size:11px;color:var(--sub-text);">.dashed-box — コード・変数表示</div>
+      <div class="dashed-box">--form-label-w: 210px;<br>--card-px: 20px;</div>
+
+      <div style="font-size:11px;color:var(--sub-text);">.ds-warning-inline — 警告・注意</div>
+      <div class="ds-warning-inline">
+        <span class="wi-icon">⚠</span>
+        評価額が投資累計額を下回っています（含み損の状態）。入力値を確認してください。
+      </div>
+    </div>
+  </section>
+
+  <!-- ds-divider -->
+  <section class="cat-section" id="divider">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-divider</h2>
+      <span class="cat-section-tag">.ds-divider</span>
+    </div>
+    <p class="cat-desc">フェードグラデーション付きの区切り線。</p>
+    <div class="preview col" style="gap:12px;">
+      <p style="font-size:13px;color:var(--sub-text);">セクション上部のコンテンツ</p>
+      <hr class="ds-divider" style="margin:0;">
+      <p style="font-size:13px;color:var(--sub-text);">セクション下部のコンテンツ</p>
+    </div>
+  </section>
+
+  <!-- ds-badge -->
+  <section class="cat-section" id="badge">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-badge</h2>
+      <span class="cat-section-tag">.ds-badge</span>
+    </div>
+    <p class="cat-desc">ステータス・ラベル表示用インラインバッジ。pulse アニメーション付き。</p>
+    <div class="preview center" style="gap:16px;">
+      <span class="ds-badge">NEW</span>
+      <span class="ds-badge">UPDATED</span>
+      <span class="ds-badge">🌿 Mint DS</span>
+      <span class="ds-badge">v2.0</span>
+    </div>
+  </section>
+
+  <!-- ds-card -->
+  <section class="cat-section" id="card">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-card</h2>
+      <span class="cat-section-tag">.ds-card</span>
+    </div>
+    <p class="cat-desc">ホワイトカード。上部にアクセントカラーのシマーバー付き。<code>overflow: hidden</code> のため子要素の角丸も適用。</p>
+    <div class="preview" style="gap:16px;">
+      <div class="ds-card" style="flex:1;min-width:180px;animation:none;">
+        <p style="font-size:13px;color:var(--sub-text);line-height:1.7;">カード内のコンテンツです。シマーバーが上部に表示されます。</p>
+      </div>
+      <div class="ds-card" style="flex:1;min-width:180px;animation:secFadeIn 0.5s both;">
+        <p style="font-size:13px;color:var(--sub-text);line-height:1.7;"><code style="font-family:'Roboto Mono',monospace;font-size:11px;color:var(--accent-deep);background:rgba(168,213,186,0.15);padding:1px 5px;border-radius:4px;">secFadeIn</code> でフェードインアニメーション付き表示。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ボタン -->
+  <section class="cat-section" id="buttons">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ボタン</h2>
+      <span class="cat-section-tag">.ds-btn-primary / secondary / ghost</span>
+    </div>
+    <p class="cat-desc">3種類のバリアント。ホバー時はスプリング感のあるスケールアニメーション。アクティブ時は押し込み効果。</p>
+    <div class="preview" style="align-items:center;gap:12px;">
+      <button class="ds-btn-primary">プライマリ</button>
+      <button class="ds-btn-secondary">セカンダリ</button>
+      <button class="ds-btn-ghost">ゴースト</button>
+    </div>
+  </section>
+
+  <!-- back-to-index -->
+  <section class="cat-section" id="back-to-index">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">back-to-index</h2>
+      <span class="cat-section-tag">.back-to-index</span>
+    </div>
+    <p class="cat-desc">各シミュレーター・ツールページ下部に配置する「マネーツール一覧へ戻る」ボタン。<code>href="../index.html"</code> で一覧ページへリンク。</p>
+    <div class="preview center" style="padding: 32px 28px;">
+      <div class="back-to-index">
+        <a href="../index.html">← マネーツールへ戻る</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════
+       GROUP: ユーティリティ
+  ════════════════════════════════ -->
+  <div class="cat-group-heading" id="group-util">
+    <span class="cat-group-heading-label">ユーティリティ / JS関数</span>
+    <div class="cat-group-heading-line"></div>
+  </div>
+
+  <!-- 数値フォーマット + clamp -->
+  <section class="cat-section" id="fmt">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">数値フォーマット</h2>
+      <span class="cat-section-tag">base.js</span>
+    </div>
+    <p class="cat-desc">円単位の数値を「億円 / 万円」形式に変換する関数群。入力値を変えるとリアルタイムに結果が更新されます。</p>
+
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+      <span class="fn-label">入力値（円）：</span>
+      <input class="fn-input" id="fmtInput" type="number" value="12345678" style="width:180px;">
+    </div>
+
+    <div class="fn-demo">
+      <div class="fn-head"><span class="fn-name">fmtYen</span><span class="fn-sig">( n ) → string</span></div>
+      <div class="fn-body"><span class="fn-label">→</span><div class="fn-output" id="fmtYenOut"></div></div>
+    </div>
+    <div class="fn-demo">
+      <div class="fn-head"><span class="fn-name">fmtYenParts</span><span class="fn-sig">( n ) → &#123; num, unit &#125;</span></div>
+      <div class="fn-body"><span class="fn-label">→</span><div class="fn-output" id="fmtPartsOut" style="min-width:260px;"></div></div>
+    </div>
+    <div class="fn-demo">
+      <div class="fn-head"><span class="fn-name">fmtAxisYen</span><span class="fn-sig">( n ) → string — グラフ軸用短縮</span></div>
+      <div class="fn-body"><span class="fn-label">→</span><div class="fn-output" id="fmtAxisOut"></div></div>
+    </div>
+    <div class="fn-demo">
+      <div class="fn-head"><span class="fn-name">clamp</span><span class="fn-sig">( v, min, max ) → number</span></div>
+      <div class="fn-body">
+        <span class="fn-label">v =</span>
+        <input class="fn-input" id="clampV"   type="number" value="150" style="width:80px;">
+        <span class="fn-label">min =</span>
+        <input class="fn-input" id="clampMin" type="number" value="0"   style="width:80px;">
+        <span class="fn-label">max =</span>
+        <input class="fn-input" id="clampMax" type="number" value="100" style="width:80px;">
+        <span class="fn-label">→</span>
+        <div class="fn-output" id="clampOut" style="min-width:80px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- animateNum -->
+  <section class="cat-section" id="animate">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">animateNum</h2>
+      <span class="cat-section-tag">base.js</span>
+    </div>
+    <p class="cat-desc">easeOutQuart（700ms）でカウントアップアニメーション。<code>fmt</code> 関数を渡してカスタム表示も可能。</p>
+    <div class="fn-demo">
+      <div class="fn-head"><span class="fn-name">animateNum</span><span class="fn-sig">( el, from, to, ms? = 700, fmt? )</span></div>
+      <div class="fn-body" style="flex-direction:column;align-items:flex-start;gap:18px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <span class="fn-label">目標値（円）：</span>
+          <input class="fn-input" id="animTarget" type="number" value="12345678" style="width:180px;">
+          <button class="ds-btn-primary" id="animBtn">▶ アニメーション実行</button>
+        </div>
+        <div style="display:flex;gap:36px;align-items:flex-end;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:10px;color:var(--sub-text);margin-bottom:6px;">toLocaleString</div>
+            <div id="animEl" style="font-family:'Roboto',sans-serif;font-size:2.2rem;font-weight:300;color:var(--accent-deep);">0</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--sub-text);margin-bottom:6px;">fmtYen フォーマット</div>
+            <div id="animElYen" style="font-family:'Roboto',sans-serif;font-size:2.2rem;font-weight:300;color:var(--accent-deep);">0万円</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- showToast -->
+  <section class="cat-section" id="toast-demo">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">showToast</h2>
+      <span class="cat-section-tag">base.js</span>
+    </div>
+    <p class="cat-desc"><code>#ds-toast</code> 要素にメッセージを表示。スプリングアニメーションで出現し、指定時間後に自動消去。</p>
+    <div class="fn-demo">
+      <div class="fn-head"><span class="fn-name">showToast</span><span class="fn-sig">( msg, duration? = 2600, el? )</span></div>
+      <div class="fn-body" style="flex-wrap:wrap;gap:12px;">
+        <input class="fn-input" id="toastMsg" type="text" value="シミュレーション完了！ 🎉" style="width:240px;">
+        <input class="fn-input" id="toastDur" type="number" value="2600" style="width:80px;">
+        <span class="fn-label">ms</span>
+        <button class="ds-btn-primary" id="toastBtn">Toast 表示</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- fireConfetti -->
+  <section class="cat-section" id="confetti-demo">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">fireConfetti</h2>
+      <span class="cat-section-tag">base.js</span>
+    </div>
+    <p class="cat-desc"><code>#ds-confetti</code> コンテナにパーティクルを生成。達成イベント・NISA枠到達時などに使用。</p>
+    <div class="fn-demo">
+      <div class="fn-head"><span class="fn-name">fireConfetti</span><span class="fn-sig">( count? = 60 )</span></div>
+      <div class="fn-body" style="gap:12px;flex-wrap:wrap;">
+        <span class="fn-label">パーティクル数：</span>
+        <input class="fn-input" id="confettiCount" type="number" value="60" style="width:80px;">
+        <button class="ds-btn-primary"   id="confettiBtn">🎊 発火</button>
+        <button class="ds-btn-secondary" id="confettiBig">どかーん（150）</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+<script>
+/* === base.js === */
+/**
+ * base.js — Mint Design System ユーティリティ関数
+ * base-design-system.html から汎用ロジックを抽出
+ *
+ * 使い方:
+ *   <script src="../shared/base.js"></script>
+ *   または ES module として import して使用
+ */
+
+/* ══════════════════════════════════════════
+   汎用ユーティリティ
+══════════════════════════════════════════ */
+
+/**
+ * 値を [min, max] の範囲に丸める
+ * @param {number} v
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+function clamp(v, min, max) {
+  return Math.min(max, Math.max(min, v));
+}
+
+/* ══════════════════════════════════════════
+   数値フォーマット（日本円）
+══════════════════════════════════════════ */
+
+/**
+ * 円単位の数値を「億円 / 万円」形式に分解して返す
+ * @param {number} n  円単位の数値
+ * @returns {{ num: string, unit: string }}
+ *   例: 123_456_789 → { num: "1億2,346", unit: "万円" }
+ *   例:   1_234_000 → { num: "123",      unit: "万円" }
+ */
+function fmtYenParts(n) {
+  n = Math.round(n);
+  if (n >= 100_000_000) {
+    const oku = Math.floor(n / 100_000_000);
+    const man = Math.round((n % 100_000_000) / 10_000);
+    if (man === 0) return { num: oku.toLocaleString('ja-JP'), unit: '億円' };
+    return { num: oku.toLocaleString('ja-JP') + '億' + man.toLocaleString('ja-JP'), unit: '万円' };
+  }
+  return { num: Math.round(n / 10_000).toLocaleString('ja-JP'), unit: '万円' };
+}
+
+/**
+ * 円単位の数値を「億円 / 万円」の文字列で返す
+ * @param {number} n
+ * @returns {string}  例: "1億2,346万円" / "123万円"
+ */
+function fmtYen(n) {
+  const { num, unit } = fmtYenParts(n);
+  return num + unit;
+}
+
+/**
+ * 3桁カンマ区切りフォーマット（入力欄用）
+ * @param {string} val  入力文字列
+ * @returns {string}  例: "1234567" → "1,234,567"
+ */
+function formatComma(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  const num = val.replace(/[^\d]/g, '');
+  return num === '' ? '' : Number(num).toLocaleString('ja-JP');
+}
+
+/**
+ * カンマ付き文字列を数値に変換
+ * @param {string} val
+ * @returns {number}
+ */
+function parseComma(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  return Number(val.replace(/[^\d]/g, '')) || 0;
+}
+
+/**
+ * 数値入力欄に3桁カンマ区切りを適用する
+ * @param {string|string[]} selectorOrIds  CSSセレクタ、または id の配列
+ */
+function initCommaInput(selectorOrIds) {
+  const els = Array.isArray(selectorOrIds)
+    ? selectorOrIds.map(id => document.getElementById(id)).filter(Boolean)
+    : document.querySelectorAll(selectorOrIds);
+  els.forEach(el => {
+    el.addEventListener('input', function() {
+      const pos = this.selectionStart;
+      const prevLen = this.value.length;
+      this.value = formatComma(this.value);
+      const diff = this.value.length - prevLen;
+      this.setSelectionRange(pos + diff, pos + diff);
+    });
+    el.addEventListener('blur', function() {
+      this.value = formatComma(this.value);
+    });
+  });
+}
+
+/**
+ * グラフ軸ラベル用の短縮フォーマット
+ * @param {number} n  円単位の数値
+ * @returns {string}  例: "1.2億" / "1,234万"
+ */
+function fmtAxisYen(n) {
+  if (n >= 100_000_000) {
+    return (n / 100_000_000).toFixed(1).replace(/\.0$/, '') + '億';
+  }
+  return Math.round(n / 10_000).toLocaleString('ja-JP') + '万';
+}
+
+/* ══════════════════════════════════════════
+   カウントアップアニメーション
+   easeOutQuart / 700ms — Mint Design System
+══════════════════════════════════════════ */
+
+/**
+ * 数値要素をカウントアップアニメーションで更新する
+ * @param {HTMLElement} el      表示対象の要素（textContent を更新）
+ * @param {number}      from    開始値（円単位）
+ * @param {number}      to      終了値（円単位）
+ * @param {number}      [ms=700] アニメーション時間（ミリ秒）
+ * @param {function}    [fmt]   フォーマット関数（省略時は toLocaleString）
+ * @returns {number}  requestAnimationFrame の ID
+ *
+ * 使用例:
+ *   animateNum(document.getElementById('total'), 0, 12_345_678);
+ *   animateNum(el, prev, next, 700, n => fmtYen(n));
+ */
+function animateNum(el, from, to, ms = 700, fmt = null) {
+  const t0 = performance.now();
+  let rafId;
+  function step(now) {
+    const p    = Math.min((now - t0) / ms, 1);
+    const ease = 1 - Math.pow(1 - p, 4); // easeOutQuart
+    const cur  = Math.round(from + (to - from) * ease);
+    el.textContent = fmt ? fmt(cur) : cur.toLocaleString('ja-JP');
+    if (p < 1) rafId = requestAnimationFrame(step);
+  }
+  rafId = requestAnimationFrame(step);
+  return rafId;
+}
+
+/* ══════════════════════════════════════════
+   スライダー
+══════════════════════════════════════════ */
+
+/**
+ * range input のトラック塗りつぶし（--pct カスタムプロパティ）を更新する
+ * CSS 側で background に --pct を参照していること
+ * @param {HTMLInputElement} sl  input[type="range"] 要素
+ */
+function updateSliderBg(sl) {
+  const pct = clamp(
+    ((parseFloat(sl.value) - parseFloat(sl.min)) /
+     (parseFloat(sl.max)  - parseFloat(sl.min))) * 100,
+    0, 100
+  );
+  sl.style.setProperty('--pct', pct + '%');
+
+  const rangeWrap = sl.closest('.ds-range-wrap');
+  if (rangeWrap) rangeWrap.style.setProperty('--pct', pct + '%');
+
+  const shimmer = document.getElementById(sl.id + '-shimmer');
+  if (shimmer) shimmer.style.width = pct + '%';
+
+  const pill = document.getElementById(sl.id + '-pill');
+  const pillLabel = document.getElementById(sl.id + '-pill-label');
+  if (pill && pillLabel) {
+    const thumbD = 22;
+    const trackW = sl.getBoundingClientRect().width;
+    const p = (parseFloat(sl.value) - parseFloat(sl.min)) / (parseFloat(sl.max) - parseFloat(sl.min));
+    pill.style.left = (p * (trackW - thumbD) + thumbD / 2) + 'px';
+
+    const unit = sl.dataset.unit || '';
+    const val = parseFloat(sl.value);
+    pillLabel.textContent = (Number.isInteger(val) ? val : val.toFixed(1)) + unit;
+  }
+}
+
+/* ══════════════════════════════════════════
+   インプット連動
+══════════════════════════════════════════ */
+
+/**
+ * number input と range input を双方向にリンクする
+ * @param {string}   numId     number input の id
+ * @param {string}   slId      range input の id
+ * @param {number}   slMin     スライダーの最小値
+ * @param {number}   slMax     スライダーの最大値
+ * @param {number}   step      ステップ幅（1未満の場合は小数点1桁表示）
+ * @param {function} [onChange] 値変更時に呼ぶコールバック（例: simulate）
+ */
+function linkInputs(numId, slId, slMin, slMax, step, onChange = null) {
+  const num = document.getElementById(numId);
+  const sl  = document.getElementById(slId);
+  num.addEventListener('input', () => {
+    let v = parseFloat(num.value);
+    if (isNaN(v)) { if (onChange) onChange(); return; }
+    sl.value = clamp(v, slMin, slMax);
+    updateSliderBg(sl);
+    if (onChange) onChange();
+  });
+  sl.addEventListener('input', () => {
+    num.value = parseFloat(sl.value).toFixed(step < 1 ? 1 : 0);
+    updateSliderBg(sl);
+    if (onChange) onChange();
+  });
+  updateSliderBg(sl);
+}
+
+/* ══════════════════════════════════════════
+   トースト通知
+══════════════════════════════════════════ */
+
+/**
+ * .ds-toast 要素にメッセージを表示する
+ * @param {string}          msg          表示テキスト
+ * @param {number}          [duration=2600] 表示時間（ミリ秒）
+ * @param {HTMLElement|null} [el]        対象要素（省略時は #ds-toast）
+ */
+let _toastTimer = null;
+function showToast(msg, duration = 2600, el = null) {
+  const t = el || document.getElementById('ds-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+}
+
+/* ══════════════════════════════════════════
+   チップスクロール
+══════════════════════════════════════════ */
+
+/**
+ * .ds-chip-scroll 要素の右端フェードマスクを更新する
+ * スクロール可能かつ末端に達していない場合のみマスクを表示
+ * @param {HTMLElement} el  .ds-chip-scroll 要素
+ */
+const _CHIPS_FADE = 'linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%)';
+
+function updateChipsMask(el) {
+  const overflows = el.scrollWidth > el.clientWidth + 2;
+  const atEnd     = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+  const mask = (overflows && !atEnd) ? _CHIPS_FADE : '';
+  el.style.webkitMaskImage = mask;
+  el.style.maskImage       = mask;
+}
+
+/**
+ * 指定セレクタにマッチする .ds-chip-scroll 要素にスクロールフェードを初期化する
+ * @param {string} [selector='.ds-chip-scroll']  対象セレクタ
+ */
+function initChipScroll(selector = '.ds-chip-scroll') {
+  document.querySelectorAll(selector).forEach(el => {
+    el.addEventListener('scroll', () => updateChipsMask(el), { passive: true });
+    updateChipsMask(el);
+  });
+}
+
+/* ══════════════════════════════════════════
+   コンフェッティ
+══════════════════════════════════════════ */
+
+/**
+ * コンフェッティエフェクトを発火する
+ * #ds-confetti コンテナが DOM に存在していること
+ * @param {number} [count=60]  パーティクル数
+ */
+function fireConfetti(count = 60) {
+  const wrap = document.getElementById('ds-confetti');
+  if (!wrap) return;
+  const colors = ['#a8d5ba', '#4a8c6f', '#d4ede3', '#e8f5f1', '#7fc49e', '#2d7a5a'];
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('div');
+    c.className = 'ds-confetti-piece';
+    c.style.cssText = [
+      `left:${10 + Math.random() * 80}%`,
+      'top:-10px',
+      `width:${6 + Math.random() * 8}px`,
+      `height:${6 + Math.random() * 8}px`,
+      `background:${colors[Math.floor(Math.random() * colors.length)]}`,
+      `border-radius:${Math.random() > 0.5 ? '50%' : '2px'}`,
+      `animation-duration:${1.2 + Math.random() * 1.3}s`,
+      `animation-delay:${Math.random() * 0.5}s`,
+    ].join(';');
+    wrap.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
+  }
+}
+
+/* ══════════════════════════════════════════
+   サイト共通ヘッダー
+   ページ読み込み時に body 先頭に prepend
+══════════════════════════════════════════ */
+
+function initSiteHeader() {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'initSiteHeader called',data:{readyState:document.readyState,hasBody:!!document.body,pathname:location.pathname},hypothesisId:'h2',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  const depth = location.pathname.split('/').filter(Boolean).length - 1;
+  const prefix = depth > 0 ? '../'.repeat(depth) : './';
+  const href = prefix + 'index.html';
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'depth calc',data:{depth,prefix,href},hypothesisId:'h3',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+
+  const header = document.createElement('header');
+  header.id = 'site-header';
+  header.innerHTML = '<a href="' + href + '" class="site-header-logo">Money Tools</a>';
+  document.body.insertBefore(header, document.body.firstChild);
+  document.body.classList.add('has-site-header');
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'header inserted',data:{headerInDOM:!!document.getElementById('site-header')},hypothesisId:'h4',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+}
+
+// #region agent log
+fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:top',message:'base.js loaded',data:{readyState:document.readyState},hypothesisId:'h1',timestamp:Date.now()})}).catch(()=>{});
+// #endregion
+if (document.readyState === 'loading') {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:branch',message:'defer to DOMContentLoaded',data:{},hypothesisId:'h5',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  document.addEventListener('DOMContentLoaded', initSiteHeader);
+} else {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:branch',message:'run initSiteHeader immediately',data:{},hypothesisId:'h5',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  initSiteHeader();
+}
+
+</script>
+</body>
+</html>

@@ -7,10 +7,11 @@
  * 使い方:
  *   <script src="./base.js"></script>
  *   <script src="./chart-stacked-bar.js"></script>
- *   drawStackedBarChart('chart', data, { tooltipId: 'tooltip', formatTooltip: (d,f)=>'...' });
+ *   drawStackedBarChart('chart', data, { tooltipId: 'tooltip', formatTooltip: (d,f)=>'...', animate: true, duration: 700 });
  *
  * data: [{ year, age, principal, gain, total }, ...]
- * options: { tooltipId?, formatTooltip?, onResize? }
+ * options: { tooltipId?, formatTooltip?, onResize?, animate?, duration? }
+ *   animate: true で棒が左から伸びるアニメーション（duration はミリ秒、既定 700）
  */
 
 (function(){ 'use strict';
@@ -46,6 +47,7 @@
   function _render(inst) {
     const { canvas, data, hoveredIdx } = inst;
     if (!canvas || !data.length) return;
+    const progress = (typeof inst.animProgress === 'number') ? inst.animProgress : 1;
 
     const isMobile = window.innerWidth < 560;
     const dpr = window.devicePixelRatio || 1;
@@ -95,8 +97,8 @@
     inst.bars = data.map((d, i) => {
       const x = PAD.l + i * (BAR + GAP);
       const baseY = PAD.t + pH;
-      const totalH = (d.total / maxVal) * pH;
-      const principH = (d.principal / maxVal) * pH;
+      const totalH = (d.total / maxVal) * pH * progress;
+      const principH = (d.principal / maxVal) * pH * progress;
       const gainH = totalH - principH;
       const isHov = i === hoveredIdx;
 
@@ -126,6 +128,28 @@
 
       return { ...d, _x: x, _w: BAR };
     });
+  }
+
+  function _startAnim(inst) {
+    if (inst._animRaf) cancelAnimationFrame(inst._animRaf);
+    const duration = Math.max(120, parseInt(inst.opts.duration, 10) || 700);
+    const t0 = performance.now();
+    inst.animProgress = 0;
+    inst.animating = true;
+    function step(now) {
+      const p = Math.min((now - t0) / duration, 1);
+      // 棒グラフの伸びを自然に見せる easeOutCubic
+      inst.animProgress = 1 - Math.pow(1 - p, 3);
+      _render(inst);
+      if (p < 1) {
+        inst._animRaf = requestAnimationFrame(step);
+      } else {
+        inst.animating = false;
+        inst.animProgress = 1;
+        inst._animRaf = null;
+      }
+    }
+    inst._animRaf = requestAnimationFrame(step);
   }
 
   function _onPointer(inst, e) {
@@ -165,7 +189,7 @@
    * 積み上げ棒グラフを描画
    * @param {string} canvasId  canvas 要素の id
    * @param {Array} data [{ year, age, principal, gain, total }, ...]
-   * @param {Object} options { tooltipId?, formatTooltip?, onResize? }
+   * @param {Object} options { tooltipId?, formatTooltip?, onResize?, animate?, duration? }
    */
   function drawStackedBarChart(canvasId, data, options) {
     const canvas = document.getElementById(canvasId);
@@ -181,6 +205,7 @@
       inst = {
         canvas, tip, opts,
         data: [], bars: [], hoveredIdx: -1,
+        animProgress: 1, animating: false, _animRaf: null,
         _boundPointer: null, _boundHide: null, _boundResize: null,
       };
       _instances.set(canvasId, inst);
@@ -203,7 +228,17 @@
     inst.data = data;
     inst.opts = opts;
     inst.hoveredIdx = -1;
-    _render(inst);
+    if (opts.animate) {
+      _startAnim(inst);
+    } else {
+      inst.animating = false;
+      inst.animProgress = 1;
+      if (inst._animRaf) {
+        cancelAnimationFrame(inst._animRaf);
+        inst._animRaf = null;
+      }
+      _render(inst);
+    }
   }
 
   window.drawStackedBarChart = drawStackedBarChart;

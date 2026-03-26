@@ -1,0 +1,3157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- snapshot: 2026-03-26 weekday-counter initial-mvp -->
+<title>平日日数カウンター — Money Tools</title>
+<style>
+/* === tokens.css === */
+/* ══════════════════════════════════════════
+   DESIGN TOKENS — Mint Design System
+   このファイルは base-design-system.html の
+   :root {} から抽出したCSS変数定義のみを含む
+══════════════════════════════════════════ */
+:root {
+  /* ── ブランドカラー ── */
+  --base-bg:     #e8f5f1;   /* ベース背景（淡いミント）*/
+  --accent:      #a8d5ba;   /* アクセント（若葉ミント）*/
+  --accent-deep: #4a8c6f;   /* アクセント深（深みミント）*/
+
+  /* ── テキスト ── */
+  --text-main:   #44504c;   /* メイン文字（チャコールグレー）*/
+  --text-sub:    #ccd6d1;   /* サブ文字（極薄グレー）*/
+  --sub-text:    #7a9a8e;   /* セカンダリテキスト */
+  --placeholder: #b8d4cc;   /* プレースホルダー */
+  --label-color: #5a7a70;   /* ラベル */
+
+  /* ── 面・背景 ── */
+  --card-bg:     #ffffff;   /* カード背景（純白）*/
+  --mint-light:  #d4ede3;   /* ボーダー・バー背景 */
+  --mint-pale:   #f0faf5;   /* 入力・ホバー背景 */
+
+  /* ── エフェクト ── */
+  --shadow:         rgba(74, 140, 111, 0.12);  /* グリーン系シャドウ */
+  --accent-border:  rgba(168,213,186,0.5);      /* アクセントの半透明ボーダー */
+
+  /* ── セマンティック ── */
+  --warn-color:  #e07a3a;   /* 警告・注意（オレンジ）*/
+
+  /* Data Colors（データ識別用） */
+  --data-blue-1:  #4a7fd4;
+  --data-blue-2:  #7aa8e8;
+  --data-blue-3:  #aac8f4;
+  --data-orange:  #e07a3a;
+  --data-amber:   #f0c060;
+
+  /* ── システムUI専用（デザインシステム閲覧画面用）── */
+  --sys-sidebar: #f8fcfa;
+  --sys-border:  #e2f0e9;
+  --sys-code-bg: #1e2d28;
+  --sys-code-fg: #a8d5ba;
+}
+
+
+/* === components.css === */
+/* ══════════════════════════════════════════
+   COMPONENTS — Mint Design System
+   base-design-system.html のスタイル定義を抽出
+══════════════════════════════════════════ */
+@import './tokens.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+/* ── Reset ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--mint-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ══════════════════════════════════════════
+   site-header
+   共通ヘッダー（base.js で挿入・トップへ戻るリンク）
+   padding-top はヘッダー挿入前のレイアウトシフト防止のため共通化
+══════════════════════════════════════════ */
+body {
+  padding-top: 52px !important; /* ページの padding 指定より優先（レイアウトシフト防止） */
+}
+#site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 52px;
+  z-index: 1000;
+  background: var(--card-bg, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px var(--shadow, rgba(74, 140, 111, 0.12));
+  border-bottom: 1px solid var(--mint-light, #d4ede3);
+}
+.site-header-logo {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 600;
+  color: var(--accent-deep, #4a8c6f);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s ease;
+}
+.site-header-logo:hover {
+  color: var(--accent, #a8d5ba);
+}
+
+/* ══════════════════════════════════════════
+   ds-page-title
+   ツールページタイトル（統一コンポーネント）
+   <header class="ds-page-title"><h1>…</h1><p>…</p></header>
+══════════════════════════════════════════ */
+.ds-page-title {
+  margin-top: clamp(20px, 4vw, 36px);
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+.ds-page-title h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+.ds-page-title p {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* 後方互換：app-scope 直下 h1+p（ds-page-title 未使用時） */
+.app-scope > h1 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin-top: clamp(20px, 4vw, 36px);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.app-scope > h1 + p {
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: var(--sub-text);
+  line-height: 1.65;
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+#site-header + h1,
+body > h1:first-of-type,
+.wrapper > h1:first-of-type {
+  margin-top: clamp(20px, 4vw, 32px);
+}
+#site-header + h1 + p,
+body > h1:first-of-type + p,
+.wrapper > h1:first-of-type + p {
+  margin-bottom: clamp(20px, 4vw, 32px);
+}
+
+/* ══════════════════════════════════════════
+   app-scope — ページ基本レイアウト
+   すべてのアプリの <main class="app-scope"> に適用
+══════════════════════════════════════════ */
+.app-scope {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 40px) 80px;
+}
+
+/* ══════════════════════════════════════════
+   2カラムページレイアウト
+   PC: 入力(左固定幅) + 結果(右可変)
+   SP: 縦1カラム
+══════════════════════════════════════════ */
+.ds-page-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 800px) {
+  .ds-page-cols {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .ds-input-col {
+    position: sticky;
+    top: 72px; /* site-header(52px) + 余白20px */
+  }
+  .ds-result-col {
+    position: sticky;
+    top: 72px;
+  }
+  /* 2カラム時の左右フェードイン（トップページの .tool-card に合わせ 0.45s） */
+  .ds-input-col .ds-card {
+    animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .ds-input-col .ds-card:nth-child(1) { animation-delay: 0.04s; }
+  .ds-result-col .ds-card {
+    animation: secFadeIn 0.45s cubic-bezier(0.22,0.61,0.36,1) both;
+    animation-delay: 0.1s;
+  }
+  /* ds-input-col は 340px 幅のため、フォームを縦並びに（はみ出し防止） */
+  .ds-input-col .ds-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-result-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0; /* grid内でのはみ出し防止 */
+}
+
+/* ══════════════════════════════════════════
+   KEYFRAMES
+══════════════════════════════════════════ */
+@keyframes shimmerBar    { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+@keyframes secFadeIn     { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulseBadge    { 0%,100%{box-shadow:0 2px 12px var(--accent-border)} 50%{box-shadow:0 4px 22px rgba(74,140,111,0.45)} }
+@keyframes barShimmer    { 0%{left:-100%} 100%{left:200%} }
+@keyframes dsConfettiFall{ 0%{transform:translateY(-20px) rotate(0deg) scale(0);opacity:1} 100%{transform:translateY(100vh) rotate(720deg) scale(0.4);opacity:0} }
+@keyframes fadeInDown    { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInUp      { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes floatLeaf     { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-8px) rotate(3deg)} }
+
+/* ══════════════════════════════════════════
+   ds-badge
+   インラインバッジ（ステータス・ラベル表示）
+══════════════════════════════════════════ */
+.ds-badge {
+  display: inline-block;
+  background: var(--accent); color: #fff;
+  font-size: 11px; letter-spacing: 0.14em;
+  padding: 4px 16px; border-radius: 20px; font-weight: 500;
+  box-shadow: 0 2px 12px var(--accent-border);
+  animation: pulseBadge 3s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+   ds-card
+   ホワイトカード（グリーンシマーバー付き）
+══════════════════════════════════════════ */
+.ds-card {
+  background: var(--card-bg); border-radius: 28px; padding: 28px;
+  box-shadow: 0 8px 40px var(--shadow), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
+  position: relative; overflow: hidden;
+}
+.ds-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep), var(--accent));
+  background-size: 200%; animation: shimmerBar 3s linear infinite;
+  border-radius: 28px 28px 0 0;
+}
+
+/* ds-card 内ラベル（●条件設定 / ●シミュレーション結果 等） */
+.ds-card-label {
+  font-size: clamp(0.65rem, 1.9vw, 0.75rem); font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--sub-text); margin-bottom: clamp(16px, 3vw, 22px);
+  display: flex; align-items: center; gap: 8px;
+}
+.ds-card-label::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-deep); flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   ds-input
+   ボーダー付きテキスト入力（フルワイド）
+══════════════════════════════════════════ */
+.ds-input-wrap { position: relative; }
+.ds-input {
+  width: 100%; padding: 16px 56px 16px 20px;
+  font-size: 20px; font-family: 'Roboto', sans-serif; font-weight: 500;
+  color: var(--text-main); border: 2px solid var(--mint-light);
+  border-radius: 16px; outline: none; background: var(--mint-pale);
+  transition: all 0.3s ease; letter-spacing: 0.04em;
+}
+.ds-input::placeholder { color: var(--placeholder); font-weight: 500; font-size: 16px; }
+.ds-input:focus { border-color: var(--accent); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(168,213,186,0.25); }
+.ds-input-unit {
+  position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; color: var(--sub-text); pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   Buttons
+══════════════════════════════════════════ */
+.ds-btn-primary {
+  background: var(--accent-deep); color: #fff;
+  border: none; border-radius: 20px; padding: 10px 24px;
+  font-size: 13px; font-family: inherit; font-weight: 500; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 2px 12px rgba(74,140,111,0.35);
+}
+.ds-btn-primary:hover { transform: scale(1.05); box-shadow: 0 4px 18px rgba(74,140,111,0.45); }
+.ds-btn-primary:active { transform: scale(0.96); }
+
+.ds-btn-secondary {
+  background: transparent; color: var(--sub-text);
+  border: 1.5px solid var(--mint-light); border-radius: 20px; padding: 9px 22px;
+  font-size: 13px; font-family: inherit; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ds-btn-secondary:hover { border-color: var(--accent-deep); color: var(--accent-deep); background: var(--mint-pale); transform: scale(1.05); }
+.ds-btn-secondary:active { transform: scale(0.96); }
+
+.ds-btn-ghost {
+  background: transparent; color: var(--sub-text);
+  border: none; border-radius: 8px; padding: 8px 16px;
+  font-size: 13px; font-family: inherit; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ds-btn-ghost:hover { background: var(--mint-pale); color: var(--text-main); }
+
+/* ══════════════════════════════════════════
+   ds-segment
+   セグメントコントロール（タブ切り替え）
+══════════════════════════════════════════ */
+.ds-segment {
+  display: flex; gap: 6px; background: var(--mint-pale);
+  padding: 5px; border-radius: 14px; width: fit-content;
+}
+.ds-seg-btn {
+  padding: 9px 20px; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  color: var(--sub-text); background: transparent; letter-spacing: 0.04em;
+  font-family: inherit;
+}
+.ds-seg-btn.active {
+  background: var(--card-bg); color: var(--accent-deep);
+  box-shadow: 0 2px 10px var(--shadow); transform: scale(1.02);
+}
+.ds-seg-btn:hover:not(.active) { background: rgba(168,213,186,0.2); }
+
+/* ══════════════════════════════════════════
+   ds-result
+   結果カード（KPI単体表示）
+══════════════════════════════════════════ */
+.ds-result {
+  background: var(--mint-pale); border-radius: 16px; padding: 18px 20px;
+  border: 1.5px solid var(--mint-light); margin-bottom: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ds-result:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.ds-result.highlight {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  border-color: var(--accent); box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-result-label { font-size: 11px; color: var(--sub-text); margin-bottom: 5px; letter-spacing: 0.08em; }
+.ds-result-value {
+  font-family: 'Roboto', sans-serif; font-size: 26px; font-weight: 500;
+  color: var(--text-main); display: flex; align-items: baseline; gap: 4px;
+}
+.ds-result-unit { font-family: 'Hiragino Kaku Gothic ProN', sans-serif; font-size: 13px; color: var(--sub-text); font-weight: 400; }
+.ds-result-sub { font-size: 11px; color: var(--sub-text); margin-top: 6px; line-height: 1.4; }
+
+/* ══════════════════════════════════════════
+   ds-progress
+   進捗バー（グラデーション＋シマー）
+══════════════════════════════════════════ */
+.ds-progress-bg { height: 6px; background: var(--mint-light); border-radius: 3px; overflow: hidden; }
+.ds-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: 3px; transition: width 1s cubic-bezier(0.22,0.61,0.36,1);
+  position: relative; overflow: hidden;
+}
+.ds-progress-fill::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+   ds-divider
+   区切り線（フェードグラデーション）
+══════════════════════════════════════════ */
+.ds-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--mint-light), transparent); margin: 20px 0; }
+
+/* ══════════════════════════════════════════
+   ds-form-row
+   ラベル＋インプットの横並びレイアウト
+   --form-label-w でラベル幅をカスタマイズ可能（デフォルト 200px）
+══════════════════════════════════════════ */
+.ds-form-rows { display: flex; flex-direction: column; gap: clamp(18px, 3.5vw, 26px); }
+.ds-form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 560px) {
+  .ds-form-row {
+    grid-template-columns: var(--form-label-w, 200px) 1fr;
+    align-items: center;
+    gap: 20px;
+  }
+}
+.ds-form-row-label { display: flex; flex-direction: column; gap: 4px; }
+.ds-form-row-label .lname {
+  font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+.ds-form-row-label .ldesc {
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
+  color: var(--sub-text);
+  line-height: 1.5;
+}
+.ds-form-row-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ══════════════════════════════════════════
+   ds-toast
+   フローティングトースト通知
+══════════════════════════════════════════ */
+.ds-toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--accent-deep); color: #fff; padding: 12px 28px;
+  border-radius: 40px; font-size: 13px; letter-spacing: 0.08em;
+  box-shadow: 0 6px 24px rgba(74,140,111,0.4);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+  opacity: 0; z-index: 9999; white-space: nowrap; pointer-events: none;
+}
+.ds-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ══════════════════════════════════════════
+   ds-confetti
+   コンフェッティエフェクト用コンテナ
+══════════════════════════════════════════ */
+#ds-confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998; overflow: hidden; }
+.ds-confetti-piece { position: absolute; animation: dsConfettiFall linear forwards; opacity: 0; }
+
+/* ══════════════════════════════════════════
+   ds-range
+   シンプルスライダー（ds-progress と同じ fill＋シマーアニメーション）
+══════════════════════════════════════════ */
+.ds-range-wrap {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mint-light);
+  overflow: visible;
+}
+.ds-range-wrap .ds-range {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+}
+.ds-range-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--pct, 0%);
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: 3px;
+  overflow: hidden;
+  /* transition なし：thumb と fill を完全同期させるため */
+  pointer-events: none;
+}
+.ds-range-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+.ds-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  z-index: 1;
+  /* 単体使用時のフォールバック（wrap 内では transparent で上書き） */
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent-deep) var(--pct, 0%),
+    var(--mint-light) var(--pct, 0%),
+    var(--mint-light) 100%
+  );
+}
+.ds-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: grab;
+}
+.ds-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.ds-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  cursor: grab;
+}
+
+/* ══════════════════════════════════════════
+   note-box / dashed-box
+   注釈・補足ボックス
+══════════════════════════════════════════ */
+.note-box {
+  background: rgba(168,213,186,0.1); border-left: 3px solid var(--accent);
+  border-radius: 12px; padding: 14px 18px; font-size: 12px;
+  color: var(--sub-text); line-height: 1.8; letter-spacing: 0.05em;
+}
+.dashed-box {
+  border: 1px dashed var(--mint-light); border-radius: 12px;
+  padding: 14px 18px; background: var(--mint-pale); font-size: 12px;
+  color: var(--sub-text); line-height: 1.8; font-family: 'Roboto Mono', monospace;
+}
+
+/* ══════════════════════════════════════════
+   ① ds-input-stepper
+   数値入力 + スライダー + ±ボタン セット
+══════════════════════════════════════════ */
+.ds-val-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.ds-val-row-stack { display: flex; flex-direction: column; gap: 10px; }
+.ds-val-row-stack .ds-chip-scroll { margin-left: 0; flex: none; }
+.ds-val-row .ds-input-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  background: transparent;
+  padding: 4px 0 6px;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s ease;
+  -moz-appearance: textfield;
+}
+.ds-val-row .ds-input-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-val-row .ds-input-underline::-webkit-outer-spin-button,
+.ds-val-row .ds-input-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ds-num-edit {
+  font-size: clamp(1.5rem, 5.5vw, 2rem); font-weight: 500;
+  color: var(--text-main); font-family: 'Roboto', sans-serif;
+  border: none; border-bottom: 2px solid var(--mint-light); outline: none;
+  background: transparent; width: 100px; -moz-appearance: textfield;
+  padding: 0 4px 4px; transition: border-color .25s ease; line-height: 1.1;
+}
+.ds-num-edit:focus { border-bottom-color: var(--accent-deep); }
+.ds-num-edit::-webkit-outer-spin-button,
+.ds-num-edit::-webkit-inner-spin-button { -webkit-appearance: none; }
+.ds-val-unit { font-size: 0.95rem; color: var(--sub-text); font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   ds-input-num-underline
+   数値入力（アンダーラインのみ・単位付き）
+   ds-val-row 内で使用: <input class="ds-input-num-underline"> + <span class="ds-val-unit">万円</span>
+══════════════════════════════════════════ */
+.ds-input-num-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.5rem, 5.5vw, 2rem);
+  font-weight: 500;
+  color: var(--text-main);
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  outline: none;
+  background: transparent;
+  width: 100px;
+  padding: 0 4px 4px;
+  transition: border-color 0.25s ease;
+  line-height: 1.1;
+  -moz-appearance: textfield;
+}
+.ds-input-num-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-input-num-underline::placeholder {
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+}
+.ds-input-num-underline::-webkit-outer-spin-button,
+.ds-input-num-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ds-input-stepper { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ds-pm-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: transparent;
+  color: var(--accent-deep);
+  border: 1.5px solid var(--accent);
+  cursor: pointer; font-size: 1rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(74,140,111,0.12);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  user-select: none; line-height: 1;
+}
+.ds-pm-btn:hover {
+  background: var(--mint-pale);
+  border-color: var(--accent-deep);
+  box-shadow: 0 1px 4px rgba(74,140,111,0.12);
+  transform: none;
+}
+.ds-pm-btn:active { transform: scale(0.9); }
+
+/* ピル+縦線のラッパー */
+.ds-stepper-wrap {
+  flex: 1; min-width: 0;
+  position: relative;
+}
+/* ピルの高さ分の余白。padding-bottom でスライダーバーと±ボタンの上下中央揃え */
+.ds-stepper-wrap-inner {
+  position: relative;
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+/* B1フローティングピル */
+.ds-stepper-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ds-stepper-pill-label {
+  background: #fff;
+  color: var(--accent-deep);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  border: 1.5px solid var(--mint-light);
+  line-height: 1.4;
+}
+.ds-stepper-pill-line {
+  width: 1.5px;
+  height: 4px;
+  background: var(--mint-light);
+  flex-shrink: 0;
+}
+/* シマーオーバーレイ（ds-progressと同じ） */
+.ds-stepper-shimmer {
+  pointer-events: none;
+  position: absolute;
+  top: 38px;
+  left: 0;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  overflow: hidden;
+  /* transition なし：thumb と fill を完全同期させるため */
+}
+.ds-stepper-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+
+/* ピル無しバージョン（.ds-stepper-wrap--no-pill を付与） */
+.ds-stepper-wrap--no-pill .ds-stepper-shimmer {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* サム：白抜き＋深緑リング */
+.ds-stepper-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent var(--pct, 0%),
+    var(--mint-light) var(--pct, 0%),
+    var(--mint-light) 100%
+  );
+}
+.ds-stepper-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: grab;
+}
+.ds-stepper-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.ds-stepper-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent-deep);
+  box-shadow: 0 1px 6px rgba(74, 140, 111, 0.18);
+  cursor: grab;
+}
+
+/* ══════════════════════════════════════════
+   ② ds-warning-inline
+   オレンジ系インライン警告ボックス
+══════════════════════════════════════════ */
+.ds-warning-inline {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 14px;
+  background: rgba(224,122,58,0.08);
+  border-radius: 10px;
+  font-size: 12px; color: var(--warn-color);
+  line-height: 1.7; letter-spacing: 0.04em;
+}
+.ds-warning-inline .wi-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+/* ══════════════════════════════════════════
+   ③ ds-select-underline
+   アンダーラインスタイルのセレクトボックス
+══════════════════════════════════════════ */
+.ds-select-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.ds-select-underline {
+  font-size: clamp(1.4rem, 5vw, 1.8rem); font-weight: 500;
+  color: var(--text-main);
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  border: none; border-bottom: 2px solid var(--mint-light);
+  background: transparent; outline: none; cursor: pointer;
+  padding: 0 4px 4px; -webkit-appearance: none; appearance: none;
+  transition: border-color .25s ease; line-height: 1.1;
+}
+.ds-select-underline:focus { border-bottom-color: var(--accent-deep); }
+.ds-select-unit { font-size: 0.95rem; color: var(--sub-text); font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   ④ ds-summary-grid / ds-stat-card
+   KPI・サマリーグリッドレイアウト
+══════════════════════════════════════════ */
+.ds-summary-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+@media (min-width: 480px) {
+  .ds-summary-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+@media (max-width: 479px) {
+  .ds-summary-grid .ds-stat-card:last-child { grid-column: 1 / -1; }
+}
+.ds-stat-card {
+  background: var(--mint-pale); border-radius: 16px;
+  padding: clamp(14px, 3vw, 20px) clamp(10px, 2vw, 16px) clamp(12px, 2.5vw, 18px);
+  text-align: center; border: 1.5px solid var(--mint-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ds-stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.ds-stat-card.highlight {
+  background: linear-gradient(135deg, #f0faf6, #e8f5f1);
+  border-color: var(--accent); box-shadow: 0 4px 20px rgba(74,140,111,0.1);
+}
+.ds-stat-label {
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem); color: var(--sub-text);
+  font-weight: 600; margin-bottom: clamp(6px, 1.8vw, 10px); line-height: 1.4; letter-spacing: 0.04em;
+}
+.ds-stat-value { font-family: 'Roboto', sans-serif; line-height: 1.1; }
+.ds-stat-num {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 500; color: var(--accent-deep);
+}
+.ds-stat-unit { font-size: clamp(0.85rem, 2.8vw, 1.1rem); font-weight: 400; color: var(--accent-deep); margin-left: 3px; }
+.ds-stat-detail { font-size: clamp(0.72rem, 2.3vw, 0.88rem); color: var(--sub-text); font-weight: 500; margin-top: 8px; }
+.ds-stat-detail-num {
+  font-family: 'Roboto', sans-serif; font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 500; color: var(--accent-deep);
+}
+.ds-stat-detail-unit {
+  font-size: clamp(0.75rem, 2.5vw, 0.95rem); font-weight: 400;
+  color: var(--accent-deep); margin-left: 1px; margin-right: 2px;
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif; vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════
+   ⑤ ds-chip-scroll / ds-chip
+   横スクロール可能なプリセットチップ群
+══════════════════════════════════════════ */
+.ds-chip-scroll {
+  display: flex; gap: 6px; flex-wrap: nowrap;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; min-width: 0; padding: 4px;
+}
+/* ds-val-row 内では残スペースを埋めて右端に寄せる */
+.ds-val-row .ds-chip-scroll { flex: 1 1 0; margin-left: auto; }
+.ds-chip-scroll::-webkit-scrollbar { display: none; }
+.ds-chip {
+  padding: 5px 14px;
+  border: 1.5px solid var(--mint-light); border-radius: 20px;
+  font-size: clamp(0.7rem, 2.2vw, 0.78rem); font-weight: 500;
+  font-family: inherit; color: var(--sub-text); background: transparent;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  letter-spacing: 0.04em; line-height: 1.4; white-space: nowrap; flex-shrink: 0;
+}
+.ds-chip:hover {
+  border-color: var(--accent-deep); color: var(--accent-deep);
+  background: var(--mint-pale); transform: scale(1.05);
+}
+.ds-chip:active { transform: scale(0.95); }
+.ds-chip.active {
+  background: var(--accent-deep); border-color: var(--accent-deep);
+  color: #fff; box-shadow: 0 2px 10px rgba(74,140,111,0.35);
+}
+
+/* ══════════════════════════════════════════
+   ⑥ ds-sim-chart
+   積立シミュレーション棒グラフ
+══════════════════════════════════════════ */
+.ds-chart-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+.ds-chart-li { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--sub-text); font-weight: 500; }
+.ds-chart-ld { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.ds-chart-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+.ds-chart-note { font-size: 11px; color: var(--sub-text); text-align: right; margin-top: 8px; letter-spacing: 0.04em; }
+.ds-chart-tooltip {
+  position: fixed; background: #2c3a35; color: #fff;
+  border-radius: 14px; padding: 12px 16px;
+  font-size: 12px; pointer-events: none;
+  opacity: 0; transition: opacity .15s; z-index: 9999;
+  min-width: 190px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(74,140,111,0.2);
+  line-height: 1.8; border: 1px solid rgba(168,213,186,0.2);
+}
+.ds-chart-tooltip.show { opacity: 1; }
+.ds-chart-tooltip .tt-year  { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 3px; }
+.ds-chart-tooltip .tt-total { font-size: 14px; font-weight: 500; font-family: 'Roboto', sans-serif; margin-bottom: 2px; }
+.ds-chart-tooltip .tt-row   { display: flex; align-items: center; gap: 8px; }
+.ds-chart-tooltip .tt-dot   { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.ds-chart-tooltip .tt-sep   { border-top: 1px solid rgba(255,255,255,0.12); margin: 4px 0; }
+
+/* ══════════════════════════════════════════
+   back-to-index
+   マネーツール一覧へ戻るボタン（各シミュレーター下部）
+══════════════════════════════════════════ */
+.back-to-index { margin-top: 24px; text-align: center; }
+.back-to-index a {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  background: var(--mint-pale); border: 1px solid var(--mint-light);
+  border-radius: 12px; color: var(--accent-deep);
+  text-decoration: none; font-size: 14px; font-weight: 500;
+  transition: background 0.2s, border-color 0.2s;
+}
+.back-to-index a:hover { background: #fff; border-color: var(--accent); }
+
+/* ══════════════════════════════════════════
+   ds-hero-result
+   手取りヒーローカード（グラデーション背景）
+══════════════════════════════════════════ */
+.ds-hero-result {
+  background: linear-gradient(135deg, #5aaa8e 0%, #6ec4a8 100%);
+  border-radius: 20px;
+  padding: 24px 24px 20px;
+  color: #fff;
+  box-shadow: 0 4px 22px rgba(74,140,111,0.22);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.ds-hero-result .hero-eyebrow {
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+.ds-hero-result .hero-amount {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(2.2rem, 7vw, 3rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+.ds-hero-result .hero-amount-unit {
+  font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  font-weight: 400;
+}
+.ds-hero-result .hero-sub {
+  margin-top: 14px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ds-hero-result .hero-sub-value {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════
+   ds-calc-basis
+   計算の根拠（番号付きステップ＋要約式）
+══════════════════════════════════════════ */
+.ds-calc-basis {
+  background: var(--mint-pale);
+  border: 1.5px dashed var(--mint-light);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 4px;
+}
+.ds-calc-basis-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-deep);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ds-calc-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+.ds-calc-step-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.ds-calc-step .val {
+  font-weight: 500;
+  color: var(--accent-deep);
+}
+.ds-calc-eq {
+  font-size: 13px;
+  color: var(--text-main);
+  background: var(--card-bg);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  line-height: 1.8;
+}
+.ds-calc-eq .em {
+  color: var(--accent-deep);
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════
+   ds-breakdown-accordion
+   社会保険料・税金の内訳アコーディオン
+══════════════════════════════════════════ */
+.ds-breakdown-block {
+  background: var(--card-bg);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.ds-breakdown-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--card-bg);
+  font-size: clamp(0.82rem, 2.4vw, 0.92rem);
+  font-weight: 700;
+  color: var(--text-main);
+  border-bottom: 1.5px solid var(--mint-light);
+}
+.ds-accordion-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 18px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--mint-light);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.ds-accordion-trigger:hover {
+  background: var(--mint-pale);
+}
+.ds-accordion-trigger .acc-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--sub-text);
+  text-transform: uppercase;
+}
+.ds-accordion-trigger .acc-toggle-label {
+  font-size: 10px;
+  background: var(--mint-pale);
+  border: 1px solid var(--mint-light);
+  color: var(--accent-deep);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: background 0.2s;
+}
+.ds-accordion-trigger[aria-expanded="true"] .acc-toggle-label {
+  background: var(--mint-light);
+}
+.ds-accordion-trigger .acc-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  font-weight: 500;
+  color: var(--sub-text);
+  text-align: right;
+}
+.acc-resident-hint {
+  font-size: 10px;
+  color: var(--warn-color);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+.ds-accordion-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+  background: #fafcfb;
+}
+.ds-accordion-body.open {
+  max-height: 400px;
+}
+.ds-accordion-body .breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 18px;
+  font-size: clamp(0.78rem, 2.3vw, 0.88rem);
+  border-bottom: 1px solid var(--mint-light);
+}
+.ds-accordion-body .breakdown-row .breakdown-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sub-text);
+}
+.ds-accordion-body .breakdown-row .breakdown-label::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.ds-accordion-body .breakdown-row.color-health .breakdown-label::before { background: var(--data-blue-2); }
+.ds-accordion-body .breakdown-row.color-care .breakdown-label::before { background: var(--data-blue-2); }
+.ds-accordion-body .breakdown-row.color-pension .breakdown-label::before { background: var(--data-blue-1); }
+.ds-accordion-body .breakdown-row.color-employ .breakdown-label::before { background: var(--data-blue-3); }
+.ds-accordion-body .breakdown-row.color-income .breakdown-label::before { background: var(--data-orange); }
+.ds-accordion-body .breakdown-row.color-resident .breakdown-label::before { background: var(--data-amber); }
+.ds-accordion-body .breakdown-row .breakdown-value {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: var(--sub-text);
+  text-align: right;
+}
+.ds-accordion-body .breakdown-row:last-child {
+  border-bottom: none;
+}
+.ds-breakdown-subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 18px;
+  font-size: clamp(0.8rem, 2.3vw, 0.9rem);
+  font-weight: 600;
+  color: var(--sub-text);
+  border-top: 1px solid var(--mint-light);
+}
+.ds-breakdown-takehome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  font-size: clamp(0.88rem, 2.5vw, 1rem);
+  font-weight: 700;
+  color: var(--text-main);
+}
+.ds-breakdown-takehome .takehome-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 500;
+  color: var(--accent-deep);
+}
+
+/* ══════════════════════════════════════════
+   ds-donut-summary
+   ドーナツグラフ＋内訳を横並びにしたカード
+══════════════════════════════════════════ */
+.ds-donut-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  background: var(--mint-pale);
+  border: 1.5px solid var(--mint-light);
+  border-radius: 16px;
+}
+.ds-donut-summary .donut-canvas-wrap,
+.ds-donut-summary .donut-svg-wrap {
+  flex-shrink: 0;
+  width: clamp(90px, 22vw, 120px);
+  aspect-ratio: 1;
+  position: relative;
+}
+.ds-donut-summary .donut-svg-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ds-donut-summary .donut-legend {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ds-donut-summary .donut-legend-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--placeholder);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.ds-donut-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(0.72rem, 2vw, 0.82rem);
+}
+.ds-donut-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.ds-donut-legend-name {
+  flex: 1;
+  color: var(--sub-text);
+}
+.ds-donut-legend-val {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: var(--text-main);
+  text-align: right;
+}
+.ds-donut-legend-pct {
+  font-size: 10px;
+  color: var(--placeholder);
+  margin-left: 3px;
+}
+
+/* ══════════════════════════════════════════
+   ds-resident-savings
+   住民税取り置きブロック（翌年払い注意）
+   住民税を計算から外すON時に表示
+══════════════════════════════════════════ */
+.ds-resident-savings {
+  display: none;                          /* JSでshow/hide */
+  background: rgba(224,122,58,0.07);
+  border: 1.5px solid rgba(224,122,58,0.25);
+  border-radius: 16px;
+  padding: 16px 18px;
+  animation: fadeInUp 0.3s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+.ds-resident-savings.visible {
+  display: block;
+}
+
+/* ヘッダー行 */
+.drs-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.drs-header-icon { font-size: 16px; }
+.drs-header-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--warn-color);
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+.drs-badge {
+  font-size: 10px;
+  background: rgba(224,122,58,0.12);
+  color: var(--warn-color);
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* 月額→年額カード行 */
+.drs-amounts {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 14px;
+}
+.drs-amount-card {
+  flex: 1;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  padding: 11px 13px;
+  border: 1px solid rgba(224,122,58,0.22);
+}
+.drs-amount-card.annual {
+  background: rgba(224,122,58,0.1);
+  border-color: rgba(224,122,58,0.3);
+  border-width: 1.5px;
+}
+.drs-amount-label {
+  font-size: 10px;
+  color: var(--warn-color);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.drs-amount-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 500;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+.drs-amount-card.annual .drs-amount-value {
+  font-weight: 500;
+  color: var(--warn-color);
+}
+.drs-amount-unit {
+  font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: 12px;
+  color: var(--sub-text);
+  margin-left: 2px;
+}
+.drs-amount-card.annual .drs-amount-unit {
+  color: var(--warn-color);
+  opacity: 0.8;
+}
+.drs-arrow {
+  padding: 0 10px;
+  font-size: 16px;
+  color: rgba(224,122,58,0.35);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* プログレスバー */
+.drs-bar-wrap {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.drs-bar-track {
+  flex: 1;
+  min-width: 0;
+}
+.drs-bar-bg {
+  height: 14px;
+  background: rgba(224,122,58,0.12);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.drs-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(224,122,58,0.55), var(--warn-color));
+  border-radius: 7px;
+  transition: width 0.7s cubic-bezier(0.22,0.61,0.36,1);
+  position: relative;
+  overflow: hidden;
+}
+.drs-bar-fill::after {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: barShimmer 2s ease-in-out infinite;
+}
+.drs-bar-pct {
+  font-size: 11px;
+  color: var(--warn-color);
+  font-weight: 600;
+  opacity: 0.9;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 注記 */
+.drs-note {
+  font-size: 11px;
+  color: var(--sub-text);
+  line-height: 1.75;
+  border-top: 1px dashed rgba(224,122,58,0.25);
+  padding-top: 10px;
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════
+   ds-period-strip
+   内訳ブロック上部 月間／年間 切り替えストリップ
+══════════════════════════════════════════ */
+.ds-period-strip {
+  display: flex;
+  border-bottom: 1.5px solid var(--mint-light);
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  background: var(--mint-pale);
+}
+.ds-period-strip-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  position: relative;
+  background: transparent;
+  color: var(--sub-text);
+  transition: color 0.2s ease;
+}
+.ds-period-strip-btn.active {
+  color: var(--accent-deep);
+}
+/* アクティブのアンダーライン */
+.ds-period-strip-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--accent-deep);
+  transition: width 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ds-period-strip-btn.active::after {
+  width: 40px;
+}
+/* ボタン間の区切り線 */
+.ds-period-strip-btn:not(:last-child) {
+  border-right: 1px solid var(--mint-light);
+}
+
+/* 金額切り替えアニメーション */
+.bd-amount {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  display: inline-block;
+}
+.ds-breakdown-block.period-switching .bd-amount {
+  opacity: 0;
+  transform: translateY(3px);
+}
+
+/* タブ切り替え: まとめてフェードイン */
+@keyframes breakdownFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ds-breakdown-block.period-switching .ds-breakdown-single > *,
+.ds-breakdown-block.period-switching .ds-breakdown-stack-item > * {
+  opacity: 0;
+  animation: breakdownFadeIn 0.4s ease forwards;
+}
+.ds-breakdown-block.period-switching > *:not(.ds-period-strip):not(.ds-breakdown-single):not(.ds-breakdown-monthly-stack) {
+  opacity: 0;
+  animation: breakdownFadeIn 0.4s ease forwards;
+}
+.ds-breakdown-block.period-switching .ds-breakdown-single .bd-amount,
+.ds-breakdown-block.period-switching .ds-breakdown-stack-item .bd-amount,
+.ds-breakdown-block.period-switching .bd-amount {
+  opacity: inherit;
+  transform: inherit;
+  transition: none;
+}
+
+/* ══════════════════════════════════════════
+   ds-work-fields
+   稼働条件（時間/日・日数/月・交通費）横並びグリッド
+══════════════════════════════════════════ */
+.ds-work-fields {
+  display: grid;
+  grid-template-columns: 1fr 0.4fr 1fr 0.4fr 1.8fr 0.4fr;
+  align-items: end;
+  column-gap: 12px;
+  row-gap: 8px;
+}
+.ds-work-fields .ds-input-underline {
+  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  font-weight: 500;
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--mint-light);
+  background: transparent;
+  padding: 4px 0 6px;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s ease;
+  -moz-appearance: textfield;
+}
+.ds-work-fields .ds-input-underline:focus {
+  border-bottom-color: var(--accent-deep);
+}
+.ds-work-fields .ds-input-underline::-webkit-outer-spin-button,
+.ds-work-fields .ds-input-underline::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ds-work-fields .field-label {
+  font-size: clamp(0.68rem, 2vw, 0.76rem);
+  font-weight: 600;
+  color: var(--sub-text);
+  white-space: nowrap;
+}
+.ds-work-fields .field-unit {
+  font-size: clamp(0.82rem, 2.4vw, 0.95rem);
+  color: var(--sub-text);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  /* ── 稼働条件グリッド：幅を絞り交通費のみ広く ── */
+  .ds-work-fields {
+    grid-template-columns: 44px auto 44px auto 80px auto;
+    align-items: end;
+    column-gap: 6px;
+    row-gap: 0;
+  }
+
+  /* ── 稼働条件の入力欄フォントサイズを1段階アップ ── */
+  .ds-work-fields .ds-input-underline {
+    font-size: 22px;
+  }
+}
+
+
+/* === weekday-counter tool styles === */
+
+    /* ── tool specific ── */
+    .wc-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .wc-grid { grid-template-columns: 1fr; }
+    }
+
+    .wc-left .ds-card { height: 100%; }
+
+    .wc-panel-title {
+      font-size: clamp(0.9rem, 2.4vw, 1rem);
+      color: var(--accent-deep);
+      font-weight: 700;
+      margin: 0 0 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .wc-subtle {
+      color: var(--sub-text);
+      font-size: 12px;
+      line-height: 1.8;
+      margin: -6px 0 14px;
+    }
+
+    .wc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .wc-tabs {
+      display: inline-flex;
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--sys-border);
+      border-radius: 14px;
+      background: rgba(168,213,186,0.06);
+      margin: 10px 0 14px;
+    }
+    .wc-tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--sub-text);
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .wc-tab-btn.active {
+      background: rgba(168,213,186,0.20);
+      color: var(--text-main);
+    }
+
+    .wc-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 500px) {
+      .wc-form-row { grid-template-columns: 1fr; }
+    }
+
+    .wc-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+      max-height: 220px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .wc-list-item {
+      background: rgba(168,213,186,0.07);
+      border: 1px solid var(--sys-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .wc-list-title { font-weight: 800; font-size: 13px; margin-bottom: 4px; color: var(--text-main); }
+    .wc-list-sub { color: var(--sub-text); font-size: 12px; line-height: 1.6; }
+
+    .wc-mini-btn {
+      border: 1px solid var(--mint-light);
+      background: rgba(168,213,186,0.10);
+      color: var(--sub-text);
+      padding: 8px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      flex: 0 0 auto;
+    }
+    .wc-mini-btn:hover { background: rgba(168,213,186,0.18); }
+
+    /* ── calendar ── */
+    .wc-calendar-shell { display: grid; gap: 12px; }
+    .wc-calendar-toolbar { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .wc-calendar-title { font-weight: 900; font-size: clamp(1.05rem, 2.8vw, 1.25rem); letter-spacing: -0.02em; }
+    .wc-month-nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .wc-month-chip {
+      border: 1px solid var(--mint-light);
+      background: rgba(168,213,186,0.08);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .wc-weekday-head, .wc-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .wc-weekday-head div {
+      color: var(--sub-text);
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .wc-day-cell {
+      min-height: 88px;
+      border-radius: 18px;
+      padding: 10px;
+      border: 1px solid rgba(212,237,227,0.55);
+      background: rgba(168,213,186,0.05);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .wc-day-cell:hover { transform: translateY(-1px); border-color: rgba(168,213,186,0.9); }
+    .wc-day-cell.is-outside {
+      opacity: 0.35;
+      background: rgba(168,213,186,0.02);
+      cursor: default;
+      border-style: dashed;
+    }
+    .wc-day-cell.is-selected {
+      outline: 2px solid rgba(124,156,255,0.7);
+      outline-offset: 2px;
+    }
+    .wc-day-cell.is-today::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(168,213,186,0.9);
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    .wc-day-cell.weekend { background: rgba(255,255,255,0.05); }
+    .wc-day-cell.holiday-off { background: rgba(255,143,143,0.22); border-color: rgba(255,143,143,0.35); }
+    .wc-day-cell.extra-holiday { background: rgba(74,144,226,0.18); border-color: rgba(74,144,226,0.30); }
+    .wc-day-cell.extra-workday { background: rgba(75,181,67,0.18); border-color: rgba(75,181,67,0.30); }
+
+    .wc-day-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .wc-day-num { font-weight: 900; font-size: 14px; }
+    .wc-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .wc-badge {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.16);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.92);
+      letter-spacing: 0.02em;
+      font-weight: 800;
+    }
+
+    .wc-day-bottom { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .wc-status-text { font-size: 11px; color: rgba(255,255,255,0.88); font-weight: 800; }
+    .wc-memo-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,0.92); opacity: 0.75; }
+
+    /* ── details ── */
+    .wc-details-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 860px) {
+      .wc-details-grid { grid-template-columns: 1fr; }
+    }
+    .wc-detail-card {
+      background: rgba(168,213,186,0.06);
+      border: 1px solid var(--sys-border);
+      border-radius: 18px;
+      padding: 16px 16px;
+      min-height: 170px;
+    }
+    .wc-detail-date { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .wc-pill-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 900;
+      background: rgba(168,213,186,0.08);
+      border: 1px solid var(--sys-border);
+      margin-bottom: 14px;
+    }
+    .wc-detail-list { color: var(--sub-text); font-size: 13px; line-height: 1.8; display: grid; gap: 8px; }
+    .wc-detail-list strong { color: var(--text-main); font-weight: 900; }
+
+    /* ── toast ── */
+    .wc-toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      padding: 14px 16px;
+      background: rgba(15,22,43,0.92);
+      color: var(--text-main);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.30);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+      max-width: 340px;
+      z-index: 30;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .wc-toast.show { opacity: 1; transform: translateY(0); }
+
+    /* helper buttons */
+    .wc-primary-btn {
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      color: #fff;
+      font-weight: 900;
+      padding: 12px 16px;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(74,140,111,0.25);
+    }
+    .wc-ghost-btn {
+      border: 1px solid var(--mint-light);
+      background: rgba(168,213,186,0.10);
+      cursor: pointer;
+      color: var(--sub-text);
+      font-weight: 900;
+      padding: 12px 16px;
+      border-radius: 14px;
+    }
+  
+</style>
+</head>
+<body>
+
+<main class="app-scope">
+
+  <header class="ds-page-title">
+    <h1>平日日数カウンター</h1>
+    <p>土日・祝日・追加休日・追加出勤を反映して、月ごとの稼働日数と年間合計を見える化します。</p>
+  </header>
+
+  <div class="wc-grid">
+    <!-- left -->
+    <div class="wc-left">
+      <div class="ds-card">
+        <div class="ds-card-label">条件設定</div>
+
+        <div class="ds-card-inner" style="padding: 0 18px 18px;">
+          <div class="wc-panel-title">基本設定</div>
+
+          <div class="ds-form-row">
+            <div class="ds-form-row-label">対象年</div>
+            <div class="ds-form-row-right">
+              <select id="yearSelect" class="ds-select-underline"></select>
+            </div>
+          </div>
+
+          <div style="height: 10px;"></div>
+          <div class="ds-form-row">
+            <div class="ds-form-row-label">祝日の扱い</div>
+            <div class="ds-form-row-right">
+              <div class="ds-segment" id="holidayModeSegmented">
+                <button type="button" class="ds-seg-btn active" data-mode="holiday">祝日は休日</button>
+                <button type="button" class="ds-seg-btn" data-mode="workday">祝日は出勤</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 16px;"></div>
+          <div class="wc-panel-title">追加休日</div>
+          <div class="wc-subtle">平日だけど休みにしたい日を追加します（単発／期間）。</div>
+
+          <div class="wc-tabs" id="holidayTabs">
+            <button type="button" class="wc-tab-btn active" data-tab="single">単発</button>
+            <button type="button" class="wc-tab-btn" data-tab="range">期間</button>
+          </div>
+
+          <div id="holidaySingleFields">
+            <div class="ds-form-row">
+              <div class="ds-form-row-label">日付</div>
+              <div class="ds-form-row-right">
+                <input id="holidaySingleDate" type="date" class="ds-input-underline" />
+              </div>
+            </div>
+          </div>
+
+          <div id="holidayRangeFields" hidden>
+            <div class="wc-form-row">
+              <div class="ds-form-row" style="margin-bottom:0;">
+                <div class="ds-form-row-label">開始日</div>
+                <div class="ds-form-row-right">
+                  <input id="holidayRangeStart" type="date" class="ds-input-underline" />
+                </div>
+              </div>
+              <div class="ds-form-row" style="margin-bottom:0;">
+                <div class="ds-form-row-label">終了日</div>
+                <div class="ds-form-row-right">
+                  <input id="holidayRangeEnd" type="date" class="ds-input-underline" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ds-form-row">
+            <div class="ds-form-row-label">メモ</div>
+            <div class="ds-form-row-right">
+              <input id="holidayLabel" type="text" class="ds-input-underline" placeholder="例：年末年始、お盆休み" />
+            </div>
+          </div>
+
+          <div class="wc-actions" style="margin-top: 12px;">
+            <button class="wc-primary-btn" id="addHolidayBtn" type="button">追加休日を登録</button>
+          </div>
+
+          <div id="extraHolidayList" class="wc-list"></div>
+
+          <div style="height: 16px;"></div>
+          <div class="wc-panel-title">追加出勤日</div>
+          <div class="wc-subtle">本来の休日を、その日だけ出勤扱いにします。</div>
+
+          <div class="ds-form-row">
+            <div class="ds-form-row-label">日付</div>
+            <div class="ds-form-row-right">
+              <input id="workdayDate" type="date" class="ds-input-underline" />
+            </div>
+          </div>
+
+          <div class="ds-form-row">
+            <div class="ds-form-row-label">メモ</div>
+            <div class="ds-form-row-right">
+              <input id="workdayLabel" type="text" class="ds-input-underline" placeholder="例：祝日出勤、土曜出勤" />
+            </div>
+          </div>
+
+          <div class="wc-actions" style="margin-top: 12px;">
+            <button class="wc-primary-btn" id="addWorkdayBtn" type="button">追加出勤日を登録</button>
+          </div>
+
+          <div id="extraWorkdayList" class="wc-list"></div>
+
+          <div style="height: 16px;"></div>
+          <div class="wc-actions">
+            <button class="wc-ghost-btn" id="recalculateBtn" type="button">再計算</button>
+            <button class="wc-ghost-btn" id="resetBtn" type="button">初期化</button>
+          </div>
+
+          <div style="height: 14px;"></div>
+          <div class="ds-divider"></div>
+          <div class="wc-subtle" style="margin: 12px 0 0;">
+            年間稼働日数：<span id="statYearWorking">-</span>日
+            <br>対象年：<span id="statYear">-</span>
+            <br>追加休日：<span id="statExtraHolidayCount">0</span>件
+            <br>追加出勤日：<span id="statExtraWorkdayCount">0</span>件
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- right -->
+    <div class="wc-right">
+      <div class="ds-card">
+        <div class="ds-card-label">結果</div>
+        <div class="ds-card-inner" style="padding: 18px;">
+
+          <div class="wc-details-grid">
+            <div class="wc-detail-card">
+              <div class="wc-panel-title" style="margin-bottom: 8px;">年間サマリー</div>
+              <div class="wc-subtle" style="margin-top:-2px;">月をクリックすると、右側のカレンダーが切り替わります。</div>
+              <div id="summaryTable" style="display:grid; gap:10px;"></div>
+            </div>
+
+            <div class="wc-calendar-shell">
+              <div class="wc-calendar-toolbar">
+                <div>
+                  <div class="wc-panel-title" style="margin:0 0 6px;">月カレンダー</div>
+                  <div class="wc-calendar-title" id="calendarTitle">-</div>
+                </div>
+                <div class="wc-month-nav">
+                  <button class="wc-month-chip" type="button" id="prevMonthBtn">← 前月</button>
+                  <button class="wc-month-chip" type="button" id="nextMonthBtn">次月 →</button>
+                </div>
+              </div>
+              <div class="wc-weekday-head">
+                <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+              </div>
+              <div class="wc-calendar-grid" id="calendarGrid"></div>
+              <div class="ds-note" style="margin-top: 6px;">
+                凡例：通常出勤／土日／祝日休み／追加休日／追加出勤／祝日出勤は通常色 + [祝]
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 16px;"></div>
+          <div class="wc-details-grid">
+            <div class="wc-detail-card">
+              <div class="wc-detail-date" id="detailDate">日付を選択してください</div>
+              <div class="wc-pill-status" id="detailStatus">-</div>
+              <div class="wc-detail-list" id="detailList"></div>
+            </div>
+            <div class="wc-detail-card">
+              <div class="wc-panel-title" style="margin-bottom: 8px; font-size: 15px;">この月の概要</div>
+              <div class="wc-detail-list" id="monthOverview"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="ds-confetti" style="position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;"></div>
+<div id="wc-toast" class="wc-toast" role="status" aria-live="polite"></div>
+
+
+<script>
+/* === base.js === */
+/**
+ * base.js — Mint Design System ユーティリティ関数
+ * base-design-system.html から汎用ロジックを抽出
+ *
+ * 使い方:
+ *   <script src="../shared/base.js"></script>
+ *   または ES module として import して使用
+ */
+
+/* ══════════════════════════════════════════
+   汎用ユーティリティ
+══════════════════════════════════════════ */
+
+/**
+ * 値を [min, max] の範囲に丸める
+ * @param {number} v
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+function clamp(v, min, max) {
+  return Math.min(max, Math.max(min, v));
+}
+
+/* ══════════════════════════════════════════
+   数値フォーマット（日本円）
+══════════════════════════════════════════ */
+
+/**
+ * 円単位の数値を「億円 / 万円」形式に分解して返す
+ * @param {number} n  円単位の数値
+ * @returns {{ num: string, unit: string }}
+ *   例: 123_456_789 → { num: "1億2,346", unit: "万円" }
+ *   例:   1_234_000 → { num: "123",      unit: "万円" }
+ */
+function fmtYenParts(n) {
+  n = Math.round(n);
+  if (n >= 100_000_000) {
+    const oku = Math.floor(n / 100_000_000);
+    const man = Math.round((n % 100_000_000) / 10_000);
+    if (man === 0) return { num: oku.toLocaleString('ja-JP'), unit: '億円' };
+    return { num: oku.toLocaleString('ja-JP') + '億' + man.toLocaleString('ja-JP'), unit: '万円' };
+  }
+  return { num: Math.round(n / 10_000).toLocaleString('ja-JP'), unit: '万円' };
+}
+
+/**
+ * 円単位の数値を「億円 / 万円」の文字列で返す
+ * @param {number} n
+ * @returns {string}  例: "1億2,346万円" / "123万円"
+ */
+function fmtYen(n) {
+  const { num, unit } = fmtYenParts(n);
+  return num + unit;
+}
+
+/**
+ * 3桁カンマ区切りフォーマット（入力欄用）
+ * @param {string} val  入力文字列
+ * @returns {string}  例: "1234567" → "1,234,567"
+ */
+function formatComma(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  const num = val.replace(/[^\d]/g, '');
+  return num === '' ? '' : Number(num).toLocaleString('ja-JP');
+}
+
+/**
+ * カンマ付き文字列を数値に変換
+ * @param {string} val
+ * @returns {number}
+ */
+function parseComma(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  return Number(val.replace(/[^\d]/g, '')) || 0;
+}
+
+/**
+ * 数値入力欄に3桁カンマ区切りを適用する
+ * @param {string|string[]} selectorOrIds  CSSセレクタ、または id の配列
+ */
+function initCommaInput(selectorOrIds) {
+  const els = Array.isArray(selectorOrIds)
+    ? selectorOrIds.map(id => document.getElementById(id)).filter(Boolean)
+    : document.querySelectorAll(selectorOrIds);
+  els.forEach(el => {
+    el.addEventListener('input', function() {
+      const pos = this.selectionStart;
+      const prevLen = this.value.length;
+      this.value = formatComma(this.value);
+      const diff = this.value.length - prevLen;
+      this.setSelectionRange(pos + diff, pos + diff);
+    });
+    el.addEventListener('blur', function() {
+      this.value = formatComma(this.value);
+    });
+  });
+}
+
+/**
+ * グラフ軸ラベル用の短縮フォーマット
+ * @param {number} n  円単位の数値
+ * @returns {string}  例: "1.2億" / "1,234万"
+ */
+function fmtAxisYen(n) {
+  if (n >= 100_000_000) {
+    return (n / 100_000_000).toFixed(1).replace(/\.0$/, '') + '億';
+  }
+  return Math.round(n / 10_000).toLocaleString('ja-JP') + '万';
+}
+
+/* ══════════════════════════════════════════
+   カウントアップアニメーション
+   easeOutQuart / 700ms — Mint Design System
+══════════════════════════════════════════ */
+
+/**
+ * 数値要素をカウントアップアニメーションで更新する
+ * @param {HTMLElement} el      表示対象の要素（textContent を更新）
+ * @param {number}      from    開始値（円単位）
+ * @param {number}      to      終了値（円単位）
+ * @param {number}      [ms=700] アニメーション時間（ミリ秒）
+ * @param {function}    [fmt]   フォーマット関数（省略時は toLocaleString）
+ * @returns {number}  requestAnimationFrame の ID
+ *
+ * 使用例:
+ *   animateNum(document.getElementById('total'), 0, 12_345_678);
+ *   animateNum(el, prev, next, 700, n => fmtYen(n));
+ */
+function animateNum(el, from, to, ms = 700, fmt = null) {
+  const t0 = performance.now();
+  let rafId;
+  function step(now) {
+    const p    = Math.min((now - t0) / ms, 1);
+    const ease = 1 - Math.pow(1 - p, 4); // easeOutQuart
+    const cur  = Math.round(from + (to - from) * ease);
+    el.textContent = fmt ? fmt(cur) : cur.toLocaleString('ja-JP');
+    if (p < 1) rafId = requestAnimationFrame(step);
+  }
+  rafId = requestAnimationFrame(step);
+  return rafId;
+}
+
+/* ══════════════════════════════════════════
+   スライダー
+══════════════════════════════════════════ */
+
+/**
+ * range input のトラック塗りつぶし（--pct カスタムプロパティ）を更新する
+ * CSS 側で background に --pct を参照していること
+ * @param {HTMLInputElement} sl  input[type="range"] 要素
+ */
+function updateSliderBg(sl) {
+  const pct = clamp(
+    ((parseFloat(sl.value) - parseFloat(sl.min)) /
+     (parseFloat(sl.max)  - parseFloat(sl.min))) * 100,
+    0, 100
+  );
+  sl.style.setProperty('--pct', pct + '%');
+
+  const rangeWrap = sl.closest('.ds-range-wrap');
+  if (rangeWrap) rangeWrap.style.setProperty('--pct', pct + '%');
+
+  const shimmer = document.getElementById(sl.id + '-shimmer');
+  if (shimmer) shimmer.style.width = pct + '%';
+
+  const pill = document.getElementById(sl.id + '-pill');
+  const pillLabel = document.getElementById(sl.id + '-pill-label');
+  if (pill && pillLabel) {
+    const thumbD = 22;
+    const trackW = sl.getBoundingClientRect().width;
+    const p = (parseFloat(sl.value) - parseFloat(sl.min)) / (parseFloat(sl.max) - parseFloat(sl.min));
+    pill.style.left = (p * (trackW - thumbD) + thumbD / 2) + 'px';
+
+    const unit = sl.dataset.unit || '';
+    const val = parseFloat(sl.value);
+    pillLabel.textContent = (Number.isInteger(val) ? val : val.toFixed(1)) + unit;
+  }
+}
+
+/* ══════════════════════════════════════════
+   インプット連動
+══════════════════════════════════════════ */
+
+/**
+ * number input と range input を双方向にリンクする
+ * @param {string}   numId     number input の id
+ * @param {string}   slId      range input の id
+ * @param {number}   slMin     スライダーの最小値
+ * @param {number}   slMax     スライダーの最大値
+ * @param {number}   step      ステップ幅（1未満の場合は小数点1桁表示）
+ * @param {function} [onChange] 値変更時に呼ぶコールバック（例: simulate）
+ */
+function linkInputs(numId, slId, slMin, slMax, step, onChange = null) {
+  const num = document.getElementById(numId);
+  const sl  = document.getElementById(slId);
+  num.addEventListener('input', () => {
+    let v = parseFloat(num.value);
+    if (isNaN(v)) { if (onChange) onChange(); return; }
+    sl.value = clamp(v, slMin, slMax);
+    updateSliderBg(sl);
+    if (onChange) onChange();
+  });
+  sl.addEventListener('input', () => {
+    num.value = parseFloat(sl.value).toFixed(step < 1 ? 1 : 0);
+    updateSliderBg(sl);
+    if (onChange) onChange();
+  });
+  updateSliderBg(sl);
+}
+
+/* ══════════════════════════════════════════
+   トースト通知
+══════════════════════════════════════════ */
+
+/**
+ * .ds-toast 要素にメッセージを表示する
+ * @param {string}          msg          表示テキスト
+ * @param {number}          [duration=2600] 表示時間（ミリ秒）
+ * @param {HTMLElement|null} [el]        対象要素（省略時は #ds-toast）
+ */
+let _toastTimer = null;
+function showToast(msg, duration = 2600, el = null) {
+  const t = el || document.getElementById('ds-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+}
+
+/* ══════════════════════════════════════════
+   チップスクロール
+══════════════════════════════════════════ */
+
+/**
+ * .ds-chip-scroll 要素の右端フェードマスクを更新する
+ * スクロール可能かつ末端に達していない場合のみマスクを表示
+ * @param {HTMLElement} el  .ds-chip-scroll 要素
+ */
+const _CHIPS_FADE = 'linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%)';
+
+function updateChipsMask(el) {
+  const overflows = el.scrollWidth > el.clientWidth + 2;
+  const atEnd     = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+  const mask = (overflows && !atEnd) ? _CHIPS_FADE : '';
+  el.style.webkitMaskImage = mask;
+  el.style.maskImage       = mask;
+}
+
+/**
+ * 指定セレクタにマッチする .ds-chip-scroll 要素にスクロールフェードを初期化する
+ * @param {string} [selector='.ds-chip-scroll']  対象セレクタ
+ */
+function initChipScroll(selector = '.ds-chip-scroll') {
+  document.querySelectorAll(selector).forEach(el => {
+    el.addEventListener('scroll', () => updateChipsMask(el), { passive: true });
+    updateChipsMask(el);
+  });
+}
+
+/* ══════════════════════════════════════════
+   コンフェッティ
+══════════════════════════════════════════ */
+
+/**
+ * コンフェッティエフェクトを発火する
+ * #ds-confetti コンテナが DOM に存在していること
+ * @param {number} [count=60]  パーティクル数
+ */
+function fireConfetti(count = 60) {
+  const wrap = document.getElementById('ds-confetti');
+  if (!wrap) return;
+  const colors = ['#a8d5ba', '#4a8c6f', '#d4ede3', '#e8f5f1', '#7fc49e', '#2d7a5a'];
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('div');
+    c.className = 'ds-confetti-piece';
+    c.style.cssText = [
+      `left:${10 + Math.random() * 80}%`,
+      'top:-10px',
+      `width:${6 + Math.random() * 8}px`,
+      `height:${6 + Math.random() * 8}px`,
+      `background:${colors[Math.floor(Math.random() * colors.length)]}`,
+      `border-radius:${Math.random() > 0.5 ? '50%' : '2px'}`,
+      `animation-duration:${1.2 + Math.random() * 1.3}s`,
+      `animation-delay:${Math.random() * 0.5}s`,
+    ].join(';');
+    wrap.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
+  }
+}
+
+/* ══════════════════════════════════════════
+   サイト共通ヘッダー
+   ページ読み込み時に body 先頭に prepend
+══════════════════════════════════════════ */
+
+function initSiteHeader() {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'initSiteHeader called',data:{readyState:document.readyState,hasBody:!!document.body,pathname:location.pathname},hypothesisId:'h2',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  const depth = location.pathname.split('/').filter(Boolean).length - 1;
+  const prefix = depth > 0 ? '../'.repeat(depth) : './';
+  const href = prefix + 'index.html';
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'depth calc',data:{depth,prefix,href},hypothesisId:'h3',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+
+  const header = document.createElement('header');
+  header.id = 'site-header';
+  header.innerHTML = '<a href="' + href + '" class="site-header-logo">Money Tools</a>';
+  document.body.insertBefore(header, document.body.firstChild);
+  document.body.classList.add('has-site-header');
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:initSiteHeader',message:'header inserted',data:{headerInDOM:!!document.getElementById('site-header')},hypothesisId:'h4',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+}
+
+// #region agent log
+fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:top',message:'base.js loaded',data:{readyState:document.readyState},hypothesisId:'h1',timestamp:Date.now()})}).catch(()=>{});
+// #endregion
+if (document.readyState === 'loading') {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:branch',message:'defer to DOMContentLoaded',data:{},hypothesisId:'h5',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  document.addEventListener('DOMContentLoaded', initSiteHeader);
+} else {
+  // #region agent log
+  fetch('http://127.0.0.1:7416/ingest/586379a4-4958-4acd-a5bf-22eefd1c3b2e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a709be'},body:JSON.stringify({sessionId:'a709be',location:'base.js:branch',message:'run initSiteHeader immediately',data:{},hypothesisId:'h5',timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  initSiteHeader();
+}
+
+</script>
+<script>
+
+(function(){
+  'use strict';
+
+  // -----------------------------
+  // State
+  // -----------------------------
+  const STORAGE_KEY = 'weekday-counter-state-v1';
+  const state = {
+    year: new Date().getFullYear(),
+    holidayMode: 'holiday', // holiday|workday
+    holidayTab: 'single',   // single|range
+    extraHolidays: [],
+    extraWorkdays: [],
+    selectedMonth: new Date().getMonth(),
+    selectedDate: null, // ISO string
+    computed: null
+  };
+
+  // -----------------------------
+  // holiday fallback (from attached)
+  // -----------------------------
+  const fallbackHolidayMap = {
+    2024: {
+      "2024-01-01": "元日",
+      "2024-01-08": "成人の日",
+      "2024-02-11": "建国記念の日",
+      "2024-02-12": "振替休日",
+      "2024-02-23": "天皇誕生日",
+      "2024-03-20": "春分の日",
+      "2024-04-29": "昭和の日",
+      "2024-05-03": "憲法記念日",
+      "2024-05-04": "みどりの日",
+      "2024-05-05": "こどもの日",
+      "2024-05-06": "振替休日",
+      "2024-07-15": "海の日",
+      "2024-08-11": "山の日",
+      "2024-08-12": "振替休日",
+      "2024-09-16": "敬老の日",
+      "2024-09-22": "秋分の日",
+      "2024-09-23": "振替休日",
+      "2024-10-14": "スポーツの日",
+      "2024-11-03": "文化の日",
+      "2024-11-04": "振替休日",
+      "2024-11-23": "勤労感謝の日"
+    },
+    2025: {
+      "2025-01-01": "元日",
+      "2025-01-13": "成人の日",
+      "2025-02-11": "建国記念の日",
+      "2025-02-23": "天皇誕生日",
+      "2025-02-24": "振替休日",
+      "2025-03-20": "春分の日",
+      "2025-04-29": "昭和の日",
+      "2025-05-03": "憲法記念日",
+      "2025-05-04": "みどりの日",
+      "2025-05-05": "こどもの日",
+      "2025-05-06": "振替休日",
+      "2025-07-21": "海の日",
+      "2025-08-11": "山の日",
+      "2025-09-15": "敬老の日",
+      "2025-09-23": "秋分の日",
+      "2025-10-13": "スポーツの日",
+      "2025-11-03": "文化の日",
+      "2025-11-23": "勤労感謝の日",
+      "2025-11-24": "振替休日"
+    },
+    2026: {
+      "2026-01-01": "元日",
+      "2026-01-12": "成人の日",
+      "2026-02-11": "建国記念の日",
+      "2026-02-23": "天皇誕生日",
+      "2026-03-20": "春分の日",
+      "2026-04-29": "昭和の日",
+      "2026-05-03": "憲法記念日",
+      "2026-05-04": "みどりの日",
+      "2026-05-05": "こどもの日",
+      "2026-05-06": "振替休日",
+      "2026-07-20": "海の日",
+      "2026-08-11": "山の日",
+      "2026-09-21": "敬老の日",
+      "2026-09-22": "国民の休日",
+      "2026-09-23": "秋分の日",
+      "2026-10-12": "スポーツの日",
+      "2026-11-03": "文化の日",
+      "2026-11-23": "勤労感謝の日"
+    },
+    2027: {
+      "2027-01-01": "元日",
+      "2027-01-11": "成人の日",
+      "2027-02-11": "建国記念の日",
+      "2027-02-23": "天皇誕生日",
+      "2027-03-21": "春分の日",
+      "2027-03-22": "振替休日",
+      "2027-04-29": "昭和の日",
+      "2027-05-03": "憲法記念日",
+      "2027-05-04": "みどりの日",
+      "2027-05-05": "こどもの日",
+      "2027-07-19": "海の日",
+      "2027-08-11": "山の日",
+      "2027-09-20": "敬老の日",
+      "2027-09-23": "秋分の日",
+      "2027-10-11": "スポーツの日",
+      "2027-11-03": "文化の日",
+      "2027-11-23": "勤労感謝の日"
+    },
+    2028: {
+      "2028-01-01": "元日",
+      "2028-01-10": "成人の日",
+      "2028-02-11": "建国記念の日",
+      "2028-02-23": "天皇誕生日",
+      "2028-03-20": "春分の日",
+      "2028-04-29": "昭和の日",
+      "2028-05-03": "憲法記念日",
+      "2028-05-04": "みどりの日",
+      "2028-05-05": "こどもの日",
+      "2028-07-17": "海の日",
+      "2028-08-11": "山の日",
+      "2028-09-18": "敬老の日",
+      "2028-09-22": "秋分の日",
+      "2028-10-09": "スポーツの日",
+      "2028-11-03": "文化の日",
+      "2028-11-23": "勤労感謝の日"
+    },
+    2029: {
+      "2029-01-01": "元日",
+      "2029-01-08": "成人の日",
+      "2029-02-11": "建国記念の日",
+      "2029-02-12": "振替休日",
+      "2029-02-23": "天皇誕生日",
+      "2029-03-20": "春分の日",
+      "2029-04-29": "昭和の日",
+      "2029-04-30": "振替休日",
+      "2029-05-03": "憲法記念日",
+      "2029-05-04": "みどりの日",
+      "2029-05-05": "こどもの日",
+      "2029-07-16": "海の日",
+      "2029-08-11": "山の日",
+      "2029-09-17": "敬老の日",
+      "2029-09-23": "秋分の日",
+      "2029-09-24": "振替休日",
+      "2029-10-08": "スポーツの日",
+      "2029-11-03": "文化の日",
+      "2029-11-23": "勤労感謝の日"
+    },
+    2030: {
+      "2030-01-01": "元日",
+      "2030-01-14": "成人の日",
+      "2030-02-11": "建国記念の日",
+      "2030-02-23": "天皇誕生日",
+      "2030-03-20": "春分の日",
+      "2030-04-29": "昭和の日",
+      "2030-05-03": "憲法記念日",
+      "2030-05-04": "みどりの日",
+      "2030-05-05": "こどもの日",
+      "2030-05-06": "振替休日",
+      "2030-07-15": "海の日",
+      "2030-08-11": "山の日",
+      "2030-08-12": "振替休日",
+      "2030-09-16": "敬老の日",
+      "2030-09-23": "秋分の日",
+      "2030-10-14": "スポーツの日",
+      "2030-11-03": "文化の日",
+      "2030-11-04": "振替休日",
+      "2030-11-23": "勤労感謝の日"
+    }
+  };
+
+  // -----------------------------
+  // Elements
+  // -----------------------------
+  const el = {
+    yearSelect: document.getElementById('yearSelect'),
+    holidayModeSegmented: document.getElementById('holidayModeSegmented'),
+    holidayTabs: document.getElementById('holidayTabs'),
+    holidaySingleFields: document.getElementById('holidaySingleFields'),
+    holidayRangeFields: document.getElementById('holidayRangeFields'),
+    holidaySingleDate: document.getElementById('holidaySingleDate'),
+    holidayRangeStart: document.getElementById('holidayRangeStart'),
+    holidayRangeEnd: document.getElementById('holidayRangeEnd'),
+    holidayLabel: document.getElementById('holidayLabel'),
+    addHolidayBtn: document.getElementById('addHolidayBtn'),
+    extraHolidayList: document.getElementById('extraHolidayList'),
+
+    workdayDate: document.getElementById('workdayDate'),
+    workdayLabel: document.getElementById('workdayLabel'),
+    addWorkdayBtn: document.getElementById('addWorkdayBtn'),
+    extraWorkdayList: document.getElementById('extraWorkdayList'),
+
+    summaryTable: document.getElementById('summaryTable'),
+    calendarTitle: document.getElementById('calendarTitle'),
+    calendarGrid: document.getElementById('calendarGrid'),
+    detailDate: document.getElementById('detailDate'),
+    detailStatus: document.getElementById('detailStatus'),
+    detailList: document.getElementById('detailList'),
+    monthOverview: document.getElementById('monthOverview'),
+
+    prevMonthBtn: document.getElementById('prevMonthBtn'),
+    nextMonthBtn: document.getElementById('nextMonthBtn'),
+    recalculateBtn: document.getElementById('recalculateBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+
+    statYearWorking: document.getElementById('statYearWorking'),
+    statYear: document.getElementById('statYear'),
+    statExtraHolidayCount: document.getElementById('statExtraHolidayCount'),
+    statExtraWorkdayCount: document.getElementById('statExtraWorkdayCount'),
+
+    toast: document.getElementById('wc-toast'),
+  };
+
+  // -----------------------------
+  // utils
+  // -----------------------------
+  function formatDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function parseDate(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function displayDateJP(iso) {
+    const date = parseDate(iso);
+    const weekdays = ['日','月','火','水','木','金','土'];
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日(${weekdays[date.getDay()]})`;
+  }
+
+  function expandDateRange(startISO, endISO) {
+    const result = [];
+    const start = parseDate(startISO);
+    const end = parseDate(endISO);
+    let cur = new Date(start);
+    while (cur <= end) {
+      result.push(formatDate(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return result;
+  }
+
+  function showToast(message) {
+    if (!el.toast) return;
+    el.toast.textContent = message;
+    el.toast.classList.add('show');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => el.toast.classList.remove('show'), 2200);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      year: state.year,
+      holidayMode: state.holidayMode,
+      holidayTab: state.holidayTab,
+      extraHolidays: state.extraHolidays,
+      extraWorkdays: state.extraWorkdays,
+      selectedMonth: state.selectedMonth,
+      selectedDate: state.selectedDate,
+    }));
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      Object.assign(state, parsed);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  function setDefaultSampleData(year) {
+    state.year = year;
+    state.holidayMode = 'holiday';
+    state.holidayTab = 'single';
+    state.extraHolidays = [
+      {
+        id: crypto.randomUUID(),
+        type: 'range',
+        startDate: `${year}-08-13`,
+        endDate: `${year}-08-15`,
+        label: 'お盆休み'
+      },
+      {
+        id: crypto.randomUUID(),
+        type: 'range',
+        startDate: `${year}-12-29`,
+        endDate: `${year}-12-31`,
+        label: '年末休業'
+      }
+    ];
+    state.extraWorkdays = [
+      {
+        id: crypto.randomUUID(),
+        date: `${year}-01-10`,
+        label: '土曜出勤サンプル'
+      }
+    ];
+    state.selectedMonth = (new Date().getFullYear() === year) ? new Date().getMonth() : 0;
+    state.selectedDate = null;
+  }
+
+  // -----------------------------
+  // holiday module (TODO 2/3)
+  // -----------------------------
+  async function fetchHolidayMap(year) {
+    // MVP: date-holidays を CDN で読み込み → 失敗時はフォールバック
+    try {
+      // date-holidaysを動的に読み込む
+      if (!window.Holidays) {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/date-holidays@2.0.1/dist/umd/index.min.js';
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      const HolidaysCtor = window.Holidays?.default || window.Holidays;
+      const hd = new HolidaysCtor('JP');
+      const list = hd.getHolidays(year);
+      const map = {};
+      (list || []).forEach(h => {
+        const iso = typeof h.date === 'string' ? h.date.slice(0, 10) : null;
+        if (!iso) return;
+        if (!map[iso]) map[iso] = h.name || '祝日';
+      });
+      return map;
+    } catch (e) {
+      return fallbackHolidayMap[year] || {};
+    }
+  }
+
+  // -----------------------------
+  // compute-logic (TODO 3/3)
+  // -----------------------------
+  function computeYearData(holidayMap) {
+    const extraHolidayMap = new Map();
+    const extraWorkdayMap = new Map();
+
+    // extra holidays
+    state.extraHolidays.forEach(item => {
+      const dates = item.type === 'single'
+        ? [item.startDate]
+        : expandDateRange(item.startDate, item.endDate);
+      dates.forEach(date => {
+        if (!extraHolidayMap.has(date)) extraHolidayMap.set(date, []);
+        extraHolidayMap.get(date).push(item);
+      });
+    });
+
+    // extra workdays
+    state.extraWorkdays.forEach(item => {
+      if (!extraWorkdayMap.has(item.date)) extraWorkdayMap.set(item.date, []);
+      extraWorkdayMap.get(item.date).push(item);
+    });
+
+    const days = [];
+    const monthly = Array.from({ length: 12 }, (_, monthIndex) => ({
+      monthIndex,
+      monthLabel: `${monthIndex + 1}月`,
+      workingDays: 0,
+      totalDays: 0,
+      weekendDays: 0,
+      holidayOffDays: 0,
+      extraHolidayDays: 0,
+      extraWorkdayDays: 0,
+    }));
+
+    const current = new Date(state.year, 0, 1);
+    const end = new Date(state.year, 11, 31);
+
+    while (current <= end) {
+      const iso = formatDate(current);
+      const monthIndex = current.getMonth();
+      const dayOfWeek = current.getDay();
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const holidayName = holidayMap[iso] || null;
+      const isHoliday = Boolean(holidayName);
+      const extraHolidaysForDay = extraHolidayMap.get(iso) || [];
+      const extraWorkdaysForDay = extraWorkdayMap.get(iso) || [];
+      const hasExtraHoliday = extraHolidaysForDay.length > 0;
+      const hasExtraWorkday = extraWorkdaysForDay.length > 0;
+
+      // priorities
+      let isWorkingDay = true;
+      let reason = '通常出勤日';
+      let statusType = 'workday'; // workday|weekend|holiday-off|extra-holiday|extra-workday|holiday-workday|outside
+
+      if (hasExtraWorkday) {
+        isWorkingDay = true;
+        reason = '追加出勤日';
+        statusType = 'extra-workday';
+      } else if (hasExtraHoliday) {
+        isWorkingDay = false;
+        reason = '追加休日';
+        statusType = 'extra-holiday';
+      } else if (isWeekend) {
+        isWorkingDay = false;
+        reason = '土日';
+        statusType = 'weekend';
+      } else if (isHoliday && state.holidayMode === 'holiday') {
+        isWorkingDay = false;
+        reason = '祝日休み';
+        statusType = 'holiday-off';
+      } else if (isHoliday && state.holidayMode === 'workday') {
+        isWorkingDay = true;
+        reason = '祝日出勤設定';
+        statusType = 'holiday-workday';
+      }
+
+      const item = {
+        iso,
+        year: current.getFullYear(),
+        monthIndex,
+        day: current.getDate(),
+        dayOfWeek,
+        isWeekend,
+        isHoliday,
+        holidayName,
+        hasExtraHoliday,
+        hasExtraWorkday,
+        extraHolidays: extraHolidaysForDay,
+        extraWorkdays: extraWorkdaysForDay,
+        isWorkingDay,
+        reason,
+        statusType,
+        isToday: iso === formatDate(new Date()),
+      };
+
+      monthly[monthIndex].totalDays += 1;
+      if (item.isWorkingDay) monthly[monthIndex].workingDays += 1;
+      if (isWeekend) monthly[monthIndex].weekendDays += 1;
+      if (statusType === 'holiday-off') monthly[monthIndex].holidayOffDays += 1;
+      if (statusType === 'extra-holiday') monthly[monthIndex].extraHolidayDays += 1;
+      if (statusType === 'extra-workday') monthly[monthIndex].extraWorkdayDays += 1;
+
+      days.push(item);
+      current.setDate(current.getDate() + 1);
+    }
+
+    return { days, monthly };
+  }
+
+  // -----------------------------
+  // render
+  // -----------------------------
+  function renderModeButtons() {
+    [...el.holidayModeSegmented.querySelectorAll('button')].forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === state.holidayMode);
+    });
+    el.holidaySingleFields.hidden = state.holidayTab !== 'single';
+    el.holidayRangeFields.hidden = state.holidayTab !== 'range';
+  }
+
+  function populateYearOptions() {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let y = currentYear - 2; y <= currentYear + 5; y++) years.push(y);
+    el.yearSelect.innerHTML = years.map(y => `<option value="${y}">${y}年</option>`).join('');
+    if (!years.includes(state.year)) state.year = currentYear;
+    el.yearSelect.value = String(state.year);
+  }
+
+  function renderLists() {
+    if (!state.extraHolidays.length) {
+      el.extraHolidayList.innerHTML = `<div class="wc-list-item" style="justify-content:center;align-items:center;"><div class="wc-list-sub">追加休日はまだありません。</div></div>`;
+    } else {
+      el.extraHolidayList.innerHTML = state.extraHolidays.map(item => {
+        const rangeText = item.type === 'single'
+          ? displayDateJP(item.startDate)
+          : `${displayDateJP(item.startDate)} 〜 ${displayDateJP(item.endDate)}`;
+        return `
+          <div class="wc-list-item">
+            <div>
+              <div class="wc-list-title">${escapeHtml(item.label || '追加休日')}</div>
+              <div class="wc-list-sub">${rangeText}</div>
+            </div>
+            <button class="wc-mini-btn" type="button" data-remove-holiday="${item.id}">削除</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    if (!state.extraWorkdays.length) {
+      el.extraWorkdayList.innerHTML = `<div class="wc-list-item" style="justify-content:center;align-items:center;"><div class="wc-list-sub">追加出勤日はまだありません。</div></div>`;
+    } else {
+      el.extraWorkdayList.innerHTML = state.extraWorkdays.map(item => `
+        <div class="wc-list-item">
+          <div>
+            <div class="wc-list-title">${escapeHtml(item.label || '追加出勤日')}</div>
+            <div class="wc-list-sub">${displayDateJP(item.date)}</div>
+          </div>
+          <button class="wc-mini-btn" type="button" data-remove-workday="${item.id}">削除</button>
+        </div>
+      `).join('');
+    }
+
+    el.statExtraHolidayCount.textContent = String(state.extraHolidays.length);
+    el.statExtraWorkdayCount.textContent = String(state.extraWorkdays.length);
+  }
+
+  function renderSummary() {
+    const monthly = state.computed.monthly;
+    const totalWorking = monthly.reduce((sum, item) => sum + item.workingDays, 0);
+    el.statYearWorking.textContent = `${totalWorking}日`;
+    el.statYear.textContent = `${state.year}`;
+
+    // list buttons
+    el.summaryTable.innerHTML = `
+      <div style="display:grid;gap:10px;">
+        <div style="display:flex;justify-content:space-between;gap:10px;color:var(--sub-text);font-weight:800;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;">
+          <span>月</span><span>稼働日数</span>
+        </div>
+        ${monthly.map(item => `
+          <button type="button" class="wc-list-item" data-month-index="${item.monthIndex}" style="cursor:pointer;${item.monthIndex === state.selectedMonth ? 'border-color: var(--accent-deep); background: rgba(124,156,255,0.14);' : ''}">
+            <div>
+              <div class="wc-list-title" style="margin-bottom:0;">${item.monthLabel}</div>
+              <div class="wc-list-sub"> </div>
+            </div>
+            <div class="wc-list-title" style="font-size:18px; margin-top: 2px;">${item.workingDays}日</div>
+          </button>
+        `).join('')}
+        <div class="wc-list-item" style="background: rgba(168,213,186,0.10);">
+          <div>
+            <div class="wc-list-title" style="margin-bottom:0;">年間合計</div>
+            <div class="wc-list-sub"> </div>
+          </div>
+          <div class="wc-list-title" style="font-size:18px;">${totalWorking}日</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function getMonthDays(monthIndex) {
+    return state.computed.days.filter(day => day.monthIndex === monthIndex);
+  }
+
+  function renderCalendar() {
+    const year = state.year;
+    const month = state.selectedMonth;
+    el.calendarTitle.textContent = `${year}年 ${month + 1}月`;
+
+    const first = new Date(year, month, 1);
+    const firstDay = first.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevMonthLastDate = new Date(year, month, 0).getDate();
+    const monthMap = new Map(getMonthDays(month).map(day => [day.iso, day]));
+
+    const cells = [];
+    for (let i = 0; i < 42; i++) {
+      let date;
+      let outside = false;
+      if (i < firstDay) {
+        date = new Date(year, month - 1, prevMonthLastDate - firstDay + i + 1);
+        outside = true;
+      } else if (i >= firstDay + daysInMonth) {
+        date = new Date(year, month + 1, i - (firstDay + daysInMonth) + 1);
+        outside = true;
+      } else {
+        date = new Date(year, month, i - firstDay + 1);
+      }
+
+      const iso = formatDate(date);
+      let dayData = monthMap.get(iso);
+      if (!dayData) {
+        // month外のセルや計算対象外日のデータ
+        const holidayMap = state.computed.holidayMap;
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        const isHoliday = Boolean(holidayMap[iso]);
+        const holidayName = holidayMap[iso] || null;
+        dayData = {
+          iso,
+          day: date.getDate(),
+          dayOfWeek: date.getDay(),
+          isWeekend,
+          isHoliday,
+          holidayName,
+          hasExtraHoliday: false,
+          hasExtraWorkday: false,
+          extraHolidays: [],
+          extraWorkdays: [],
+          isWorkingDay: true,
+          reason: '月外日',
+          statusType: 'outside',
+          isToday: iso === formatDate(new Date()),
+        };
+      }
+
+      const classes = ['wc-day-cell'];
+      if (outside) classes.push('is-outside');
+      if (dayData.iso === state.selectedDate) classes.push('is-selected');
+      if (dayData.isToday) classes.push('is-today');
+
+      if (!outside) {
+        if (dayData.statusType === 'weekend') classes.push('weekend');
+        if (dayData.statusType === 'holiday-off') classes.push('holiday-off');
+        if (dayData.statusType === 'extra-holiday') classes.push('extra-holiday');
+        if (dayData.statusType === 'extra-workday') classes.push('extra-workday');
+        // holiday-workday shows normal but badge [祝]
+      }
+
+      const badges = [];
+      if (!outside && dayData.isHoliday) badges.push(`<span class="wc-badge">祝</span>`);
+      if (!outside && dayData.hasExtraHoliday) badges.push(`<span class="wc-badge">休</span>`);
+      if (!outside && dayData.hasExtraWorkday) badges.push(`<span class="wc-badge">勤</span>`);
+
+      let statusText = outside ? '' : (dayData.isWorkingDay ? '出勤' : '休日');
+      if (!outside && dayData.statusType === 'holiday-workday') statusText = '出勤';
+
+      const memoLabel = (!outside && (dayData.extraHolidays?.[0]?.label || dayData.extraWorkdays?.[0]?.label)) ? (dayData.extraHolidays?.[0]?.label || dayData.extraWorkdays?.[0]?.label) : null;
+      const memoDot = (memoLabel && !outside) ? `<span class="wc-memo-dot" title="メモあり"></span>` : `<span style="width:9px;height:9px;display:inline-block;"></span>`;
+
+      const disabled = outside ? 'disabled' : '';
+      cells.push(`
+        <button type="button" class="${classes.join(' ')}" data-date="${iso}" ${disabled}>
+          <div class="wc-day-top">
+            <div class="wc-day-num">${date.getDate()}</div>
+            <div class="wc-badges">${badges.join('')}</div>
+          </div>
+          <div class="wc-day-bottom">
+            <span class="wc-status-text">${statusText}</span>
+            ${memoDot}
+          </div>
+        </button>
+      `);
+    }
+
+    el.calendarGrid.innerHTML = cells.join('');
+  }
+
+  function renderDetails() {
+    const item = state.computed.days.find(day => day.iso === state.selectedDate);
+    const month = state.computed.monthly[state.selectedMonth];
+
+    if (!item) {
+      el.detailDate.textContent = '日付を選択してください';
+      el.detailStatus.textContent = '-';
+      el.detailList.innerHTML = '';
+      return;
+    }
+
+    el.detailDate.textContent = displayDateJP(item.iso);
+    el.detailStatus.textContent = item.isWorkingDay ? '出勤日' : '休日';
+    el.detailStatus.style.background = item.isWorkingDay ? 'rgba(115,224,193,0.14)' : 'rgba(255,143,143,0.14)';
+
+    const lines = [
+      `<div><strong>最終判定：</strong>${escapeHtml(item.reason)}</div>`,
+      `<div><strong>曜日：</strong>${['日','月','火','水','木','金','土'][item.dayOfWeek]}曜日</div>`,
+      `<div><strong>祝日：</strong>${item.isHoliday ? `${escapeHtml(item.holidayName || '')}${state.holidayMode === 'workday' && !item.hasExtraHoliday && !item.hasExtraWorkday && !item.isWeekend ? '（出勤設定）' : ''}` : '該当なし'}</div>`,
+      `<div><strong>追加休日：</strong>${item.extraHolidays.length ? item.extraHolidays.map(h => escapeHtml(h.label || '追加休日')).join(' / ') : 'なし'}</div>`,
+      `<div><strong>追加出勤日：</strong>${item.extraWorkdays.length ? item.extraWorkdays.map(w => escapeHtml(w.label || '追加出勤日')).join(' / ') : 'なし'}</div>`,
+    ];
+    el.detailList.innerHTML = lines.join('');
+
+    const monthDays = getMonthDays(state.selectedMonth);
+    const holidayOff = monthDays.filter(d => d.statusType === 'holiday-off').length;
+    const extraHoliday = monthDays.filter(d => d.statusType === 'extra-holiday').length;
+    const extraWork = monthDays.filter(d => d.statusType === 'extra-workday').length;
+    const weekends = monthDays.filter(d => d.statusType === 'weekend').length;
+
+    el.monthOverview.innerHTML = `
+      <div><strong>${state.selectedMonth + 1}月の稼働日数：</strong>${month.workingDays}日</div>
+      <div><strong>土日休み：</strong>${weekends}日</div>
+      <div><strong>祝日休み：</strong>${holidayOff}日</div>
+      <div><strong>追加休日：</strong>${extraHoliday}日</div>
+      <div><strong>追加出勤日：</strong>${extraWork}日</div>
+      <div><strong>祝日設定：</strong>${state.holidayMode === 'holiday' ? '祝日は休日' : '祝日は出勤'}</div>
+    `;
+  }
+
+  function renderAll() {
+    // async for holiday fetching
+  }
+
+  // -----------------------------
+  // actions
+  // -----------------------------
+  function attachEvents() {
+    el.yearSelect.addEventListener('change', e => {
+      state.year = Number(e.target.value);
+      state.selectedMonth = 0;
+      state.selectedDate = null;
+      renderAll();
+    });
+
+    el.holidayModeSegmented.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-mode]');
+      if (!btn) return;
+      state.holidayMode = btn.dataset.mode;
+      renderAll();
+    });
+
+    el.holidayTabs.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-tab]');
+      if (!btn) return;
+      state.holidayTab = btn.dataset.tab;
+      renderModeButtons();
+      saveState();
+    });
+
+    el.addHolidayBtn.addEventListener('click', () => {
+      const label = (el.holidayLabel.value || '').trim();
+      if (state.holidayTab === 'single') {
+        const date = el.holidaySingleDate.value;
+        if (!date) return showToast('追加休日の日付を選んでください。');
+        if (!date.startsWith(String(state.year))) return showToast('対象年と同じ年の日付を選んでください。');
+        state.extraHolidays.unshift({ id: crypto.randomUUID(), type: 'single', startDate: date, endDate: date, label });
+      } else {
+        const start = el.holidayRangeStart.value;
+        const end = el.holidayRangeEnd.value;
+        if (!start || !end) return showToast('開始日と終了日を入力してください。');
+        if (start > end) return showToast('終了日は開始日以降にしてください。');
+        if (!start.startsWith(String(state.year)) || !end.startsWith(String(state.year))) return showToast('対象年と同じ年の期間を指定してください。');
+        state.extraHolidays.unshift({ id: crypto.randomUUID(), type: 'range', startDate: start, endDate: end, label });
+      }
+
+      el.holidayLabel.value = '';
+      el.holidaySingleDate.value = '';
+      el.holidayRangeStart.value = '';
+      el.holidayRangeEnd.value = '';
+      renderAll();
+      showToast('追加休日を登録しました。');
+    });
+
+    el.addWorkdayBtn.addEventListener('click', () => {
+      const date = el.workdayDate.value;
+      const label = (el.workdayLabel.value || '').trim();
+      if (!date) return showToast('追加出勤日の日付を選んでください。');
+      if (!date.startsWith(String(state.year))) return showToast('対象年と同じ年の日付を選んでください。');
+      state.extraWorkdays.unshift({ id: crypto.randomUUID(), date, label });
+      el.workdayDate.value = '';
+      el.workdayLabel.value = '';
+      renderAll();
+      showToast('追加出勤日を登録しました。');
+    });
+
+    el.recalculateBtn.addEventListener('click', () => {
+      renderAll();
+      showToast('再計算しました。');
+    });
+
+    el.resetBtn.addEventListener('click', () => {
+      setDefaultSampleData(state.year);
+      renderAll();
+      showToast('初期化しました。');
+    });
+
+    el.extraHolidayList.addEventListener('click', e => {
+      const btn = e.target.closest('[data-remove-holiday]');
+      if (!btn) return;
+      const id = btn.dataset.removeHoliday;
+      state.extraHolidays = state.extraHolidays.filter(item => item.id !== id);
+      renderAll();
+    });
+
+    el.extraWorkdayList.addEventListener('click', e => {
+      const btn = e.target.closest('[data-remove-workday]');
+      if (!btn) return;
+      const id = btn.dataset.removeWorkday;
+      state.extraWorkdays = state.extraWorkdays.filter(item => item.id !== id);
+      renderAll();
+    });
+
+    el.summaryTable.addEventListener('click', e => {
+      const row = e.target.closest('[data-month-index]');
+      if (!row) return;
+      state.selectedMonth = Number(row.dataset.monthIndex);
+      const monthDays = getMonthDays(state.selectedMonth);
+      state.selectedDate = monthDays[0]?.iso || null;
+      renderAll();
+    });
+
+    el.calendarGrid.addEventListener('click', e => {
+      const cell = e.target.closest('[data-date]');
+      if (!cell) return;
+      if (cell.disabled) return;
+      const iso = cell.dataset.date;
+      const date = parseDate(iso);
+      if (date.getFullYear() !== state.year) return;
+      if (date.getMonth() !== state.selectedMonth) state.selectedMonth = date.getMonth();
+      state.selectedDate = iso;
+      renderAll(false);
+    });
+
+    el.prevMonthBtn.addEventListener('click', () => {
+      state.selectedMonth = (state.selectedMonth + 11) % 12;
+      const monthDays = getMonthDays(state.selectedMonth);
+      state.selectedDate = monthDays[0]?.iso || null;
+      renderAll(false);
+    });
+
+    el.nextMonthBtn.addEventListener('click', () => {
+      state.selectedMonth = (state.selectedMonth + 1) % 12;
+      const monthDays = getMonthDays(state.selectedMonth);
+      state.selectedDate = monthDays[0]?.iso || null;
+      renderAll(false);
+    });
+  }
+
+  // renderAll: compute if needed; allow lightweight rerender
+  async function renderAll(recompute = true) {
+    if (!recompute && state.computed) {
+      renderModeButtons();
+      renderLists();
+      renderSummary();
+      renderCalendar();
+      renderDetails();
+      saveState();
+      return;
+    }
+
+    renderModeButtons();
+    renderLists();
+
+    const holidayMap = await fetchHolidayMap(state.year);
+    const computed = computeYearData(holidayMap);
+    state.computed = { ...computed, holidayMap };
+
+    if (!state.selectedDate) {
+      const firstWorking = state.computed.days.find(d => d.monthIndex === state.selectedMonth);
+      state.selectedDate = firstWorking ? firstWorking.iso : state.computed.days[0]?.iso || null;
+    }
+
+    renderSummary();
+    renderCalendar();
+    renderDetails();
+    saveState();
+  }
+
+  function init() {
+    loadState();
+    populateYearOptions();
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      setDefaultSampleData(state.year);
+    }
+    renderModeButtons();
+    attachEvents();
+    renderAll();
+  }
+
+  init();
+})();
+
+</script>
+</body>
+</html>

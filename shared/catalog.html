@@ -200,6 +200,7 @@ body {
   <a class="cat-nav-link" href="#donut-summary">ds-donut-summary</a>
   <a class="cat-nav-link" href="#breakdown-accordion">ds-breakdown-accordion</a>
   <a class="cat-nav-link" href="#resident-savings">ds-resident-savings</a>
+  <a class="cat-nav-link" href="#explain-panel">ds-explain-panel</a>
   <a class="cat-nav-link" href="#asset-line-chart">ds-asset-line-chart</a>
   <a class="cat-nav-link" href="#stacked-bar-chart">ds-stacked-bar-chart</a>
   <a class="cat-nav-link" href="#calc-basis">ds-calc-basis</a>
@@ -776,13 +777,37 @@ body {
     </div>
   </section>
 
+  <!-- ds-explain-panel -->
+  <section class="cat-section" id="explain-panel">
+    <div class="cat-section-header">
+      <h2 class="cat-section-title">ds-explain-panel</h2>
+      <span class="cat-section-tag">.ds-explain-panel</span>
+    </div>
+    <p class="cat-desc">用語・考え方の短い説明（ds-resident-savings と同系の枠・Mint）。インフレ実質の説明などに使用。</p>
+    <div class="ds-explain-panel" style="max-width:440px;">
+      <div class="ds-explain-head">
+        <span class="ds-explain-head-icon">💡</span>
+        <span class="ds-explain-head-title">実質残高（今日の価値）とは</span>
+        <span class="ds-explain-badge">参考</span>
+      </div>
+      <div class="ds-explain-body">
+        <p><strong>名目残高</strong>は、将来その時点で口座にある金額です。</p>
+        <p><strong>実質残高</strong>は、それを今の物価感覚に直した金額です。</p>
+        <p>たとえば65歳で4,000万円あっても、物価が上がれば、今の感覚では約3,000万円の価値になることがあります。</p>
+      </div>
+      <div class="ds-explain-note">
+        ※ 物価指数は年1回だけ更新する単純モデルです。実際の物価や制度とは異なる場合があります。
+      </div>
+    </div>
+  </section>
+
   <!-- ds-asset-line-chart -->
   <section class="cat-section" id="asset-line-chart">
     <div class="cat-section-header">
       <h2 class="cat-section-title">ds-asset-line-chart</h2>
       <span class="cat-section-tag">.canvasWrap / chart-asset-line.js</span>
     </div>
-    <p class="cat-desc">名目残高・実質残高・取り崩し額の3本線グラフ。ホバーでツールチップ表示。資産取り崩しシミュレーター等で使用。左から右へ描画するアニメーション付き。</p>
+    <p class="cat-desc">名目残高・実質残高・取り崩し額の折れ線グラフ。データに <code>principal</code> を入れ <code>showPrincipalLine: true</code> で元本線（既定色 <code>--accent-deep</code>）を追加可能。ホバーでツールチップ。左から右へアニメーション付き。</p>
     <div class="preview col" style="max-width:640px;">
       <div class="canvasWrap" style="padding:12px 0;">
         <canvas id="cat-chart-demo" width="600" height="280" aria-label="資産推移デモ" style="width:100%;height:280px;background:var(--mint-pale);border:1px solid var(--sys-border);border-radius:14px;display:block;"></canvas>
@@ -801,7 +826,7 @@ body {
       <h2 class="cat-section-title">ds-stacked-bar-chart</h2>
       <span class="cat-section-tag">chart-stacked-bar.js</span>
     </div>
-    <p class="cat-desc">元本＋運用収益の積み上げ棒グラフ。ホバーでツールチップ表示。NISA・iDeCo シミュレーター等で使用。</p>
+    <p class="cat-desc">元本＋運用収益の積み上げ棒グラフ。ホバーでツールチップ表示。<code>drawStackedBarChart</code> のオプション <code>animate: true</code> で左から右へ棒が伸びるアニメーション（<code>duration</code> はミリ秒、既定 700）。NISA・iDeCo シミュレーター等で使用。</p>
     <div class="preview col" style="max-width:640px;">
       <div class="canvasWrap" style="padding:12px 0;">
         <canvas id="cat-stacked-bar-demo" width="600" height="280" aria-label="積み上げ棒グラフデモ" style="width:100%;height:280px;background:var(--mint-pale);border:1px solid var(--sys-border);border-radius:14px;display:block;"></canvas>
@@ -1243,7 +1268,11 @@ document.getElementById('confettiBig').addEventListener('click', () => fireConfe
       total,
     });
   }
-  drawStackedBarChart('cat-stacked-bar-demo', demoData, { tooltipId: 'cat-stacked-bar-tooltip' });
+  drawStackedBarChart('cat-stacked-bar-demo', demoData, {
+    tooltipId: 'cat-stacked-bar-tooltip',
+    animate: true,
+    duration: 700,
+  });
 })();
 
 // ── サイドバーアクティブリンク（IntersectionObserver） ──

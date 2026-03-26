@@ -1312,6 +1312,76 @@ body > h1:first-of-type + p,
 }
 
 /* ══════════════════════════════════════════
+   ds-explain-panel
+   用語・考え方の短い説明（ds-resident-savings と同系の枠・Mint系）
+   インフレ実質額の説明などに使用
+══════════════════════════════════════════ */
+.ds-explain-panel {
+  display: block;
+  background: rgba(168,213,186,0.12);
+  border: 1.5px solid rgba(74,140,111,0.22);
+  border-radius: 16px;
+  padding: 18px 20px 20px;
+  margin-top: 16px;
+  animation: fadeInUp 0.35s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+.ds-explain-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ds-explain-head-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.ds-explain-head-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-deep);
+  letter-spacing: 0.04em;
+  flex: 1;
+  line-height: 1.35;
+}
+.ds-explain-badge {
+  font-size: 10px;
+  background: rgba(74,140,111,0.12);
+  color: var(--accent-deep);
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ds-explain-body {
+  font-size: clamp(0.78rem, 2.2vw, 0.88rem);
+  color: var(--text-main);
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+}
+.ds-explain-body p {
+  margin: 0;
+}
+.ds-explain-body p + p {
+  margin-top: 7px;
+}
+.ds-explain-body strong {
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+.ds-explain-note {
+  font-size: 11px;
+  color: var(--sub-text);
+  line-height: 1.65;
+  border-top: 1px dashed rgba(74,140,111,0.3);
+  padding-top: 9px;
+  margin-top: 10px;
+  letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════
    ds-period-strip
    内訳ブロック上部 月間／年間 切り替えストリップ
 ══════════════════════════════════════════ */
